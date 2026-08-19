@@ -47,4 +47,17 @@ public class UpdateVersionTests
         // Genau diese Bedingung entscheidet im Dienst ueber "Update verfuegbar".
         Assert.Equal(istNeuer, latest > current);
     }
+
+    [Theory]
+    [InlineData(0, 2, 0, 0, "0.2.0")]
+    [InlineData(1, 0, 0, 7, "1.0.0")]
+    [InlineData(1, 2, 3, 0, "1.2.3")]
+    public void VersionenWerdenDreistelligAngezeigt(int a, int b, int c, int d, string erwartet) =>
+        // Die vierte Stelle stammt aus der Assembly-Version und sagt nichts aus -
+        // "Version 0.2.0.0 ist aktuell" verwirrt nur.
+        Assert.Equal(erwartet, UpdateCheckResult.Anzeigen(new Version(a, b, c, d)));
+
+    [Fact]
+    public void ZweistelligeVersionenBleibenUnveraendert() =>
+        Assert.Equal("1.2", UpdateCheckResult.Anzeigen(new Version(1, 2)));
 }

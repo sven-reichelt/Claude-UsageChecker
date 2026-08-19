@@ -77,7 +77,8 @@ public sealed class GitHubReleaseUpdateService(
                 Status = UpdateCheckStatus.UpdateAvailable,
                 AvailableVersion = latest,
                 ReleasePage = page,
-                Message = $"Version {latest} ist verfuegbar (installiert: {currentVersion})."
+                Message = $"Version {UpdateCheckResult.Anzeigen(latest)} ist verfuegbar "
+                          + $"(installiert: {UpdateCheckResult.Anzeigen(currentVersion)})."
             };
         }
         catch (Exception ex) when (ex is HttpRequestException or JsonException or TaskCanceledException)

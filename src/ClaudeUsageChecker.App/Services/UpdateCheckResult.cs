@@ -20,8 +20,18 @@ public sealed record UpdateCheckResult
     {
         Status = UpdateCheckStatus.UpToDate,
         AvailableVersion = current,
-        Message = $"Version {current} ist aktuell."
+        Message = $"Version {Anzeigen(current)} ist aktuell."
     };
+
+    /// <summary>
+    /// Kuerzt auf drei Stellen. Assembly-Versionen haben immer vier, deren
+    /// letzte hier nichts aussagt - "0.2.0.0" verwirrt nur.
+    /// </summary>
+    internal static string Anzeigen(Version version)
+    {
+        ArgumentNullException.ThrowIfNull(version);
+        return version.Build >= 0 ? version.ToString(3) : version.ToString();
+    }
 
     /// <summary>Es gibt (noch) keine Veroeffentlichung, gegen die geprueft werden koennte.</summary>
     public static UpdateCheckResult Unavailable(string reason) => new()

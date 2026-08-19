@@ -5,6 +5,11 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unveröffentlicht]
 
+### Behoben
+- Versionen werden dreistellig angezeigt. Die vierte Stelle stammt aus der
+  Assembly-Version und sagt nichts aus – „Version 0.2.0.0 ist aktuell"
+  verwirrte nur.
+
 ## [0.2.0] – 2026-08-19
 
 Erste Veröffentlichung. Eigenständige Einzeldatei für Windows x64, 21 MB,
