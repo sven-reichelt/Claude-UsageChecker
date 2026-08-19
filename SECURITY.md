@@ -38,6 +38,33 @@ Zwei getrennte Einträge:
 Die Einstellungsdatei `%LOCALAPPDATA%\ClaudeUsageChecker\settings.json` enthält
 ausschließlich Verhaltenseinstellungen und niemals Geheimnisse.
 
+### 2a. Was die Anwendung wo ablegt – vollständig
+
+| Ort | Inhalt | Bleibt nach Deinstallation |
+| --- | --- | --- |
+| Anmeldeinformationsverwaltung, `ClaudeUsageChecker:OAuth` | eigene Anmeldung (Access- und Refresh-Token) | ja |
+| Anmeldeinformationsverwaltung, `ClaudeUsageChecker:OAuthToken` | von Hand hinterlegtes Einzeltoken | ja |
+| `%LOCALAPPDATA%\ClaudeUsageChecker\settings.json` | Verhaltenseinstellungen, keine Geheimnisse | ja |
+| `%LOCALAPPDATA%\ClaudeUsageChecker\crash.log` | lokale Fehlerberichte | ja |
+| `%USERPROFILE%\ClaudeUsageChecker\` | die Anwendung selbst, nach Einrichtung | ja |
+| `HKCU\…\CurrentVersion\Run`, Wert `ClaudeUsageChecker` | Autostart-Eintrag | ja |
+| `%TEMP%\.net\ClaudeUsageChecker\<Kennung>\` | von der .NET-Laufzeit ausgepackte Bibliotheken | wird beim Start aufgeräumt |
+| `%TEMP%\ClaudeUsageChecker-<Kennung>.exe` | Zwischenablage beim Aktualisieren | wird sofort gelöscht |
+| Neben der Exe: `ClaudeUsageChecker.exe.alt` | ersetzte Fassung nach einem Update | wird beim nächsten Start gelöscht |
+
+Der Entpackungsordner ist der einzige Ort, den nicht die Anwendung selbst
+anlegt: Eine komprimierte Einzeldatei kann ihre nativen Bibliotheken nicht aus
+dem Bündel laden, die Laufzeit packt sie deshalb aus. Da die Kennung am Inhalt
+hängt, bekäme jede Fassung einen eigenen Ordner – rund 16 MB, die sich mit
+jedem Update sammelten. Die Anwendung räumt die Ordner früherer Fassungen
+deshalb selbst weg.
+
+Zum vollständigen Entfernen genügen die Zeilen der Tabelle; es gibt keine
+weiteren Ablagen, keine Datenbank und keine Spuren in anderen Profilen.
+
+**Nichts davon verlässt den Rechner.** Es gibt keine Telemetrie, keine
+Nutzungsstatistik und keine Übermittlung von Fehlerberichten.
+
 ### 3. Fremde Anmeldedaten werden nur gelesen, eigene selbst verwaltet
 
 Hier ist streng zu trennen:

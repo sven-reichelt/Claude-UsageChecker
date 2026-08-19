@@ -117,6 +117,15 @@ public partial class App : Application, IDisposable
                 "Aktualisierungspruefung beim Start", () => CheckForUpdatesAsync(announceUpToDate: false));
         }
 
+        // Erst wenn die nativen Bibliotheken geladen sind, laesst sich der
+        // eigene Entpackungsordner erkennen - vorher raeumte die Anwendung
+        // entweder nichts oder sich selbst weg.
+        ErrorGuard.Forget("Temporaerdateien aufraeumen", async () =>
+        {
+            await Task.Delay(TimeSpan.FromSeconds(15)).ConfigureAwait(false);
+            TempCleanup.RaeumeAlteEntpackungenWeg();
+        });
+
         if (SelfInstaller.ShouldOffer && !_settings.InstallPromptShown)
         {
             ErrorGuard.Run("Einrichtung anbieten", ShowInstallPrompt);

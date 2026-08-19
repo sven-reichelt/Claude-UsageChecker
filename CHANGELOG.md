@@ -5,6 +5,20 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unveröffentlicht]
 
+## [0.4.1] – 2026-08-19
+
+### Behoben
+- Die Entpackungsordner früherer Fassungen blieben im Temporärverzeichnis
+  liegen. Eine komprimierte Einzeldatei kann ihre nativen Bibliotheken nicht
+  aus dem Bündel laden – die .NET-Laufzeit packt sie nach
+  `%TEMP%.netClaudeUsageChecker<Kennung>` aus, und da die Kennung am Inhalt
+  hängt, bekam jede Version einen eigenen Ordner. Rund 16 MB je Update, die
+  sich unbegrenzt sammelten. Die Anwendung räumt sie jetzt selbst weg.
+
+### Dokumentation
+- [SECURITY.md](SECURITY.md) listet vollständig auf, was die Anwendung wo
+  ablegt und was nach einer Deinstallation zurückbliebe.
+
 ## [0.4.0] – 2026-08-19
 
 ### Hinzugefügt
