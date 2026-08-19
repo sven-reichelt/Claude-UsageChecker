@@ -15,6 +15,7 @@ using ClaudeUsageChecker.App.Tray;
 using ClaudeUsageChecker.App.Views;
 using ClaudeUsageChecker.Core.Api;
 using ClaudeUsageChecker.Core.Authentication;
+using ClaudeUsageChecker.Core.Authentication.OAuth;
 using ClaudeUsageChecker.Core.Configuration;
 using ClaudeUsageChecker.Core.Platform;
 using ClaudeUsageChecker.Core.Services;
@@ -33,10 +34,14 @@ public partial class App : Application, IDisposable
     private AppSettings _settings = new();
     private HttpClient? _usageHttpClient;
     private HttpClient? _updateHttpClient;
+    private HttpClient? _oauthHttpClient;
     private UsageMonitor? _monitor;
     private TrayIconController? _tray;
     private DetailsWindow? _detailsWindow;
     private IUpdateService? _updateService;
+    private AnthropicOAuthClient? _oauthClient;
+    private OAuthTokenStore? _oauthTokenStore;
+    private OAuthTokenProvider? _oauthTokenProvider;
 
     public override void Initialize() => AvaloniaXamlLoader.Load(this);
 
@@ -64,6 +69,13 @@ public partial class App : Application, IDisposable
             BaseAddress = options.BaseAddress,
             Timeout = options.Timeout
         };
+
+        // Die eigene Anmeldung bekommt einen eigenen HttpClient: Sie spricht mit
+        // console.anthropic.com, nicht mit der Basisadresse des Nutzungsabrufs.
+        _oauthHttpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
+        _oauthClient = new AnthropicOAuthClient(_oauthHttpClient);
+        _oauthTokenStore = new OAuthTokenStore(_secretStore);
+        _oauthTokenProvider = new OAuthTokenProvider(_oauthTokenStore, _oauthClient);
 
         var apiClient = new AnthropicUsageApiClient(_usageHttpClient, BuildTokenProviders(), options);
 
@@ -100,11 +112,14 @@ public partial class App : Application, IDisposable
     }
 
     /// <summary>
-    /// Reihenfolge der Tokenquellen: eigenes Langzeit-Token zuerst, danach die
-    /// Umgebungsvariable, zuletzt die Anmeldedaten der Claude-Code-CLI.
+    /// Reihenfolge der Tokenquellen: die eigene Anmeldung zuerst, danach ein von
+    /// Hand hinterlegtes Token, die Umgebungsvariable und zuletzt die
+    /// Anmeldedaten der Claude-Code-CLI. Lehnt die API eine Quelle ab, rueckt
+    /// der Abruf zur naechsten vor.
     /// </summary>
     private List<ITokenProvider> BuildTokenProviders() =>
     [
+        _oauthTokenProvider!,
         new SecretStoreTokenProvider(_secretStore),
         new EnvironmentTokenProvider(),
         new ClaudeCliTokenProvider()
@@ -151,11 +166,31 @@ public partial class App : Application, IDisposable
     private void ShowSettings()
     {
         var validator = new TokenValidator(_usageHttpClient!);
-        var window = new SettingsWindow(_secretStore, _settingsStore, _settings, token => validator.ValidateAsync(token));
+        var window = new SettingsWindow(
+            _secretStore,
+            _settingsStore,
+            _settings,
+            token => validator.ValidateAsync(token),
+            _oauthTokenStore);
+
         window.SettingsChanged += (_, settings) =>
         {
             _settings = settings;
             ErrorGuard.Forget("Abruf nach Einstellungsaenderung", RefreshAsync);
+        };
+        window.SignInRequested += (_, _) => ErrorGuard.Run("Anmeldung oeffnen", () => ShowSignIn(window));
+
+        window.Show();
+        window.Activate();
+    }
+
+    private void ShowSignIn(SettingsWindow owner)
+    {
+        var window = new SignInWindow(_oauthClient, _oauthTokenStore);
+        window.SignedIn += (_, _) =>
+        {
+            owner.RefreshSignInStatus();
+            ErrorGuard.Forget("Abruf nach Anmeldung", RefreshAsync);
         };
         window.Show();
         window.Activate();
@@ -227,13 +262,17 @@ public partial class App : Application, IDisposable
     {
         _tray?.Dispose();
         _monitor?.DisposeAsync().AsTask().GetAwaiter().GetResult();
+        _oauthTokenProvider?.Dispose();
         _usageHttpClient?.Dispose();
         _updateHttpClient?.Dispose();
+        _oauthHttpClient?.Dispose();
 
         _tray = null;
         _monitor = null;
+        _oauthTokenProvider = null;
         _usageHttpClient = null;
         _updateHttpClient = null;
+        _oauthHttpClient = null;
     }
 
     /// <summary>Gibt alle Ressourcen frei. Wird beim Beenden der Anwendung aufgerufen.</summary>

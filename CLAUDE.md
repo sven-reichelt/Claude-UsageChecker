@@ -70,3 +70,13 @@ kommentarlos. Neue Handler deshalb immer über `ErrorGuard.Run` bzw.
 Sitzung und Wochenlimit; alle weiteren Limits stehen im Kontextmenü. Wer die
 Tooltip-Texte erweitert, prüft `ToTooltip_BleibtInnerhalbDerWindowsGrenze` mit –
 der Test rechnet bewusst mit dem ungünstigsten Fall.
+
+**Fremde und eigene Anmeldedaten strikt trennen.** Das Token von Claude Code
+wird ausschließlich gelesen und nie erneuert (rotierende Refresh-Tokens würden
+dessen Anmeldung entwerten). Das eigene OAuth-Token dagegen verwaltet die
+Anwendung vollständig samt Erneuerung. Getrennte Einträge im Secret-Store,
+niemals vermischen.
+
+**Beim OAuth-Fluss bleibt es bei `user:profile`.** Mehr braucht die Anwendung
+nicht, und mehr anzufordern hieße, sich Rechte am Konto zu nehmen, die sie nie
+gebraucht. `DerAngeforderteGeltungsbereichBleibtBeimNoetigenMinimum` sichert das ab.

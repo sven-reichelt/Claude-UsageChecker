@@ -86,3 +86,24 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 ### Entfernt
 - `ChainedTokenProvider` – die Reihenfolge der Tokenquellen liegt jetzt beim
   Abruf, weil nur dort auf eine Ablehnung durch die API reagiert werden kann.
+
+### Hinzugefügt
+- **Eigene Anmeldung per OAuth mit PKCE.** Die Anwendung kann sich ein eigenes
+  Zugriffsrecht holen und ist damit unabhängig von einer laufenden
+  Claude-Code-Installation – das ursprüngliche Projektziel, das über
+  `claude setup-token` nicht erreichbar war.
+  - Angefordert wird ausschließlich `user:profile`. Ausdrücklich nicht
+    `user:inference` und nicht `org:create_api_key`.
+  - PKCE nach RFC 7636 mit S256; Verifier und `state` je Vorgang neu erzeugt.
+    Ein Code aus einem fremden Vorgang wird erkannt und gar nicht abgeschickt.
+  - Ohne lokalen Webserver: Der Code wird von Hand eingefügt statt über eine
+    Rückleitung auf `localhost` entgegengenommen. Kein offener Port.
+  - Das eigene Token wird selbsttätig erneuert, bevor es abläuft. Anders als
+    beim mitgelesenen Token ist das hier zulässig – es entwertet keine fremde
+    Anmeldung. Getrennter Eintrag `ClaudeUsageChecker:OAuth` im Secret-Store.
+- Anmeldefenster mit Führung durch beide Schritte, Anmeldezustand und
+  Abmelden in den Einstellungen.
+
+### Geändert
+- Reihenfolge der Tokenquellen: eigene Anmeldung, hinterlegtes Token,
+  Umgebungsvariable, Claude Code.

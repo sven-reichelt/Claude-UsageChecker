@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using ClaudeUsageChecker.App.Services;
 using ClaudeUsageChecker.App.Settings;
 using ClaudeUsageChecker.Core.Authentication;
+using ClaudeUsageChecker.Core.Authentication.OAuth;
 using ClaudeUsageChecker.Core.Platform;
 
 namespace ClaudeUsageChecker.App.Views;
@@ -19,6 +20,7 @@ public partial class SettingsWindow : Window
     private readonly ISecretStore _secretStore;
     private readonly SettingsStore _settingsStore;
     private readonly Func<string, Task<TokenValidationResult>>? _validateToken;
+    private readonly OAuthTokenStore? _oauthTokenStore;
     private AppSettings _settings;
 
     public SettingsWindow() : this(SecretStoreFactory.CreateForCurrentPlatform(), new SettingsStore(), new AppSettings())
@@ -29,12 +31,14 @@ public partial class SettingsWindow : Window
         ISecretStore secretStore,
         SettingsStore settingsStore,
         AppSettings settings,
-        Func<string, Task<TokenValidationResult>>? validateToken = null)
+        Func<string, Task<TokenValidationResult>>? validateToken = null,
+        OAuthTokenStore? oauthTokenStore = null)
     {
         _secretStore = secretStore;
         _settingsStore = settingsStore;
         _settings = settings;
         _validateToken = validateToken;
+        _oauthTokenStore = oauthTokenStore;
 
         InitializeComponent();
 
@@ -47,10 +51,58 @@ public partial class SettingsWindow : Window
 
         SaveTokenButton.Click += (_, _) => SaveToken();
         DeleteTokenButton.Click += (_, _) => DeleteToken();
+        SignInButton.Click += (_, _) => SignInRequested?.Invoke(this, EventArgs.Empty);
+        SignOutButton.Click += (_, _) => SignOut();
         SaveButton.Click += (_, _) => SaveAndClose();
         CancelButton.Click += (_, _) => Close();
 
         UpdateTokenStatus();
+        UpdateSignInStatus();
+    }
+
+    /// <summary>Der Nutzer moechte die eigene Anmeldung starten.</summary>
+    public event EventHandler? SignInRequested;
+
+    /// <summary>Aktualisiert die Anzeige der eigenen Anmeldung von aussen.</summary>
+    public void RefreshSignInStatus() => UpdateSignInStatus();
+
+    private void UpdateSignInStatus()
+    {
+        if (_oauthTokenStore is not { IsSupported: true })
+        {
+            SignInStatus.Text = "Auf diesem System steht kein sicherer Speicher zur Verfuegung.";
+            SignInButton.IsEnabled = false;
+            SignOutButton.IsEnabled = false;
+            return;
+        }
+
+        var tokens = _oauthTokenStore.Read();
+        SignInStatus.Text = tokens is null
+            ? "Nicht angemeldet. Ohne eigene Anmeldung wird das Token einer laufenden "
+              + "Claude-Code-Installation mitgelesen."
+            : $"Angemeldet. Rechte: {tokens.Scope ?? "unbekannt"}. "
+              + $"Token gueltig bis {tokens.ExpiresAt?.ToLocalTime():g} und wird selbsttaetig erneuert.";
+
+        SignOutButton.IsEnabled = tokens is not null;
+    }
+
+    private void SignOut()
+    {
+        if (_oauthTokenStore is null)
+        {
+            return;
+        }
+
+        try
+        {
+            _oauthTokenStore.Clear();
+            UpdateSignInStatus();
+            SettingsChanged?.Invoke(this, _settings);
+        }
+        catch (InvalidOperationException ex)
+        {
+            SignInStatus.Text = ex.Message;
+        }
     }
 
     /// <summary>Wird ausgeloest, wenn Einstellungen oder Token geaendert wurden.</summary>

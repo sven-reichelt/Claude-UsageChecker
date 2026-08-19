@@ -1,0 +1,42 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="ClaudeUsageChecker.App.Views.SignInWindow"
+        Title="Claude UsageChecker - Anmelden"
+        Width="500" SizeToContent="Height"
+        CanResize="False"
+        WindowStartupLocation="CenterScreen">
+
+  <StackPanel Margin="20" Spacing="16">
+
+    <TextBlock Text="Eigene Anmeldung" FontWeight="SemiBold" FontSize="15" />
+
+    <TextBlock TextWrapping="Wrap" FontSize="12" Opacity="0.85"
+               Text="Damit erhält die Anwendung ein eigenes Zugriffsrecht und ist nicht mehr darauf angewiesen, das Token einer laufenden Claude-Code-Installation mitzulesen. Angefordert wird ausschließlich das Recht, den Nutzungsstand zu lesen (user:profile)." />
+
+    <Border Background="{DynamicResource SystemControlBackgroundBaseLowBrush}" CornerRadius="4" Padding="12">
+      <StackPanel Spacing="8">
+        <TextBlock Text="1. Seite öffnen und Freigabe erteilen" FontWeight="Medium" FontSize="12" />
+        <Button x:Name="OpenBrowserButton" Content="Anmeldeseite im Browser öffnen" HorizontalAlignment="Left" />
+        <TextBlock x:Name="UrlHint" TextWrapping="Wrap" FontSize="11" Opacity="0.7"
+                   Text="Öffnet claude.ai. Falls sich der Browser nicht öffnet, lässt sich die Adresse hier kopieren." />
+        <TextBox x:Name="UrlBox" IsReadOnly="True" FontSize="10" MaxHeight="60" TextWrapping="Wrap" />
+      </StackPanel>
+    </Border>
+
+    <Border Background="{DynamicResource SystemControlBackgroundBaseLowBrush}" CornerRadius="4" Padding="12">
+      <StackPanel Spacing="8">
+        <TextBlock Text="2. Angezeigten Code hier einfügen" FontWeight="Medium" FontSize="12" />
+        <TextBox x:Name="CodeBox" Watermark="Code von der Anthropic-Seite" />
+        <Button x:Name="CompleteButton" Content="Anmeldung abschließen" HorizontalAlignment="Left" />
+      </StackPanel>
+    </Border>
+
+    <TextBlock x:Name="StatusText" TextWrapping="Wrap" FontSize="12" />
+
+    <Grid ColumnDefinitions="*,Auto">
+      <TextBlock x:Name="SignedInText" FontSize="11" Opacity="0.7" VerticalAlignment="Center" />
+      <Button Grid.Column="1" x:Name="CloseButton" Content="Schließen" />
+    </Grid>
+
+  </StackPanel>
+</Window>

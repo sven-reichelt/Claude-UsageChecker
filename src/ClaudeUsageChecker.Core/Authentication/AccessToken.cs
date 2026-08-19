@@ -42,6 +42,9 @@ public enum TokenSource
     /// <summary>Umgebungsvariable CLAUDE_CODE_OAUTH_TOKEN.</summary>
     Environment,
 
+    /// <summary>Eigene Anmeldung dieser Anwendung ueber OAuth mit PKCE.</summary>
+    OAuth,
+
     /// <summary>Vom Nutzer hinterlegtes Langzeit-Token aus dem Secret-Store des Betriebssystems.</summary>
     SecretStore,
 

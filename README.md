@@ -6,7 +6,8 @@ Ein Zeiger auf das Symbol genügt: Sitzung und Wochenlimit stehen mit Auslastung
 Reset-Uhrzeit und Restzeit im Tooltip. Das Kontextmenü listet **alle** gemeldeten
 Limits auf, ein Klick öffnet die Detailansicht mit Fortschrittsbalken.
 
-macOS (Menüleiste) ist vorbereitet, aber noch nicht umgesetzt – siehe [Roadmap](#roadmap).
+Mit eigener Anmeldung läuft sie unabhängig von Claude Code. macOS (Menüleiste)
+ist vorbereitet, aber noch nicht umgesetzt – siehe [Roadmap](#roadmap).
 
 ## Funktionsumfang
 
@@ -21,6 +22,7 @@ macOS (Menüleiste) ist vorbereitet, aber noch nicht umgesetzt – siehe [Roadma
 | Token verschlüsselt in der Windows-Anmeldeinformationsverwaltung | ✅ |
 | Autostart mit Windows | ✅ |
 | Nur eine Instanz je Anmeldesitzung | ✅ |
+| Eigene Anmeldung per OAuth mit PKCE – unabhängig von Claude Code | ✅ |
 | Aktualisierungsprüfung über GitHub-Releases | ✅ |
 | macOS-Menüleiste | 🚧 geplant |
 
@@ -91,18 +93,36 @@ dotnet build
 dotnet run --project src/ClaudeUsageChecker.App
 ```
 
-### Token
+### Anmelden (empfohlen)
 
-Es genügt, in Claude Code angemeldet zu sein. Die Anwendung liest das Token mit;
-ein eigener Einrichtungsschritt ist nicht nötig.
+**Einstellungen → Anmelden …** startet einen eigenen OAuth-Vorgang mit PKCE.
+Damit erhält die Anwendung ein eigenes Zugriffsrecht und braucht keine laufende
+Claude-Code-Installation mehr:
 
-Die Quellen werden der Reihe nach durchprobiert:
+1. Auf **Anmeldeseite im Browser öffnen** klicken – die Freigabe erfolgt auf
+   claude.ai.
+2. Den dort angezeigten Code in das Feld einfügen und **Anmeldung abschließen**.
+
+Angefordert wird ausschließlich `user:profile` – das Recht, den Nutzungsstand zu
+lesen. Ausdrücklich **nicht** das Recht, Anfragen im Namen des Kontos zu stellen
+oder API-Schlüssel anzulegen. Das Token wird verschlüsselt abgelegt und läuft
+selbsttätig weiter; ein erneutes Anmelden ist nicht nötig.
+
+Bewusst ohne lokalen Webserver: Der Code wird von Hand eingefügt, statt über
+eine Rückleitung auf `localhost` entgegengenommen zu werden. So öffnet die
+Anwendung keinen Port.
+
+### Ohne Anmeldung
+
+Auch ohne eigenen Anmeldevorgang funktioniert die Anwendung, solange Claude Code
+angemeldet ist. Die Quellen werden der Reihe nach durchprobiert:
 
 | Reihenfolge | Quelle | Anmerkung |
 | --- | --- | --- |
-| 1 | Windows-Anmeldeinformationsverwaltung | eigenes Token, verschlüsselt abgelegt |
-| 2 | Umgebungsvariable `CLAUDE_CODE_OAUTH_TOKEN` | vor allem für Entwicklung |
-| 3 | `%USERPROFILE%\.claude\.credentials.json` | Token von Claude Code |
+| 1 | Eigene Anmeldung (`ClaudeUsageChecker:OAuth`) | empfohlen, erneuert sich selbst |
+| 2 | Von Hand hinterlegtes Token | Sonderfall, muss `user:profile` tragen |
+| 3 | Umgebungsvariable `CLAUDE_CODE_OAUTH_TOKEN` | vor allem für Entwicklung |
+| 4 | `%USERPROFILE%\.claude\.credentials.json` | Token von Claude Code |
 
 Wird ein Token von der API abgelehnt, rückt die Anwendung zur nächsten Quelle
 vor. Eine untaugliche Quelle legt sie also nicht lahm.
@@ -115,9 +135,16 @@ vor. Eine untaugliche Quelle legt sie also nicht lahm.
 > Die Einstellungen prüfen ein eingegebenes Token deshalb vor dem Speichern und
 > lehnen es mit dieser Begründung ab. Getestet am 19.08.2026.
 
-Quelle 3 wird **nur gelesen**. Die Anwendung erneuert niemals ein Token und
-schreibt nichts in die Anmeldedaten von Claude Code zurück – siehe
-[SECURITY.md](SECURITY.md).
+Quelle 4 wird **nur gelesen**. Die Anwendung erneuert dieses Token nie und
+schreibt nichts in die Anmeldedaten von Claude Code zurück. Das eigene Token
+verwaltet sie dagegen vollständig – siehe [SECURITY.md](SECURITY.md).
+
+> **Hinweis zur Client-ID.** Der Anmeldevorgang nutzt die öffentlich bekannte
+> OAuth-Client-ID von Claude Code, da Anthropic keine Registrierung eigener
+> Anwendungen anbietet. Es werden also ausschließlich eigene Kontodaten mit
+> eigener Freigabe abgerufen, die Anwendung meldet sich gegenüber dem
+> Autorisierungsserver aber als Claude Code an. Das ist kein offiziell
+> unterstützter Weg und kann sich jederzeit ändern.
 
 ## Projektstruktur
 
@@ -126,7 +153,7 @@ Claude-UsageChecker/
 ├── src/
 │   ├── ClaudeUsageChecker.Core/     Plattformunabhängige Logik
 │   │   ├── Api/                     HTTP-Client für /api/oauth/usage
-│   │   ├── Authentication/          Tokenquellen und Fallback-Kette
+│   │   ├── Authentication/          Tokenquellen, darin OAuth/ für den eigenen Fluss
 │   │   ├── Configuration/           Optionen und JSON-Kontext
 │   │   ├── Formatting/              Tooltip- und Detailtexte
 │   │   ├── Models/                  Domänenmodell und API-DTOs
@@ -136,7 +163,7 @@ Claude-UsageChecker/
 │       ├── Services/                Aktualisierung, Autostart
 │       ├── Settings/                Benutzereinstellungen
 │       ├── Tray/                    Infobereich-Symbol und Menü
-│       └── Views/                   Detail- und Einstellungsfenster
+│       └── Views/                   Detail-, Einstellungs- und Anmeldefenster
 ├── tests/
 │   ├── ClaudeUsageChecker.Core.Tests/   Logik, Formatierung, Tokenkette
 │   └── ClaudeUsageChecker.App.Tests/    Kopflose UI-Tests (Avalonia.Headless)
