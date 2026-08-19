@@ -59,10 +59,13 @@ public static class DurationFormatter
         return dayDifference switch
         {
             0 => localReset.ToString("t", culture),
+            // Bewusst die Abkuerzung und nicht den kuerzestmoeglichen Namen:
+            // Letzterer ist im Deutschen ein einzelner Buchstabe und damit
+            // mehrdeutig - "S" stuende fuer Samstag wie fuer Sonntag.
             >= 1 and <= 6 => string.Format(
                 culture,
                 "{0} {1}",
-                culture.DateTimeFormat.GetShortestDayName(localReset.DayOfWeek),
+                culture.DateTimeFormat.GetAbbreviatedDayName(localReset.DayOfWeek),
                 localReset.ToString("t", culture)),
             _ => string.Format(culture, "{0} {1}", localReset.ToString("d", culture), localReset.ToString("t", culture))
         };

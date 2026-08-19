@@ -42,8 +42,30 @@ public class FormatterTests
         var text = DurationFormatter.ToResetMoment(reset, now, CultureInfo.InvariantCulture);
 
         var expectedDay = CultureInfo.InvariantCulture.DateTimeFormat
-            .GetShortestDayName(reset.DayOfWeek);
+            .GetAbbreviatedDayName(reset.DayOfWeek);
         Assert.StartsWith(expectedDay, text, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Der kuerzestmoegliche Wochentagsname ist im Deutschen ein einzelner
+    /// Buchstabe: "S" stuende fuer Samstag wie fuer Sonntag, "D" fuer Dienstag
+    /// wie fuer Donnerstag. Eine solche Angabe waere wertlos.
+    /// </summary>
+    [Fact]
+    public void ToResetMoment_VerwendetKeineMehrdeutigeWochentagsabkuerzung()
+    {
+        var german = new CultureInfo("de-DE");
+        var now = new DateTimeOffset(2026, 4, 11, 5, 0, 0, TimeSpan.Zero).ToLocalTime();
+
+        var namesUsed = new List<string>();
+        for (var offset = 1; offset <= 6; offset++)
+        {
+            var text = DurationFormatter.ToResetMoment(now.AddDays(offset), now, german);
+            namesUsed.Add(text.Split(' ')[0]);
+        }
+
+        Assert.All(namesUsed, name => Assert.True(name.Length >= 2, $"'{name}' ist zu kurz."));
+        Assert.Equal(namesUsed.Count, namesUsed.Distinct(StringComparer.Ordinal).Count());
     }
 
     [Fact]

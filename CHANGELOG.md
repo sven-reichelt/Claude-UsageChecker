@@ -57,6 +57,11 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
   Fortschrittsbalken und verbrauchten Credits, sofern das Abo es meldet. Die
   Werte wurden bislang abgerufen, aber nirgends angezeigt.
 
+### Behoben
+- Der Wochentag im Tooltip war mehrdeutig: `GetShortestDayName` liefert im
+  Deutschen einen einzelnen Buchstaben, sodass „S" für Samstag wie für Sonntag
+  stand. Jetzt wird die Abkürzung verwendet („So 02:59").
+
 ### Entfernt
 - `DisabledUpdateService` – der Platzhalter für das private Repository hat keinen
   Aufrufer mehr.
