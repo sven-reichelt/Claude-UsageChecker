@@ -1,0 +1,52 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="ClaudeUsageChecker.App.Views.AboutWindow"
+        Width="380" SizeToContent="Height"
+        CanResize="False"
+        WindowStartupLocation="CenterScreen"
+        SystemDecorations="None"
+        Background="Transparent">
+
+  <Border Padding="20"
+          Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+          BorderBrush="{DynamicResource AccentBrush}"
+          BorderThickness="1"
+          CornerRadius="6">
+    <StackPanel Spacing="12" HorizontalAlignment="Stretch">
+
+      <Image x:Name="LogoImage" Width="72" Height="72" HorizontalAlignment="Center" />
+
+      <StackPanel Spacing="2">
+        <TextBlock Text="Claude UsageChecker" FontWeight="SemiBold" FontSize="16"
+                   HorizontalAlignment="Center"
+                   Foreground="{DynamicResource AccentBrush}" />
+        <TextBlock x:Name="VersionText" FontSize="12" Opacity="0.75"
+                   HorizontalAlignment="Center" />
+      </StackPanel>
+
+      <TextBlock x:Name="DescriptionText" TextWrapping="Wrap" FontSize="12" TextAlignment="Center" />
+
+      <!-- Stacked and full width: with a 380 pixel window some 340 remain after
+           the margins, and the labels need considerably more side by side. See
+           AboutWindowTests. -->
+      <StackPanel Spacing="6">
+        <Button x:Name="RepositoryButton"
+                HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+        <Button x:Name="ReleaseNotesButton"
+                HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+      </StackPanel>
+
+      <TextBlock x:Name="RepositoryText" FontSize="11" Opacity="0.6"
+                 HorizontalAlignment="Center" TextWrapping="Wrap" />
+
+      <Separator />
+
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock x:Name="LicenseText" FontSize="11" Opacity="0.6"
+                   VerticalAlignment="Center" TextWrapping="Wrap" />
+        <Button Grid.Column="1" x:Name="CloseButton" IsDefault="True" />
+      </Grid>
+
+    </StackPanel>
+  </Border>
+</Window>
