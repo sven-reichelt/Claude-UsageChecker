@@ -124,6 +124,16 @@ Geltungsbereich und der Nutzungsendpunkt nimmt das Token an.
 Die Erneuerung wurde gegen den echten Server geprüft und liefert ein frisches
 Tokenpaar mit unverändertem Geltungsbereich.
 
+### Unabhängigkeit im Feld bestätigt
+
+Am 19.08.2026 auf einem Rechner **ohne Claude-Code-Installation** durchgespielt:
+Vor der Anmeldung graues Symbol und der Hinweis auf ein fehlendes Token, nach
+der Anmeldung der vollständige Nutzungsstand. Da dort kein fremdes Token zu
+finden war, kann die Anzeige nur über die eigene Anmeldung gelaufen sein.
+
+Damit ist die Kette geschlossen: Der Weg über `claude setup-token` war
+untauglich, der eigene OAuth-Fluss trägt.
+
 ### Restrisiko
 
 Der Fluss nutzt die öffentlich bekannte Client-ID von Claude Code, weil

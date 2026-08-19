@@ -6,8 +6,9 @@ Ein Zeiger auf das Symbol genügt: Sitzung und Wochenlimit stehen mit Auslastung
 Reset-Uhrzeit und Restzeit im Tooltip. Das Kontextmenü listet **alle** gemeldeten
 Limits auf, ein Klick öffnet die Detailansicht mit Fortschrittsbalken.
 
-Mit eigener Anmeldung läuft sie unabhängig von Claude Code. macOS (Menüleiste)
-ist vorbereitet, aber noch nicht umgesetzt – siehe [Roadmap](#roadmap).
+Mit eigener Anmeldung läuft sie unabhängig von Claude Code – bestätigt auf einem
+Rechner ohne Claude-Code-Installation. macOS (Menüleiste) ist vorbereitet, aber
+noch nicht umgesetzt – siehe [Roadmap](#roadmap).
 
 ## Funktionsumfang
 
