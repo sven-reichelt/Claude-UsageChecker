@@ -22,4 +22,7 @@ public sealed record UsageSnapshot
 
     /// <summary>Lokaler Zeitpunkt des erfolgreichen Abrufs.</summary>
     public required DateTimeOffset RetrievedAt { get; init; }
+
+    /// <summary>Aus welcher Quelle das verwendete Token stammte.</summary>
+    public Authentication.TokenSource TokenSource { get; init; } = Authentication.TokenSource.ClaudeCli;
 }

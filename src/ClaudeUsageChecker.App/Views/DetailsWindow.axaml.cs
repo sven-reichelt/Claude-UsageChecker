@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
+using ClaudeUsageChecker.Core.Authentication;
 using ClaudeUsageChecker.Core.Formatting;
 using ClaudeUsageChecker.Core.Models;
 using ClaudeUsageChecker.Core.Services;
@@ -63,7 +64,11 @@ public partial class DetailsWindow : Window
         RenderMessage(state);
 
         FooterText.Text = state.Snapshot is { } snapshot
-            ? string.Format(CultureInfo.CurrentCulture, "Stand: {0:t}", snapshot.RetrievedAt.ToLocalTime())
+            ? string.Format(
+                CultureInfo.CurrentCulture,
+                "Stand: {0:t} - Quelle: {1}",
+                snapshot.RetrievedAt.ToLocalTime(),
+                QuellenName(snapshot.TokenSource))
             : "Noch keine Daten";
     }
 
@@ -135,15 +140,25 @@ public partial class DetailsWindow : Window
         ExtraUsagePanel.Children.Add(new TextBlock { Text = detail, FontSize = 11, Opacity = 0.7 });
     }
 
+    /// <summary>Sprechender Name der Tokenquelle fuer die Fusszeile.</summary>
+    private static string QuellenName(TokenSource source) => source switch
+    {
+        TokenSource.SecretStore => "hinterlegtes Token",
+        TokenSource.Environment => "Umgebungsvariable",
+        _ => "Claude Code"
+    };
+
     private void RenderMessage(UsageState state)
     {
         var message = state.Kind switch
         {
             UsageStateKind.NotConfigured =>
-                "Kein Token hinterlegt. Bitte in den Einstellungen ein Token aus "
-                + "\"claude setup-token\" eintragen.",
-            UsageStateKind.AuthenticationFailed =>
-                "Das Token wurde abgelehnt. Bitte ein neues Token hinterlegen.",
+                "Kein Token gefunden. Melde dich in Claude Code an (\"claude\" starten und "
+                + "einloggen) - die Anwendung liest das Token dann mit.",
+            // Der Text der Ausnahme unterscheidet bereits zwischen abgelaufenem
+            // Token und fehlendem Geltungsbereich - er ist hier hilfreicher als
+            // eine allgemeine Formulierung.
+            UsageStateKind.AuthenticationFailed => state.Message,
             UsageStateKind.Unavailable => state.Message,
             UsageStateKind.Stale => "Die Anzeige ist veraltet: " + state.Message,
             _ => null

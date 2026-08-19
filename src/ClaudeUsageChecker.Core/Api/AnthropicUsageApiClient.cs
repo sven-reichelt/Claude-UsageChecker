@@ -12,23 +12,80 @@ namespace ClaudeUsageChecker.Core.Api;
 /// <summary>
 /// Ruft GET /api/oauth/usage bei der Anthropic-API ab.
 /// </summary>
+/// <remarks>
+/// Die Tokenquellen werden der Reihe nach durchprobiert - und zwar auch dann,
+/// wenn eine Quelle zwar ein Token liefert, die API dieses aber ablehnt. Das ist
+/// keine Feinheit: Ein Token aus <c>claude setup-token</c> traegt den
+/// Geltungsbereich <c>user:profile</c> nicht und wird hier mit HTTP 403
+/// abgewiesen, obwohl es fuer Inferenz voellig gueltig ist. Ohne dieses
+/// Weiterreichen wuerde ein solches Token die Anwendung lahmlegen, statt nur
+/// selbst zu scheitern.
+/// </remarks>
 public sealed class AnthropicUsageApiClient(
     HttpClient httpClient,
-    ITokenProvider tokenProvider,
+    IReadOnlyList<ITokenProvider> tokenProviders,
     UsageApiOptions? options = null,
     TimeProvider? timeProvider = null,
     ILogger<AnthropicUsageApiClient>? logger = null) : IUsageApiClient
 {
+    private readonly IReadOnlyList<ITokenProvider> _tokenProviders =
+        tokenProviders ?? throw new ArgumentNullException(nameof(tokenProviders));
+
     private readonly UsageApiOptions _options = options ?? new UsageApiOptions();
     private readonly TimeProvider _timeProvider = timeProvider ?? TimeProvider.System;
 
     public async Task<UsageSnapshot> GetUsageAsync(CancellationToken cancellationToken = default)
     {
-        var token = await tokenProvider.TryGetTokenAsync(cancellationToken).ConfigureAwait(false)
-            ?? throw new UsageApiException(
-                "Kein OAuth-Token gefunden. Bitte in den Einstellungen ein Token hinterlegen.",
-                UsageApiFailure.NoToken);
+        UsageApiException? rejection = null;
+        var sawToken = false;
 
+        foreach (var provider in _tokenProviders)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var token = await TryGetTokenAsync(provider, cancellationToken).ConfigureAwait(false);
+            if (token is null)
+            {
+                continue;
+            }
+
+            sawToken = true;
+
+            try
+            {
+                return await FetchAsync(token, cancellationToken).ConfigureAwait(false);
+            }
+            catch (UsageApiException ex) when (ex.Failure == UsageApiFailure.Unauthorized)
+            {
+                // Diese Quelle taugt nicht - die naechste bekommt ihre Chance.
+                logger?.LogWarning("Token aus {Source} wurde abgelehnt: {Message}", provider.Name, ex.Message);
+                rejection = ex;
+            }
+        }
+
+        throw rejection ?? new UsageApiException(
+            sawToken
+                ? "Kein verwendbares Token gefunden."
+                : "Kein OAuth-Token gefunden. Bitte in den Einstellungen ein Token hinterlegen.",
+            UsageApiFailure.NoToken);
+    }
+
+    private async ValueTask<AccessToken?> TryGetTokenAsync(
+        ITokenProvider provider, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await provider.TryGetTokenAsync(cancellationToken).ConfigureAwait(false);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            logger?.LogWarning(ex, "Tokenquelle {Source} nicht verfuegbar.", provider.Name);
+            return null;
+        }
+    }
+
+    private async Task<UsageSnapshot> FetchAsync(AccessToken token, CancellationToken cancellationToken)
+    {
         using var request = BuildRequest(token);
 
         HttpResponseMessage response;
@@ -53,7 +110,7 @@ public sealed class AnthropicUsageApiClient(
 
         using (response)
         {
-            EnsureSuccess(response);
+            await EnsureSuccessAsync(response, cancellationToken).ConfigureAwait(false);
 
             await using var stream = await response.Content
                 .ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
@@ -84,7 +141,7 @@ public sealed class AnthropicUsageApiClient(
                 logger.LogDebug("Nutzungsstand erfolgreich abgerufen (Tokenquelle {Source}).", token.Source);
             }
 
-            return MapToSnapshot(dto, _timeProvider.GetUtcNow());
+            return MapToSnapshot(dto, _timeProvider.GetUtcNow(), token.Source);
         }
     }
 
@@ -98,7 +155,7 @@ public sealed class AnthropicUsageApiClient(
         return request;
     }
 
-    private static void EnsureSuccess(HttpResponseMessage response)
+    private static async Task EnsureSuccessAsync(HttpResponseMessage response, CancellationToken cancellationToken)
     {
         if (response.IsSuccessStatusCode)
         {
@@ -113,7 +170,7 @@ public sealed class AnthropicUsageApiClient(
         throw response.StatusCode switch
         {
             HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden => new UsageApiException(
-                "Das Token wurde abgelehnt. Es ist abgelaufen oder ungueltig.",
+                await DescribeRejectionAsync(response, cancellationToken).ConfigureAwait(false),
                 UsageApiFailure.Unauthorized, response.StatusCode),
 
             HttpStatusCode.TooManyRequests => new UsageApiException(
@@ -130,7 +187,35 @@ public sealed class AnthropicUsageApiClient(
         };
     }
 
-    internal static UsageSnapshot MapToSnapshot(UsageResponseDto dto, DateTimeOffset retrievedAt) => new()
+    /// <summary>
+    /// Unterscheidet ein abgelaufenes Token von einem mit unzureichendem
+    /// Geltungsbereich - fuer den Nutzer ein grosser Unterschied, weil das eine
+    /// eine neue Anmeldung erfordert und das andere ein anderes Token.
+    /// </summary>
+    private static async Task<string> DescribeRejectionAsync(
+        HttpResponseMessage response, CancellationToken cancellationToken)
+    {
+        string body;
+        try
+        {
+            body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            body = string.Empty;
+        }
+
+        if (body.Contains("user:profile", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Dem Token fehlt der Geltungsbereich \"user:profile\". "
+                   + "Tokens aus \"claude setup-token\" taugen nur fuer Inferenz, nicht fuer den Nutzungsstand.";
+        }
+
+        return "Das Token wurde abgelehnt. Es ist abgelaufen oder ungueltig.";
+    }
+
+    internal static UsageSnapshot MapToSnapshot(
+        UsageResponseDto dto, DateTimeOffset retrievedAt, TokenSource tokenSource = TokenSource.ClaudeCli) => new()
     {
         Session = MapWindow(dto.FiveHour),
         Weekly = MapWindow(dto.SevenDay),
@@ -139,7 +224,8 @@ public sealed class AnthropicUsageApiClient(
         ExtraUsage = dto.ExtraUsage is { } extra
             ? new ExtraUsage(extra.IsEnabled, extra.MonthlyLimit, extra.UsedCredits, extra.Utilization)
             : null,
-        RetrievedAt = retrievedAt
+        RetrievedAt = retrievedAt,
+        TokenSource = tokenSource
     };
 
     private static UsageWindow? MapWindow(UsageWindowDto? dto) =>

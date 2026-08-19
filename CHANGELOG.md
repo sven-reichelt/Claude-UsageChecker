@@ -65,3 +65,24 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 ### Entfernt
 - `DisabledUpdateService` – der Platzhalter für das private Repository hat keinen
   Aufrufer mehr.
+
+### Behoben
+- Ein hinterlegtes Token, das die API ablehnt, legte die Anwendung vollständig
+  lahm: Die Tokenkette rückte nur bei einer *leeren* Quelle weiter, nicht bei
+  einer *abgelehnten*. Der Abruf probiert bei HTTP 401/403 nun die nächste
+  Quelle. Konkreter Anlass: Tokens aus `claude setup-token` sind gültig, tragen
+  aber den Geltungsbereich `user:profile` nicht und werden vom Nutzungsendpunkt
+  mit HTTP 403 abgewiesen.
+- Die Fehlermeldung unterscheidet jetzt zwischen abgelaufenem Token und
+  fehlendem Geltungsbereich – für den Nutzer ein großer Unterschied, weil das
+  eine eine neue Anmeldung erfordert und das andere ein anderes Token.
+
+### Hinzugefügt
+- Die Einstellungen prüfen ein eingegebenes Token gegen den Endpunkt, bevor sie
+  es speichern. Ein untaugliches Token gelangt gar nicht erst in den
+  Secret-Store.
+- Die Detailansicht nennt in der Fußzeile die verwendete Tokenquelle.
+
+### Entfernt
+- `ChainedTokenProvider` – die Reihenfolge der Tokenquellen liegt jetzt beim
+  Abruf, weil nur dort auf eine Ablehnung durch die API reagiert werden kann.

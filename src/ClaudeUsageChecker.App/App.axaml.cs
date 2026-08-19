@@ -65,8 +65,7 @@ public partial class App : Application, IDisposable
             Timeout = options.Timeout
         };
 
-        var tokenProvider = new ChainedTokenProvider(BuildTokenProviders());
-        var apiClient = new AnthropicUsageApiClient(_usageHttpClient, tokenProvider, options);
+        var apiClient = new AnthropicUsageApiClient(_usageHttpClient, BuildTokenProviders(), options);
 
         _monitor = new UsageMonitor(apiClient, new MonitorOptions
         {
@@ -151,7 +150,8 @@ public partial class App : Application, IDisposable
 
     private void ShowSettings()
     {
-        var window = new SettingsWindow(_secretStore, _settingsStore, _settings);
+        var validator = new TokenValidator(_usageHttpClient!);
+        var window = new SettingsWindow(_secretStore, _settingsStore, _settings, token => validator.ValidateAsync(token));
         window.SettingsChanged += (_, settings) =>
         {
             _settings = settings;

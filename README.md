@@ -91,26 +91,29 @@ dotnet build
 dotnet run --project src/ClaudeUsageChecker.App
 ```
 
-### Token hinterlegen
+### Token
 
-Empfohlen ist ein eigenes Langzeit-Token. Es macht die Anwendung vollständig
-unabhängig von Claude Code und läuft rund ein Jahr:
+Es genügt, in Claude Code angemeldet zu sein. Die Anwendung liest das Token mit;
+ein eigener Einrichtungsschritt ist nicht nötig.
 
-```powershell
-claude setup-token
-```
-
-Das ausgegebene Token (`sk-ant-oat01-…`) im Kontextmenü des Infobereich-Symbols
-unter **Einstellungen → Token speichern** einfügen. Es wird ausschließlich
-verschlüsselt in der Windows-Anmeldeinformationsverwaltung abgelegt.
-
-Ohne eigenes Token durchsucht die Anwendung folgende Quellen der Reihe nach:
+Die Quellen werden der Reihe nach durchprobiert:
 
 | Reihenfolge | Quelle | Anmerkung |
 | --- | --- | --- |
-| 1 | Windows-Anmeldeinformationsverwaltung | empfohlen, langlebig |
+| 1 | Windows-Anmeldeinformationsverwaltung | eigenes Token, verschlüsselt abgelegt |
 | 2 | Umgebungsvariable `CLAUDE_CODE_OAUTH_TOKEN` | vor allem für Entwicklung |
-| 3 | `%USERPROFILE%\.claude\.credentials.json` | Token von Claude Code, Laufzeit ca. 60 Minuten |
+| 3 | `%USERPROFILE%\.claude\.credentials.json` | Token von Claude Code |
+
+Wird ein Token von der API abgelehnt, rückt die Anwendung zur nächsten Quelle
+vor. Eine untaugliche Quelle legt sie also nicht lahm.
+
+> **`claude setup-token` funktioniert hier nicht.**
+> Solche Tokens (`sk-ant-oat01-…`) sind gültig und arbeiten einwandfrei gegen
+> `/v1/messages`, tragen aber den Geltungsbereich `user:profile` nicht. Der
+> Nutzungsendpunkt weist sie mit HTTP 403 ab:
+> `OAuth token does not meet scope requirement user:profile`.
+> Die Einstellungen prüfen ein eingegebenes Token deshalb vor dem Speichern und
+> lehnen es mit dieser Begründung ab. Getestet am 19.08.2026.
 
 Quelle 3 wird **nur gelesen**. Die Anwendung erneuert niemals ein Token und
 schreibt nichts in die Anmeldedaten von Claude Code zurück – siehe

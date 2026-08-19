@@ -1,6 +1,8 @@
 using System;
 using System.Reflection;
+using System.Threading.Tasks;
 using Avalonia.Controls;
+using ClaudeUsageChecker.App.Services;
 using ClaudeUsageChecker.App.Settings;
 using ClaudeUsageChecker.Core.Authentication;
 using ClaudeUsageChecker.Core.Platform;
@@ -16,17 +18,23 @@ public partial class SettingsWindow : Window
 {
     private readonly ISecretStore _secretStore;
     private readonly SettingsStore _settingsStore;
+    private readonly Func<string, Task<TokenValidationResult>>? _validateToken;
     private AppSettings _settings;
 
     public SettingsWindow() : this(SecretStoreFactory.CreateForCurrentPlatform(), new SettingsStore(), new AppSettings())
     {
     }
 
-    public SettingsWindow(ISecretStore secretStore, SettingsStore settingsStore, AppSettings settings)
+    public SettingsWindow(
+        ISecretStore secretStore,
+        SettingsStore settingsStore,
+        AppSettings settings,
+        Func<string, Task<TokenValidationResult>>? validateToken = null)
     {
         _secretStore = secretStore;
         _settingsStore = settingsStore;
         _settings = settings;
+        _validateToken = validateToken;
 
         InitializeComponent();
 
@@ -66,13 +74,39 @@ public partial class SettingsWindow : Window
         DeleteTokenButton.IsEnabled = hasToken;
     }
 
-    private void SaveToken()
+    private async void SaveToken()
     {
         var value = TokenBox.Text?.Trim();
         if (string.IsNullOrEmpty(value))
         {
             TokenStatus.Text = "Bitte zuerst ein Token einfuegen.";
             return;
+        }
+
+        // Erst pruefen, dann speichern: Ein untaugliches Token soll gar nicht
+        // erst in den Secret-Store gelangen.
+        if (_validateToken is not null)
+        {
+            SaveTokenButton.IsEnabled = false;
+            TokenStatus.Text = "Token wird geprueft ...";
+            try
+            {
+                var result = await _validateToken(value).ConfigureAwait(true);
+                if (!result.IsUsable)
+                {
+                    TokenStatus.Text = "Nicht gespeichert. " + result.Message;
+                    return;
+                }
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                TokenStatus.Text = "Die Pruefung ist fehlgeschlagen: " + ex.Message;
+                return;
+            }
+            finally
+            {
+                SaveTokenButton.IsEnabled = true;
+            }
         }
 
         try
