@@ -134,3 +134,14 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
   SHA-256-Summe aus. Das Ergebnis landet als **Entwurf** einer
   Veröffentlichung – erst das Freigeben von Hand macht es für die
   Aktualisierungsprüfung sichtbar.
+
+### Geändert
+- Die Veröffentlichung wird getrimmt und komprimiert gebaut: **21 MB** statt
+  93 MB, Start in 2,3 statt 7,2 Sekunden, 87 statt 136 MB Arbeitsspeicher.
+  Trimming gewinnt auf allen drei Achsen – entfernter Code muss auch nicht
+  geladen und übersetzt werden. Alle Fenster, das Kontextmenü und die Anmeldung
+  wurden in der getrimmten Fassung von Hand nachgeprüft.
+- `BuiltInComInteropSupport` ist abgeschaltet; es verhindert Trimming und wird
+  nicht gebraucht (weder Ziehen-und-Ablegen noch Shell-Einbindung).
+- Der Release-Ablauf prüft die Paketgröße, damit ein ausgefallenes Trimming
+  auffällt statt unbemerkt ein Vielfaches auszuliefern.

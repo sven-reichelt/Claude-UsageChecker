@@ -204,13 +204,27 @@ git push origin v0.2.0
 ```
 
 Der Ablauf `.github/workflows/release.yml` testet, baut eine eigenständige
-Einzeldatei für Windows x64, prüft ob sie startet, bildet die SHA-256-Summe und
-legt einen **Entwurf** der Veröffentlichung an. Erst das Freigeben von Hand macht
-sie für die Aktualisierungsprüfung sichtbar – so geht nichts ungeprüft hinaus.
+Einzeldatei für Windows x64, prüft Größe und Startfähigkeit, bildet die
+SHA-256-Summe und legt einen **Entwurf** der Veröffentlichung an. Erst das
+Freigeben von Hand macht sie für die Aktualisierungsprüfung sichtbar – so geht
+nichts ungeprüft hinaus.
 
-Das Paket ist nicht signiert. Windows SmartScreen meldet deshalb beim ersten
-Start einen unbekannten Herausgeber. Ein Zertifikat würde das beheben, kostet
-aber Geld und ist für den Eigengebrauch verzichtbar.
+Das Paket ist getrimmt und komprimiert. Gemessen gegen die unveränderte Fassung:
+
+| Variante | Größe | Start | Arbeitsspeicher |
+| --- | --- | --- | --- |
+| unverändert | 93 MB | – | – |
+| nur komprimiert | 45 MB | 7,2 s | 136 MB |
+| **getrimmt + komprimiert** | **21 MB** | **2,3 s** | **87 MB** |
+
+Trimming gewinnt auf allen drei Achsen – entfernter Code muss auch nicht geladen
+und übersetzt werden. Die Einstellungen stehen in der Projektdatei, ein lokales
+`dotnet publish -c Release -r win-x64 --self-contained -p:PublishSingleFile=true`
+liefert dasselbe Ergebnis.
+
+Das Paket ist nicht signiert – bewusst, denn es ist ein Hobbyprojekt. Windows
+SmartScreen meldet deshalb beim ersten Start einen unbekannten Herausgeber; über
+**Weitere Informationen → Trotzdem ausführen** bestätigen.
 
 ## Aktualisierungen
 

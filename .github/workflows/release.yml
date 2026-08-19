@@ -50,6 +50,8 @@ jobs:
       - name: Testen
         run: dotnet test --configuration Release --verbosity normal
 
+      # Trimming und Kompression stehen in der Projektdatei, damit ein lokales
+      # "dotnet publish" dasselbe Ergebnis liefert wie dieser Ablauf.
       - name: Veröffentlichen
         run: >
           dotnet publish src/ClaudeUsageChecker.App
@@ -57,10 +59,19 @@ jobs:
           --runtime win-x64
           --self-contained true
           -p:PublishSingleFile=true
-          -p:IncludeNativeLibrariesForSelfExtract=true
           -p:Version=${{ steps.version.outputs.version }}
-          -p:DebugType=none
           --output publish
+
+      - name: Größe prüfen
+        shell: pwsh
+        run: |
+          # Waechst das Paket unerwartet, ist meist das Trimming ausgefallen.
+          $mb = [math]::Round((Get-Item publish/ClaudeUsageChecker.exe).Length / 1MB, 1)
+          Write-Host "Paketgröße: $mb MB"
+          if ($mb -gt 35) {
+            Write-Error "Das Paket ist mit $mb MB unerwartet gross - greift das Trimming noch?"
+            exit 1
+          }
 
       - name: Ergebnis benennen und Prüfsumme bilden
         id: package
