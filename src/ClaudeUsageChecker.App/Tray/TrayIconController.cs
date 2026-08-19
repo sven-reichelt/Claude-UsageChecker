@@ -61,7 +61,10 @@ public sealed class TrayIconController : IDisposable
         Render(_monitor.State);
     }
 
-    /// <summary>Der Nutzer moechte die Detailansicht sehen.</summary>
+    /// <summary>
+    /// Der Nutzer hat auf das Symbol geklickt und moechte die Detailansicht sehen.
+    /// Bewusst der einzige Weg dorthin - siehe Aufbau des Menues.
+    /// </summary>
     public event EventHandler? ShowDetails;
 
     /// <summary>Der Nutzer moechte die Einstellungen oeffnen.</summary>
@@ -91,10 +94,10 @@ public sealed class TrayIconController : IDisposable
 
         menu.Add(new NativeMenuItemSeparator());
 
-        var details = new NativeMenuItem("Details anzeigen");
-        details.Click += (_, _) => ShowDetails?.Invoke(this, EventArgs.Empty);
-        menu.Add(details);
-
+        // Kein "Details anzeigen": Der Linksklick auf das Symbol oeffnet die
+        // Detailansicht, und die Zahlen stehen bereits in den Statuszeilen
+        // darueber. Ein Eintrag, der nur denselben Weg noch einmal anbietet,
+        // macht das Menue laenger ohne etwas hinzuzufuegen.
         var refresh = new NativeMenuItem("Jetzt aktualisieren");
         refresh.Click += (_, _) => RefreshRequested?.Invoke(this, EventArgs.Empty);
         menu.Add(refresh);

@@ -36,6 +36,7 @@ public partial class DetailsWindow : Window
                 ReleasePageRequested?.Invoke(this, page);
             }
         };
+        InstallButton.Click += (_, _) => InstallRequested?.Invoke(this, EventArgs.Empty);
 
         // Das Fenster verhaelt sich wie ein Aufklappmenue: Fokusverlust schliesst es.
         Deactivated += (_, _) => Hide();
@@ -53,6 +54,9 @@ public partial class DetailsWindow : Window
 
     /// <summary>Der Nutzer moechte die Release-Seite der neuen Version oeffnen.</summary>
     public event EventHandler<Uri>? ReleasePageRequested;
+
+    /// <summary>Der Nutzer moechte die neue Fassung einspielen lassen.</summary>
+    public event EventHandler? InstallRequested;
 
     /// <summary>
     /// Zeigt einen dauerhaften Hinweis an, etwa dass die eigene Anmeldung
@@ -86,12 +90,27 @@ public partial class DetailsWindow : Window
     /// Zeigt das Ergebnis einer Aktualisierungspruefung an. Ohne Text wird der
     /// Hinweis ausgeblendet.
     /// </summary>
-    public void SetUpdateNotice(string? message, Uri? releasePage = null)
+    /// <param name="canInstall">
+    /// Ob die neue Fassung selbst eingespielt werden kann. Nur dann wird die
+    /// entsprechende Schaltflaeche angeboten - ein Knopf, der nicht funktioniert,
+    /// ist schlimmer als keiner.
+    /// </param>
+    public void SetUpdateNotice(string? message, Uri? releasePage = null, bool canInstall = false)
     {
         _updateReleasePage = releasePage;
         UpdateText.Text = message;
         UpdateBorder.IsVisible = !string.IsNullOrWhiteSpace(message);
         UpdateButton.IsVisible = releasePage is not null;
+        InstallButton.IsVisible = canInstall;
+        InstallButton.IsEnabled = canInstall;
+    }
+
+    /// <summary>Meldet den Fortschritt des Einspielens.</summary>
+    public void SetInstallProgress(string message, bool busy)
+    {
+        UpdateText.Text = message;
+        UpdateBorder.IsVisible = true;
+        InstallButton.IsEnabled = !busy;
     }
 
     private void RenderWindows(UsageSnapshot? snapshot, DateTimeOffset now)

@@ -77,6 +77,8 @@ public sealed class GitHubReleaseUpdateService(
                 Status = UpdateCheckStatus.UpdateAvailable,
                 AvailableVersion = latest,
                 ReleasePage = page,
+                DownloadUrl = FindAsset(root, ".exe"),
+                ChecksumUrl = FindAsset(root, ".exe.sha256"),
                 Message = $"Version {UpdateCheckResult.Anzeigen(latest)} ist verfuegbar "
                           + $"(installiert: {UpdateCheckResult.Anzeigen(currentVersion)})."
             };
@@ -85,6 +87,41 @@ public sealed class GitHubReleaseUpdateService(
         {
             return UpdateCheckResult.Failed("Die Aktualisierungspruefung ist fehlgeschlagen.");
         }
+    }
+
+    /// <summary>
+    /// Sucht die angehaengte Datei mit der passenden Endung.
+    /// </summary>
+    /// <remarks>
+    /// Die Adresse stammt aus der Antwort von GitHub zu genau diesem
+    /// Repository - sie wird nicht aus dem Dateinamen zusammengesetzt oder
+    /// erraten.
+    /// </remarks>
+    internal static Uri? FindAsset(JsonElement release, string suffix)
+    {
+        if (!release.TryGetProperty("assets", out var assets) || assets.ValueKind != JsonValueKind.Array)
+        {
+            return null;
+        }
+
+        foreach (var asset in assets.EnumerateArray())
+        {
+            if (!asset.TryGetProperty("name", out var nameElement)
+                || nameElement.GetString() is not { } name
+                || !name.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            if (asset.TryGetProperty("browser_download_url", out var urlElement)
+                && Uri.TryCreate(urlElement.GetString(), UriKind.Absolute, out var url)
+                && url.Scheme == Uri.UriSchemeHttps)
+            {
+                return url;
+            }
+        }
+
+        return null;
     }
 
     /// <summary>Akzeptiert Marken der Form "v1.2.3" ebenso wie "1.2.3".</summary>

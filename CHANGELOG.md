@@ -10,6 +10,24 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
   Assembly-Version und sagt nichts aus – „Version 0.2.0.0 ist aktuell"
   verwirrte nur.
 
+### Hinzugefügt
+- **Aktualisierung auf Knopfdruck.** „Jetzt einspielen und neu starten" lädt
+  die neue Fassung, prüft ihre SHA-256-Summe gegen die veröffentlichte,
+  ersetzt die laufende Datei und startet neu. Ein Hinweis, den man von Hand
+  abarbeiten muss, bleibt in der Praxis liegen.
+  - Stimmt die Prüfsumme nicht oder fehlt sie, wird nichts eingespielt und
+    nichts ausgeführt.
+  - Die Adresse stammt aus der GitHub-Antwort zu diesem Repository; Adressen
+    ohne HTTPS werden verworfen.
+  - Nur nach ausdrücklichem Klick, nie still im Hintergrund.
+  - Der Austausch nutzt, dass Windows eine laufende Datei umbenennen lässt.
+    Scheitert das Einsetzen, wird das Umbenennen zurückgenommen.
+
+### Geändert
+- „Details anzeigen" ist aus dem Kontextmenü entfernt. Der Linksklick auf das
+  Symbol öffnet die Detailansicht, und die Zahlen stehen ohnehin in den
+  Statuszeilen darüber – der Eintrag bot nur denselben Weg ein zweites Mal.
+
 ## [0.2.0] – 2026-08-19
 
 Erste Veröffentlichung. Eigenständige Einzeldatei für Windows x64, 21 MB,

@@ -25,7 +25,7 @@ noch nicht umgesetzt – siehe [Roadmap](#roadmap).
 | Nur eine Instanz je Anmeldesitzung | ✅ |
 | Eigene Anmeldung per OAuth mit PKCE – unabhängig von Claude Code | ✅ |
 | Selbsttätige Erneuerung des eigenen Tokens | ✅ |
-| Aktualisierungsprüfung über GitHub-Releases | ✅ |
+| Aktualisierung auf Knopfdruck, mit Prüfsummenkontrolle | ✅ |
 | macOS-Menüleiste | 🚧 geplant |
 
 ## Datenquelle
@@ -234,12 +234,22 @@ Die Prüfung läuft gegen die GitHub-Releases dieses Repositorys
 `IUpdateService`). Sie erfolgt beim Start – sofern in den Einstellungen aktiviert –
 und jederzeit über **Auf Aktualisierungen prüfen …** im Kontextmenü.
 
-Das Ergebnis erscheint in der Detailansicht. Bei einer neueren Version führt
-eine Schaltfläche zur Release-Seite.
+Das Ergebnis erscheint in der Detailansicht. Bei einer neueren Version stehen
+dort zwei Schaltflächen:
 
-Bewusste Entscheidung: Die Anwendung lädt Aktualisierungen **nicht** selbst
-herunter und führt sie nicht aus. Sie meldet lediglich eine neuere Version und
-öffnet auf Wunsch die Release-Seite. Das Einspielen bleibt eine bewusste Handlung.
+* **Jetzt einspielen und neu starten** – lädt die neue Fassung, prüft ihre
+  SHA-256-Summe gegen die veröffentlichte, ersetzt die laufende Datei und
+  startet neu. Ein Klick, kein manuelles Herunterladen.
+* **Release-Seite öffnen** – für alle, die lieber selbst nachsehen.
+
+Stimmt die Prüfsumme nicht oder fehlt sie, wird nichts eingespielt und nichts
+ausgeführt. Eingespielt wird ausschließlich nach ausdrücklichem Klick, nie
+still im Hintergrund. Die Einzelheiten und die Grenzen dieser Absicherung
+stehen in [SECURITY.md](SECURITY.md).
+
+Der Selbstaustausch setzt die veröffentlichte Einzeldatei voraus. Im
+Entwicklungsstand liegen Dutzende Dateien nebeneinander – dort wird die
+Schaltfläche gar nicht erst angeboten.
 
 Solange es keine Veröffentlichung gibt, meldet die Prüfung das offen, statt zu
 schweigen.

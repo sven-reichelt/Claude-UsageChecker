@@ -13,8 +13,22 @@ public sealed record UpdateCheckResult
     /// <summary>Seite der Veroeffentlichung zum manuellen Herunterladen.</summary>
     public Uri? ReleasePage { get; init; }
 
+    /// <summary>Die ausfuehrbare Datei der neuen Fassung.</summary>
+    public Uri? DownloadUrl { get; init; }
+
+    /// <summary>
+    /// Die zugehoerige Pruefsummendatei. Ohne sie wird nichts eingespielt -
+    /// heruntergeladener Code, dessen Echtheit niemand belegt, wird nicht
+    /// ausgefuehrt.
+    /// </summary>
+    public Uri? ChecksumUrl { get; init; }
+
     /// <summary>Erlaeuternder Text fuer die Oberflaeche.</summary>
     public string? Message { get; init; }
+
+    /// <summary>Ob genug vorliegt, um die neue Fassung selbst einzuspielen.</summary>
+    public bool CanInstall =>
+        Status == UpdateCheckStatus.UpdateAvailable && DownloadUrl is not null && ChecksumUrl is not null;
 
     public static UpdateCheckResult UpToDate(Version current) => new()
     {

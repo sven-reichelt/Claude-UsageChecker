@@ -42,6 +42,7 @@ public partial class App : Application, IDisposable
     private AnthropicOAuthClient? _oauthClient;
     private OAuthTokenStore? _oauthTokenStore;
     private OAuthTokenProvider? _oauthTokenProvider;
+    private UpdateCheckResult? _pendingUpdate;
 
     public override void Initialize() => AvaloniaXamlLoader.Load(this);
 
@@ -160,6 +161,8 @@ public partial class App : Application, IDisposable
         window.RefreshRequested += (_, _) => ErrorGuard.Forget("Abruf anstossen", RefreshAsync);
         window.ReleasePageRequested += (_, page) =>
             ErrorGuard.Run("Release-Seite oeffnen", () => OpenReleasePage(page));
+        window.InstallRequested += (_, _) =>
+            ErrorGuard.Forget("Aktualisierung einspielen", InstallUpdateAsync);
         window.Closing += (_, e) =>
         {
             // Das Fenster wird nur versteckt - die Anwendung laeuft weiter.
@@ -251,7 +254,16 @@ public partial class App : Application, IDisposable
     private void ShowUpdateResult(UpdateCheckResult result, bool openWindow)
     {
         _detailsWindow ??= CreateDetailsWindow();
-        _detailsWindow.SetUpdateNotice(result.Message, result.ReleasePage);
+
+        // Das Einspielen wird nur angeboten, wenn es auch gelingen kann: Es
+        // braucht Datei und Pruefsumme und eine Fassung, die sich selbst
+        // ersetzen darf. Im Entwicklungsstand liegen Dutzende Dateien
+        // nebeneinander - da waere ein Tausch der Exe sinnlos.
+        _pendingUpdate = result;
+        _detailsWindow.SetUpdateNotice(
+            result.Message,
+            result.ReleasePage,
+            canInstall: result.CanInstall && UpdateInstaller.IsSupported);
 
         if (!openWindow)
         {
@@ -269,6 +281,34 @@ public partial class App : Application, IDisposable
 
     private static void OpenReleasePage(Uri page) =>
         Process.Start(new ProcessStartInfo(page.ToString()) { UseShellExecute = true });
+
+    /// <summary>
+    /// Spielt die neue Fassung ein und beendet danach diese Instanz - die neue
+    /// laeuft dann bereits und wartet nur noch auf das Ende dieser hier.
+    /// </summary>
+    private async Task InstallUpdateAsync()
+    {
+        if (_pendingUpdate is not { } update || _detailsWindow is null || _updateHttpClient is null)
+        {
+            return;
+        }
+
+        _detailsWindow.SetInstallProgress("Die neue Fassung wird geladen und geprueft ...", busy: true);
+
+        var installer = new UpdateInstaller(_updateHttpClient);
+        var ergebnis = await installer.InstallAsync(update).ConfigureAwait(true);
+
+        if (!ergebnis.Succeeded)
+        {
+            _detailsWindow.SetInstallProgress(ergebnis.Message, busy: false);
+            return;
+        }
+
+        _detailsWindow.SetInstallProgress(ergebnis.Message, busy: true);
+
+        // Die neue Instanz wartet auf das Ende dieser - also nicht troedeln.
+        RequestShutdown();
+    }
 
     private void RequestShutdown()
     {

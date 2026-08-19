@@ -80,3 +80,9 @@ niemals vermischen.
 **Beim OAuth-Fluss bleibt es bei `user:profile`.** Mehr braucht die Anwendung
 nicht, und mehr anzufordern hieße, sich Rechte am Konto zu nehmen, die sie nie
 gebraucht. `DerAngeforderteGeltungsbereichBleibtBeimNoetigenMinimum` sichert das ab.
+
+**Der Selbstaustausch ist der heikelste Pfad im Programm.** Er lädt eine
+ausführbare Datei aus dem Netz und startet sie. Drei Bedingungen sichern das ab –
+geprüfte SHA-256-Summe, Adresse aus der GitHub-Antwort, ausdrücklicher Klick.
+Wer dort etwas ändert, lockert die einzige Absicherung, die es gibt. Begründung
+in [SECURITY.md](SECURITY.md), Tests in `UpdateInstallerTests`.

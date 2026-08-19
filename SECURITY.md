@@ -90,10 +90,36 @@ Es gibt keine Telemetrie, keine Absturzberichte an Dritte und keine Analytik.
 Absturzberichte werden lokal nach
 `%LOCALAPPDATA%\ClaudeUsageChecker\crash.log` geschrieben und bleiben dort.
 
-### 6. Keine selbsttätige Ausführung von Fremdcode
+### 6. Aktualisierungen: heruntergeladener Code nur mit geprüfter Herkunft
 
-Die Aktualisierungsprüfung lädt nichts herunter und startet nichts. Sie öffnet
-lediglich die Release-Seite im Browser.
+Die Anwendung kann sich auf Knopfdruck selbst ersetzen. Sie lädt dabei eine
+ausführbare Datei aus dem Netz und startet sie – der heikelste Vorgang im
+gesamten Programm. Ursprünglich war das bewusst ausgeschlossen; die Entscheidung
+wurde umgekehrt, weil ein Hinweis, den man von Hand abarbeiten muss, in der
+Praxis liegen bleibt und die Anwendung dann veraltet läuft.
+
+Abgesichert ist das durch drei Bedingungen. Fehlt eine, wird nichts eingespielt:
+
+1. **Geprüfte Prüfsumme.** Zu jeder Veröffentlichung gehört eine
+   SHA-256-Summe. Die heruntergeladene Datei wird gehasht und verglichen. Bei
+   Abweichung wird sie verworfen und **nicht** ausgeführt. Ohne
+   Prüfsummendatei wird gar nicht erst begonnen.
+2. **Adresse aus der GitHub-Antwort.** Die Download-Adresse stammt aus der
+   API-Antwort zu genau diesem Repository und wird nicht aus Dateinamen
+   zusammengesetzt oder erraten. Adressen ohne HTTPS werden verworfen.
+3. **Ausdrückliche Handlung des Nutzers.** Eingespielt wird nur nach einem
+   Klick auf **Jetzt einspielen und neu starten**. Es gibt keine stille
+   Aktualisierung im Hintergrund.
+
+Die Prüfsumme ersetzt keine Signatur: Wer die Veröffentlichung auf GitHub
+verändern kann, ändert auch die Prüfsumme. Sie schützt gegen beschädigte oder
+unterwegs veränderte Downloads, nicht gegen ein übernommenes Repository. Für ein
+Hobbyprojekt ist das der bewusst gewählte Kompromiss.
+
+Der Austausch selbst nutzt aus, dass Windows eine laufende Datei zwar nicht
+überschreiben, wohl aber umbenennen lässt: umbenennen, neue Datei an den alten
+Platz, neue Fassung starten, selbst beenden. Scheitert der zweite Schritt, wird
+der erste zurückgenommen – es bleibt immer ein lauffähiges Programm zurück.
 
 ### 7. Rücksicht auf die API
 

@@ -12,6 +12,11 @@ internal static class Program
     {
         CrashReporter.InstallGlobalHandlers();
 
+        // Nach einer Aktualisierung laeuft die ersetzte Fassung noch kurz und
+        // haelt den Riegel auf eine Instanz. Erst abwarten, dann weiter.
+        StartupArguments.WaitForPredecessor(args);
+        Services.UpdateInstaller.RaeumeAltfassungWeg();
+
         // Eine zweite Instanz wuerde ein zweites Symbol im Infobereich anlegen
         // und die API doppelt abfragen. Sie beendet sich deshalb stillschweigend.
         using var instance = SingleInstance.TryAcquire();
