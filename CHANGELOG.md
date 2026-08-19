@@ -38,3 +38,25 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 - Die Anwendung läuft nur noch einmal je Anmeldesitzung. Ein zweiter Start legte
   bislang ein zweites Symbol im Infobereich an und fragte die API doppelt ab, was
   den drosselungsempfindlichen Endpunkt unnötig belastet.
+
+### Geändert
+- Der Tooltip nennt jetzt die Reset-**Uhrzeit** zusätzlich zur Restzeit, z. B.
+  „Sitzung 19 % - Reset 16:30 (2 Std 17 Min)". Bei einem Reset an einem anderen
+  Tag steht der Wochentag davor, ab einer Woche Abstand das Datum – eine bloße
+  Uhrzeit wäre für das Wochenlimit mehrdeutig.
+- Das Kontextmenü listet nun **alle** gemeldeten Limits statt nur der Sitzung,
+  jeweils mit Auslastung und Restzeit. Die Uhrzeit ist dafür in den Tooltip
+  gewandert.
+- Die Aktualisierungsprüfung läuft gegen die GitHub-Releases des nun
+  öffentlichen Repositorys. Ihr Ergebnis erscheint in der Detailansicht; bei
+  einer neueren Version führt eine Schaltfläche zur Release-Seite. Zuvor blieb
+  ein Klick auf „Auf Aktualisierungen prüfen" ohne jede Rückmeldung.
+
+### Hinzugefügt
+- Das Zusatzkontingent (`extra_usage`) erscheint in der Detailansicht mit
+  Fortschrittsbalken und verbrauchten Credits, sofern das Abo es meldet. Die
+  Werte wurden bislang abgerufen, aber nirgends angezeigt.
+
+### Entfernt
+- `DisabledUpdateService` – der Platzhalter für das private Repository hat keinen
+  Aufrufer mehr.

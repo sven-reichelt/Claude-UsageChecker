@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -17,6 +16,7 @@ namespace ClaudeUsageChecker.App.Views;
 public partial class DetailsWindow : Window
 {
     private readonly TimeProvider _timeProvider;
+    private Uri? _updateReleasePage;
 
     public DetailsWindow() : this(TimeProvider.System)
     {
@@ -28,6 +28,13 @@ public partial class DetailsWindow : Window
         InitializeComponent();
 
         RefreshButton.Click += (_, _) => RefreshRequested?.Invoke(this, EventArgs.Empty);
+        UpdateButton.Click += (_, _) =>
+        {
+            if (_updateReleasePage is { } page)
+            {
+                ReleasePageRequested?.Invoke(this, page);
+            }
+        };
 
         // Das Fenster verhaelt sich wie ein Aufklappmenue: Fokusverlust schliesst es.
         Deactivated += (_, _) => Hide();
@@ -43,17 +50,93 @@ public partial class DetailsWindow : Window
     /// <summary>Der Nutzer hat einen sofortigen Abruf angefordert.</summary>
     public event EventHandler? RefreshRequested;
 
+    /// <summary>Der Nutzer moechte die Release-Seite der neuen Version oeffnen.</summary>
+    public event EventHandler<Uri>? ReleasePageRequested;
+
     /// <summary>Stellt den uebergebenen Zustand dar.</summary>
     public void Render(UsageState state)
     {
         var now = _timeProvider.GetLocalNow();
+
+        RenderWindows(state.Snapshot, now);
+        RenderExtraUsage(state.Snapshot?.ExtraUsage);
+        RenderMessage(state);
+
+        FooterText.Text = state.Snapshot is { } snapshot
+            ? string.Format(CultureInfo.CurrentCulture, "Stand: {0:t}", snapshot.RetrievedAt.ToLocalTime())
+            : "Noch keine Daten";
+    }
+
+    /// <summary>
+    /// Zeigt das Ergebnis einer Aktualisierungspruefung an. Ohne Text wird der
+    /// Hinweis ausgeblendet.
+    /// </summary>
+    public void SetUpdateNotice(string? message, Uri? releasePage = null)
+    {
+        _updateReleasePage = releasePage;
+        UpdateText.Text = message;
+        UpdateBorder.IsVisible = !string.IsNullOrWhiteSpace(message);
+        UpdateButton.IsVisible = releasePage is not null;
+    }
+
+    private void RenderWindows(UsageSnapshot? snapshot, DateTimeOffset now)
+    {
         WindowsPanel.Children.Clear();
 
-        foreach (var (label, window) in EnumerateWindows(state.Snapshot))
+        foreach (var (label, window) in UsageFormatter.EnumerateWindows(snapshot))
         {
             WindowsPanel.Children.Add(BuildWindowRow(label, window, now));
         }
+    }
 
+    private void RenderExtraUsage(ExtraUsage? extraUsage)
+    {
+        ExtraUsagePanel.Children.Clear();
+
+        if (extraUsage is not { IsEnabled: true })
+        {
+            ExtraUsageBorder.IsVisible = false;
+            return;
+        }
+
+        ExtraUsageBorder.IsVisible = true;
+        ExtraUsagePanel.Children.Add(new TextBlock
+        {
+            Text = "Zusatzkontingent",
+            FontSize = 12,
+            FontWeight = FontWeight.Medium
+        });
+
+        if (extraUsage.Utilization is { } utilization)
+        {
+            ExtraUsagePanel.Children.Add(new ProgressBar
+            {
+                Minimum = 0,
+                Maximum = 100,
+                Value = utilization,
+                Height = 6,
+                Foreground = BrushForUtilization(utilization)
+            });
+        }
+
+        // Die API meldet je nach Konto nur einen Teil der Werte - jede Angabe
+        // wird nur dann gezeigt, wenn sie tatsaechlich vorliegt.
+        var detail = extraUsage switch
+        {
+            { UsedCredits: { } used, MonthlyLimit: { } limit } => string.Format(
+                CultureInfo.CurrentCulture, "{0:0.00} von {1:0.00} Credits verbraucht", used, limit),
+            { UsedCredits: { } usedOnly } => string.Format(
+                CultureInfo.CurrentCulture, "{0:0.00} Credits verbraucht", usedOnly),
+            { MonthlyLimit: { } limitOnly } => string.Format(
+                CultureInfo.CurrentCulture, "Monatsgrenze: {0:0.00} Credits", limitOnly),
+            _ => "aktiv"
+        };
+
+        ExtraUsagePanel.Children.Add(new TextBlock { Text = detail, FontSize = 11, Opacity = 0.7 });
+    }
+
+    private void RenderMessage(UsageState state)
+    {
         var message = state.Kind switch
         {
             UsageStateKind.NotConfigured =>
@@ -68,49 +151,11 @@ public partial class DetailsWindow : Window
 
         MessageText.Text = message;
         MessageBorder.IsVisible = message is not null;
-
-        FooterText.Text = state.Snapshot is { } snapshot
-            ? string.Format(
-                CultureInfo.CurrentCulture,
-                "Stand: {0:t}",
-                snapshot.RetrievedAt.ToLocalTime())
-            : "Noch keine Daten";
-    }
-
-    private static IEnumerable<(string Label, UsageWindow Window)> EnumerateWindows(UsageSnapshot? snapshot)
-    {
-        if (snapshot is null)
-        {
-            yield break;
-        }
-
-        if (snapshot.Session is { } session)
-        {
-            yield return ("Sitzung (5 Std)", session);
-        }
-
-        if (snapshot.Weekly is { } weekly)
-        {
-            yield return ("Woche gesamt", weekly);
-        }
-
-        if (snapshot.WeeklyOpus is { } opus)
-        {
-            yield return ("Woche Opus", opus);
-        }
-
-        if (snapshot.WeeklySonnet is { } sonnet)
-        {
-            yield return ("Woche Sonnet", sonnet);
-        }
     }
 
     private static StackPanel BuildWindowRow(string label, UsageWindow window, DateTimeOffset now)
     {
-        var header = new Grid
-        {
-            ColumnDefinitions = new ColumnDefinitions("*,Auto")
-        };
+        var header = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
 
         var title = new TextBlock { Text = label, FontSize = 12, FontWeight = FontWeight.Medium };
         var value = new TextBlock
@@ -136,9 +181,9 @@ public partial class DetailsWindow : Window
         {
             Text = string.Format(
                 CultureInfo.CurrentCulture,
-                "Reset in {0} - um {1:t}",
+                "Reset in {0} - um {1}",
                 DurationFormatter.ToCompact(window.TimeUntilReset(now)),
-                window.ResetsAt.ToLocalTime()),
+                DurationFormatter.ToResetMoment(window.ResetsAt, now)),
             FontSize = 11,
             Opacity = 0.7
         };

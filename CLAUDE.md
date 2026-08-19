@@ -7,7 +7,7 @@ Claude-Abonnements im Infobereich anzeigt.
 
 ```powershell
 dotnet build                                      # gesamte Solution
-dotnet test                                       # 39 Tests (Core.Tests + App.Tests)
+dotnet test                                       # 75 Tests (Core.Tests + App.Tests)
 dotnet run --project src/ClaudeUsageChecker.App   # Anwendung starten
 node build/generate-icons.mjs                     # Symbole neu erzeugen
 ```
@@ -65,3 +65,8 @@ fehlerfrei. `WindowConstructionTests` fängt es ab.
 Ausnahme bis in die Nachrichtenschleife und der Prozess verschwindet
 kommentarlos. Neue Handler deshalb immer über `ErrorGuard.Run` bzw.
 `ErrorGuard.Forget` führen.
+
+**Der Windows-Tooltip bricht hart bei 127 Zeichen ab.** Deshalb zeigt er nur
+Sitzung und Wochenlimit; alle weiteren Limits stehen im Kontextmenü. Wer die
+Tooltip-Texte erweitert, prüft `ToTooltip_BleibtInnerhalbDerWindowsGrenze` mit –
+der Test rechnet bewusst mit dem ungünstigsten Fall.

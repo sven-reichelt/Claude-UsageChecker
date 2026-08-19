@@ -114,14 +114,12 @@ public partial class App : Application, IDisposable
     private static ISecretStore CreateSecretStore() =>
         SecretStoreFactory.CreateForCurrentPlatform();
 
-    private static IUpdateService CreateUpdateService(HttpClient httpClient)
-    {
-        // Solange die Veroeffentlichungen nicht oeffentlich sind, bleibt die
-        // Pruefung deaktiviert. Fuer ein oeffentliches Repository genuegt es,
-        // hier den GitHubReleaseUpdateService zurueckzugeben.
-        _ = httpClient;
-        return new DisabledUpdateService();
-    }
+    /// <summary>Kennung des oeffentlichen Repositorys, aus dem Veroeffentlichungen bezogen werden.</summary>
+    private const string RepositoryOwner = "sven-reichelt";
+    private const string RepositoryName = "Claude-UsageChecker";
+
+    private static IUpdateService CreateUpdateService(HttpClient httpClient) =>
+        new GitHubReleaseUpdateService(httpClient, RepositoryOwner, RepositoryName, CurrentVersion);
 
     private void ShowDetails()
     {
@@ -140,6 +138,8 @@ public partial class App : Application, IDisposable
     {
         var window = new DetailsWindow();
         window.RefreshRequested += (_, _) => ErrorGuard.Forget("Abruf anstossen", RefreshAsync);
+        window.ReleasePageRequested += (_, page) =>
+            ErrorGuard.Run("Release-Seite oeffnen", () => OpenReleasePage(page));
         window.Closing += (_, e) =>
         {
             // Das Fenster wird nur versteckt - die Anwendung laeuft weiter.
@@ -178,22 +178,42 @@ public partial class App : Application, IDisposable
 
         var result = await _updateService.CheckAsync().ConfigureAwait(false);
 
-        if (result.Status == UpdateCheckStatus.UpToDate && !announceUpToDate)
+        // Die stille Pruefung beim Start meldet sich nur, wenn es etwas zu melden gibt.
+        var isNoteworthy = result.Status == UpdateCheckStatus.UpdateAvailable;
+        if (!isNoteworthy && !announceUpToDate)
         {
             return;
         }
 
-        await Dispatcher.UIThread.InvokeAsync(() => ShowUpdateResult(result));
+        await Dispatcher.UIThread.InvokeAsync(() => ShowUpdateResult(result, openWindow: announceUpToDate || isNoteworthy));
     }
 
-    private static void ShowUpdateResult(UpdateCheckResult result)
+    /// <summary>
+    /// Zeigt das Ergebnis in der Detailansicht. Es wird bewusst nichts
+    /// heruntergeladen oder ausgefuehrt - das Einspielen bleibt eine bewusste
+    /// Handlung des Nutzers.
+    /// </summary>
+    private void ShowUpdateResult(UpdateCheckResult result, bool openWindow)
     {
-        if (result is { Status: UpdateCheckStatus.UpdateAvailable, ReleasePage: { } page })
+        _detailsWindow ??= CreateDetailsWindow();
+        _detailsWindow.SetUpdateNotice(result.Message, result.ReleasePage);
+
+        if (!openWindow)
         {
-            // Bewusst nur oeffnen, nicht selbst herunterladen und ausfuehren.
-            Process.Start(new ProcessStartInfo(page.ToString()) { UseShellExecute = true });
+            return;
         }
+
+        if (_monitor is not null)
+        {
+            _detailsWindow.Render(_monitor.State);
+        }
+
+        _detailsWindow.Show();
+        _detailsWindow.Activate();
     }
+
+    private static void OpenReleasePage(Uri page) =>
+        Process.Start(new ProcessStartInfo(page.ToString()) { UseShellExecute = true });
 
     private void RequestShutdown()
     {

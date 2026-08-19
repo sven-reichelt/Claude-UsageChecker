@@ -2,7 +2,7 @@ using System.Globalization;
 
 namespace ClaudeUsageChecker.Core.Formatting;
 
-/// <summary>Wandelt Zeitspannen in kompakte, gut lesbare Angaben um.</summary>
+/// <summary>Wandelt Zeitspannen und Zeitpunkte in kompakte, gut lesbare Angaben um.</summary>
 public static class DurationFormatter
 {
     /// <summary>
@@ -38,5 +38,33 @@ public static class DurationFormatter
 
         var totalMinutes = (int)Math.Ceiling(duration.TotalMinutes);
         return string.Format(culture, "{0} Min", Math.Max(totalMinutes, 1));
+    }
+
+    /// <summary>
+    /// Formatiert den Reset-Zeitpunkt als Uhrzeit in der lokalen Zeitzone.
+    /// </summary>
+    /// <remarks>
+    /// Eine blosse Uhrzeit waere fuer das Wochenlimit mehrdeutig - "03:00" sagt
+    /// nicht, an welchem Tag. Deshalb kommt bei einem Reset an einem anderen Tag
+    /// der Wochentag davor, ab einer Woche Abstand das Datum.
+    /// </remarks>
+    public static string ToResetMoment(DateTimeOffset resetsAt, DateTimeOffset now, CultureInfo? culture = null)
+    {
+        culture ??= CultureInfo.CurrentCulture;
+
+        var localReset = resetsAt.ToLocalTime();
+        var localNow = now.ToLocalTime();
+        var dayDifference = (localReset.Date - localNow.Date).Days;
+
+        return dayDifference switch
+        {
+            0 => localReset.ToString("t", culture),
+            >= 1 and <= 6 => string.Format(
+                culture,
+                "{0} {1}",
+                culture.DateTimeFormat.GetShortestDayName(localReset.DayOfWeek),
+                localReset.ToString("t", culture)),
+            _ => string.Format(culture, "{0} {1}", localReset.ToString("d", culture), localReset.ToString("t", culture))
+        };
     }
 }

@@ -2,8 +2,9 @@
 
 Zeigt das Sitzungs- und Wochenlimit des Claude-Abonnements dauerhaft im
 Windows-Infobereich an – unabhängig von einer laufenden Claude-Code-Sitzung.
-Ein Zeiger auf das Symbol genügt: Auslastung und Restzeit bis zum Reset stehen
-im Tooltip, ein Klick öffnet die Detailansicht.
+Ein Zeiger auf das Symbol genügt: Sitzung und Wochenlimit stehen mit Auslastung,
+Reset-Uhrzeit und Restzeit im Tooltip. Das Kontextmenü listet **alle** gemeldeten
+Limits auf, ein Klick öffnet die Detailansicht mit Fortschrittsbalken.
 
 macOS (Menüleiste) ist vorbereitet, aber noch nicht umgesetzt – siehe [Roadmap](#roadmap).
 
@@ -15,9 +16,12 @@ macOS (Menüleiste) ist vorbereitet, aber noch nicht umgesetzt – siehe [Roadma
 | Wochenlimit gesamt, Opus und Sonnet | ✅ |
 | Farbcodiertes Infobereich-Symbol (normal / angespannt / kritisch) | ✅ |
 | Detailfenster mit Fortschrittsbalken und Reset-Uhrzeit | ✅ |
+| Zusatzkontingent, sofern im Abo aktiviert | ✅ |
+| Alle Limits im Kontextmenü | ✅ |
 | Token verschlüsselt in der Windows-Anmeldeinformationsverwaltung | ✅ |
 | Autostart mit Windows | ✅ |
-| Aktualisierungsprüfung | 🚧 vorbereitet, siehe [Aktualisierungen](#aktualisierungen) |
+| Nur eine Instanz je Anmeldesitzung | ✅ |
+| Aktualisierungsprüfung über GitHub-Releases | ✅ |
 | macOS-Menüleiste | 🚧 geplant |
 
 ## Datenquelle
@@ -52,6 +56,23 @@ Zwei Eigenheiten des Endpunkts prägen den Entwurf:
 
 Details und die verworfenen Alternativen stehen in
 [`docs/api-recherche.md`](docs/api-recherche.md).
+
+### Unterschiede zwischen Pro und Max
+
+Es gibt keine Plan-Erkennung. Jedes Fenster, das die API als `null` meldet, wird
+schlicht weggelassen – die Anzeige richtet sich allein danach, was zurückkommt.
+
+| Fenster | Pro | Max |
+| --- | --- | --- |
+| `five_hour` (Sitzung) | ja | ja |
+| `seven_day` (Woche gesamt) | ja | ja |
+| `seven_day_opus` | nein, kein Opus im Abo | eigenes Wochenlimit |
+| `seven_day_sonnet` | je nach Nutzung | je nach Nutzung |
+| `extra_usage` | vermutlich nein | wenn aktiviert |
+
+Beobachtung aus der Praxis: Die modellspezifischen Wochenfenster erscheinen erst,
+wenn das jeweilige Modell in der laufenden Woche genutzt wurde. Die Pro-Spalte ist
+recherchiert, nicht gemessen.
 
 ## Einrichtung
 
@@ -114,7 +135,8 @@ Claude-UsageChecker/
 │       ├── Tray/                    Infobereich-Symbol und Menü
 │       └── Views/                   Detail- und Einstellungsfenster
 ├── tests/
-│   └── ClaudeUsageChecker.Core.Tests/
+│   ├── ClaudeUsageChecker.Core.Tests/   Logik, Formatierung, Tokenkette
+│   └── ClaudeUsageChecker.App.Tests/    Kopflose UI-Tests (Avalonia.Headless)
 ├── build/                           Werkzeuge (Symbolgenerator)
 ├── assets/icons/                    Erzeugte Symbole
 └── docs/                            Recherche und Architektur
@@ -128,22 +150,27 @@ node build/generate-icons.mjs
 
 ## Aktualisierungen
 
-Der Update-Weg ist als austauschbare Schnittstelle (`IUpdateService`) angelegt.
-Solange das Repository privat ist, ist `DisabledUpdateService` aktiv, denn
-GitHub-Releases sind ohne Zugriffstoken nicht abrufbar. Wird das Repository
-öffentlich, genügt der Wechsel auf `GitHubReleaseUpdateService` in
-`App.axaml.cs`; dieser ist fertig implementiert und getestet.
+Die Prüfung läuft gegen die GitHub-Releases dieses Repositorys
+(`GitHubReleaseUpdateService`, hinter der austauschbaren Schnittstelle
+`IUpdateService`). Sie erfolgt beim Start – sofern in den Einstellungen aktiviert –
+und jederzeit über **Auf Aktualisierungen prüfen …** im Kontextmenü.
+
+Das Ergebnis erscheint in der Detailansicht. Bei einer neueren Version führt
+eine Schaltfläche zur Release-Seite.
 
 Bewusste Entscheidung: Die Anwendung lädt Aktualisierungen **nicht** selbst
 herunter und führt sie nicht aus. Sie meldet lediglich eine neuere Version und
-öffnet die Release-Seite. Das Einspielen bleibt eine bewusste Handlung.
+öffnet auf Wunsch die Release-Seite. Das Einspielen bleibt eine bewusste Handlung.
+
+Solange es keine Veröffentlichung gibt, meldet die Prüfung das offen, statt zu
+schweigen.
 
 ## Roadmap
 
 | Version | Inhalt |
 | --- | --- |
 | 0.1 | Windows-Infobereich, Sitzungs- und Wochenlimit, Token-Verwaltung |
-| 0.2 | Aktualisierungsprüfung aktiv, signiertes Installationspaket |
+| 0.2 | Signiertes Installationspaket, erste Veröffentlichung |
 | 0.3 | macOS-Menüleiste (Schlüsselbund-Anbindung ist bereits vorhanden) |
 
 ## Lizenz

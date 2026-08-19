@@ -15,10 +15,26 @@
 
       <StackPanel x:Name="WindowsPanel" Spacing="12" />
 
+      <Border x:Name="ExtraUsageBorder" IsVisible="False"
+              Background="{DynamicResource SystemControlBackgroundBaseLowBrush}"
+              CornerRadius="4" Padding="10">
+        <StackPanel x:Name="ExtraUsagePanel" Spacing="4" />
+      </Border>
+
       <Border x:Name="MessageBorder" IsVisible="False"
               Background="{DynamicResource SystemControlBackgroundBaseLowBrush}"
               CornerRadius="4" Padding="10">
         <TextBlock x:Name="MessageText" TextWrapping="Wrap" FontSize="12" />
+      </Border>
+
+      <Border x:Name="UpdateBorder" IsVisible="False"
+              Background="{DynamicResource SystemControlBackgroundBaseLowBrush}"
+              CornerRadius="4" Padding="10">
+        <StackPanel Spacing="8">
+          <TextBlock x:Name="UpdateText" TextWrapping="Wrap" FontSize="12" />
+          <Button x:Name="UpdateButton" Content="Release-Seite öffnen"
+                  IsVisible="False" HorizontalAlignment="Left" />
+        </StackPanel>
       </Border>
 
       <Separator />

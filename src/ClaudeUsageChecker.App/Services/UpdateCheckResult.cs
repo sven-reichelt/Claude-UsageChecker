@@ -23,9 +23,10 @@ public sealed record UpdateCheckResult
         Message = $"Version {current} ist aktuell."
     };
 
-    public static UpdateCheckResult Disabled(string reason) => new()
+    /// <summary>Es gibt (noch) keine Veroeffentlichung, gegen die geprueft werden koennte.</summary>
+    public static UpdateCheckResult Unavailable(string reason) => new()
     {
-        Status = UpdateCheckStatus.Disabled,
+        Status = UpdateCheckStatus.Unavailable,
         Message = reason
     };
 
@@ -40,6 +41,6 @@ public enum UpdateCheckStatus
 {
     UpToDate,
     UpdateAvailable,
-    Disabled,
+    Unavailable,
     Failed
 }

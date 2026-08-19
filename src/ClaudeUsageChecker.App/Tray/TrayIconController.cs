@@ -1,10 +1,11 @@
 using System;
-using Avalonia;
+using System.Collections.Generic;
 using Avalonia.Controls;
 using Avalonia.Platform;
 using Avalonia.Threading;
 using ClaudeUsageChecker.App.Settings;
 using ClaudeUsageChecker.Core.Formatting;
+using ClaudeUsageChecker.Core.Models;
 using ClaudeUsageChecker.Core.Services;
 
 namespace ClaudeUsageChecker.App.Tray;
@@ -15,12 +16,18 @@ namespace ClaudeUsageChecker.App.Tray;
 /// </summary>
 public sealed class TrayIconController : IDisposable
 {
+    /// <summary>
+    /// So viele Statuszeilen haelt das Menue bereit: Sitzung, Woche gesamt,
+    /// Woche Opus, Woche Sonnet und das Zusatzkontingent.
+    /// </summary>
+    private const int StatusSlotCount = 5;
+
     private readonly UsageMonitor _monitor;
     private readonly Func<AppSettings> _settings;
     private readonly TimeProvider _timeProvider;
 
     private readonly TrayIcon _trayIcon;
-    private readonly NativeMenuItem _statusItem;
+    private readonly List<NativeMenuItem> _statusItems = [];
     private readonly DispatcherTimer _tooltipTimer;
 
     public TrayIconController(
@@ -31,8 +38,6 @@ public sealed class TrayIconController : IDisposable
         _monitor = monitor ?? throw new ArgumentNullException(nameof(monitor));
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _timeProvider = timeProvider ?? TimeProvider.System;
-
-        _statusItem = new NativeMenuItem("Daten werden geladen ...") { IsEnabled = false };
 
         _trayIcon = new TrayIcon
         {
@@ -74,7 +79,16 @@ public sealed class TrayIconController : IDisposable
     private NativeMenu BuildMenu()
     {
         var menu = new NativeMenu();
-        menu.Add(_statusItem);
+
+        // Die Statuszeilen werden einmal angelegt und danach nur noch beschriftet.
+        // Ein Umbauen des Menues zur Laufzeit waere heikel, solange es geoeffnet ist.
+        for (var i = 0; i < StatusSlotCount; i++)
+        {
+            var item = new NativeMenuItem { IsEnabled = false, IsVisible = false };
+            _statusItems.Add(item);
+            menu.Add(item);
+        }
+
         menu.Add(new NativeMenuItemSeparator());
 
         var details = new NativeMenuItem("Details anzeigen");
@@ -118,9 +132,51 @@ public sealed class TrayIconController : IDisposable
             state, settings.WarningThreshold, settings.CriticalThreshold);
         _trayIcon.Icon = LoadIcon(severity);
 
-        _statusItem.Header = state.Snapshot?.Session is { } session
-            ? UsageFormatter.ToDetailLine("Sitzung", session, now)
-            : state.Message ?? "Keine Daten";
+        RenderStatusItems(state, now);
+    }
+
+    private void RenderStatusItems(UsageState state, DateTimeOffset now)
+    {
+        var lines = BuildStatusLines(state, now);
+
+        for (var i = 0; i < _statusItems.Count; i++)
+        {
+            if (i < lines.Count)
+            {
+                _statusItems[i].Header = lines[i];
+                _statusItems[i].IsVisible = true;
+            }
+            else
+            {
+                _statusItems[i].IsVisible = false;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Baut die Statuszeilen des Menues. Nicht gemeldete Fenster entfallen -
+    /// je nach Abonnement liefert die API etwa kein Opus-Wochenlimit.
+    /// </summary>
+    private static List<string> BuildStatusLines(UsageState state, DateTimeOffset now)
+    {
+        if (state.Snapshot is not { } snapshot)
+        {
+            return [state.Message ?? "Keine Daten"];
+        }
+
+        var lines = new List<string>(StatusSlotCount);
+
+        foreach (var (label, window) in UsageFormatter.EnumerateWindows(snapshot))
+        {
+            lines.Add(UsageFormatter.ToMenuLine(label, window, now));
+        }
+
+        if (UsageFormatter.ToExtraUsageLine(snapshot.ExtraUsage) is { } extra)
+        {
+            lines.Add(extra);
+        }
+
+        return lines.Count == 0 ? ["Keine Limits gemeldet"] : lines;
     }
 
     private static WindowIcon LoadIcon(TrayIconSeverity severity)

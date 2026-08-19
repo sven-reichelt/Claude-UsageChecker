@@ -37,8 +37,8 @@ public sealed class GitHubReleaseUpdateService(
 
             if (response.StatusCode == HttpStatusCode.NotFound)
             {
-                return UpdateCheckResult.Disabled(
-                    "Es sind keine oeffentlichen Veroeffentlichungen verfuegbar.");
+                return UpdateCheckResult.Unavailable(
+                    "Es gibt noch keine veroeffentlichte Version zum Vergleichen.");
             }
 
             if (!response.IsSuccessStatusCode)

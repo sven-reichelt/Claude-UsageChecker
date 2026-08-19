@@ -23,6 +23,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="ClaudeUsageChecker.App.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <AvaloniaResource Include="../../assets/icons/*.png" Link="Assets/%(Filename)%(Extension)" />
     <AvaloniaResource Include="../../assets/icons/*.ico" Link="Assets/%(Filename)%(Extension)" />
   </ItemGroup>
