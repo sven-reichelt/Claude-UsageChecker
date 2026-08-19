@@ -21,6 +21,7 @@ public partial class SettingsWindow : Window
     private readonly SettingsStore _settingsStore;
     private readonly Func<string, Task<TokenValidationResult>>? _validateToken;
     private readonly OAuthTokenStore? _oauthTokenStore;
+    private readonly Func<InstallResult>? _relocate;
     private AppSettings _settings;
 
     public SettingsWindow() : this(SecretStoreFactory.CreateForCurrentPlatform(), new SettingsStore(), new AppSettings())
@@ -32,13 +33,15 @@ public partial class SettingsWindow : Window
         SettingsStore settingsStore,
         AppSettings settings,
         Func<string, Task<TokenValidationResult>>? validateToken = null,
-        OAuthTokenStore? oauthTokenStore = null)
+        OAuthTokenStore? oauthTokenStore = null,
+        Func<InstallResult>? relocate = null)
     {
         _secretStore = secretStore;
         _settingsStore = settingsStore;
         _settings = settings;
         _validateToken = validateToken;
         _oauthTokenStore = oauthTokenStore;
+        _relocate = relocate;
 
         InitializeComponent();
 
@@ -56,8 +59,11 @@ public partial class SettingsWindow : Window
         SaveButton.Click += (_, _) => SaveAndClose();
         CancelButton.Click += (_, _) => Close();
 
+        LaunchAtLoginBox.IsCheckedChanged += (_, _) => UpdateRelocationHint();
+
         UpdateTokenStatus();
         UpdateSignInStatus();
+        UpdateRelocationHint();
     }
 
     /// <summary>Der Nutzer moechte die eigene Anmeldung starten.</summary>
@@ -188,6 +194,26 @@ public partial class SettingsWindow : Window
         }
     }
 
+    /// <summary>
+    /// Weist darauf hin, dass der Autostart ein Umziehen nach sich zieht.
+    /// </summary>
+    /// <remarks>
+    /// Ein Autostart-Eintrag, der in den Download-Ordner zeigt, bricht beim
+    /// ersten Aufraeumen dort. Deshalb wird die Anwendung mit dem Haken auch
+    /// gleich an ihren festen Platz gebracht - das soll aber niemanden
+    /// ueberraschen.
+    /// </remarks>
+    private void UpdateRelocationHint()
+    {
+        var noetig = (LaunchAtLoginBox.IsChecked ?? false) && _relocate is not null && SelfInstaller.ShouldOffer;
+
+        RelocationHint.IsVisible = noetig;
+        RelocationHint.Text = noetig
+            ? $"Beim Speichern wird die Anwendung nach {SelfInstaller.TargetPath} kopiert "
+              + "und von dort neu gestartet. Ein Autostart aus dem Download-Ordner wäre brüchig."
+            : null;
+    }
+
     private void SaveAndClose()
     {
         _settings = new AppSettings
@@ -196,10 +222,35 @@ public partial class SettingsWindow : Window
             LaunchAtLogin = LaunchAtLoginBox.IsChecked ?? false,
             CheckForUpdates = CheckUpdatesBox.IsChecked ?? true,
             WarningThreshold = _settings.WarningThreshold,
-            CriticalThreshold = _settings.CriticalThreshold
+            CriticalThreshold = _settings.CriticalThreshold,
+            InstallPromptShown = _settings.InstallPromptShown
         };
 
         _settingsStore.Save(_settings);
+
+        // Der Autostart braucht einen festen Platz. Beim Abwaehlen wird dagegen
+        // nur der Eintrag entfernt - die einmal eingerichtete Anwendung bleibt,
+        // wo sie ist.
+        if (_settings.LaunchAtLogin && _relocate is not null && SelfInstaller.ShouldOffer)
+        {
+            SaveButton.IsEnabled = false;
+            RelocationHint.IsVisible = true;
+            RelocationHint.Text = "Wird eingerichtet ...";
+
+            var ergebnis = _relocate();
+            if (!ergebnis.Succeeded)
+            {
+                RelocationHint.Text = ergebnis.Message;
+                SaveButton.IsEnabled = true;
+                return;
+            }
+
+            RelocationHint.Text = ergebnis.Message;
+            SettingsChanged?.Invoke(this, _settings);
+            Close();
+            return;
+        }
+
         AutostartManager.Apply(_settings.LaunchAtLogin);
         SettingsChanged?.Invoke(this, _settings);
         Close();

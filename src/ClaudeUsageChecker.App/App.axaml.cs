@@ -152,6 +152,29 @@ public partial class App : Application, IDisposable
         window.Activate();
     }
 
+    /// <summary>
+    /// Bringt die Anwendung an ihren festen Platz und beendet danach diese
+    /// Instanz. Wird aus den Einstellungen aufgerufen, wenn dort der Autostart
+    /// eingeschaltet wird: Ein Eintrag, der auf den Download-Ordner zeigt, hielte
+    /// dem ersten Aufräumen dort nicht stand.
+    /// </summary>
+    private InstallResult RichteDauerhaftEin()
+    {
+        var ergebnis = SelfInstaller.Install();
+
+        if (ergebnis.Succeeded)
+        {
+            MerkeAntwort(installiert: true);
+
+            // Erst zurueckkehren, damit die Einstellungen die Meldung noch
+            // anzeigen koennen - die neue Instanz wartet ohnehin auf das Ende
+            // dieser hier.
+            Dispatcher.UIThread.Post(() => ErrorGuard.Run("Beenden nach Einrichtung", RequestShutdown));
+        }
+
+        return ergebnis;
+    }
+
     private void MerkeAntwort(bool installiert)
     {
         _settings.InstallPromptShown = true;
@@ -225,7 +248,8 @@ public partial class App : Application, IDisposable
             _settingsStore,
             _settings,
             token => validator.ValidateAsync(token),
-            _oauthTokenStore);
+            _oauthTokenStore,
+            RichteDauerhaftEin);
 
         window.SettingsChanged += (_, settings) =>
         {

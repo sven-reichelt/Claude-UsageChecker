@@ -43,6 +43,8 @@
       </Grid>
 
       <CheckBox x:Name="LaunchAtLoginBox" Content="Mit Windows starten" />
+      <TextBlock x:Name="RelocationHint" IsVisible="False" TextWrapping="Wrap"
+                 FontSize="11" Opacity="0.75" Margin="24,-4,0,0" />
       <CheckBox x:Name="CheckUpdatesBox" Content="Beim Start auf Aktualisierungen prüfen" />
     </StackPanel>
 

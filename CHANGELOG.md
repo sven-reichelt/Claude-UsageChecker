@@ -5,6 +5,17 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unveröffentlicht]
 
+## [0.4.2] – 2026-08-19
+
+### Behoben
+- Wer die Einrichtung beim ersten Start überspringt und später nur den Haken
+  „Mit Windows starten" setzt, bekam einen Autostart-Eintrag, der auf den
+  Download-Ordner zeigte – beim ersten Aufräumen dort wäre er wertlos gewesen.
+  Der Haken zieht das Umziehen jetzt ebenfalls nach sich, mit vorherigem
+  Hinweis auf Zielpfad und Neustart.
+- Das **Abwählen** lässt die Anwendung dagegen, wo sie ist. Entfernt wird nur
+  der Autostart-Eintrag; einmal eingerichtet bleibt eingerichtet.
+
 ## [0.4.1] – 2026-08-19
 
 ### Behoben
