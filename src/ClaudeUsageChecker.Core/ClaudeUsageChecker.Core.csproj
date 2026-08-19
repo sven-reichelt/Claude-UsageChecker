@@ -17,4 +17,14 @@
     <InternalsVisibleTo Include="ClaudeUsageChecker.Core.Tests" />
   </ItemGroup>
 
+  <!--
+    Die Sprachdateien reisen als eingebettete Ressourcen mit - bewusst nicht als
+    Satelliten-Assemblies aus .resx. Die Veroeffentlichung ist eine getrimmte
+    Einzeldatei; dort sind Satelliten der Weg mit den meisten Fallstricken,
+    waehrend eingebettete Dateien jeden Trimmvorgang unveraendert ueberstehen.
+  -->
+  <ItemGroup>
+    <EmbeddedResource Include="Localization/Texts/*.json" />
+  </ItemGroup>
+
 </Project>
