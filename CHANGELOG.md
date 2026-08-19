@@ -5,6 +5,11 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unveröffentlicht]
 
+## [0.3.0] – 2026-08-19
+
+Die erste Fassung, die sich selbst aktualisieren kann. Ab hier genügt ein Klick
+– das Herunterladen von Hand entfällt.
+
 ### Behoben
 - Versionen werden dreistellig angezeigt. Die vierte Stelle stammt aus der
   Assembly-Version und sagt nichts aus – „Version 0.2.0.0 ist aktuell"
@@ -27,6 +32,9 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 - „Details anzeigen" ist aus dem Kontextmenü entfernt. Der Linksklick auf das
   Symbol öffnet die Detailansicht, und die Zahlen stehen ohnehin in den
   Statuszeilen darüber – der Eintrag bot nur denselben Weg ein zweites Mal.
+- Der Hinweis bei fehlendem Zugriffsrecht nennt zuerst die eigene Anmeldung.
+  Bisher stand dort „Melde dich in Claude Code an" – ein Rat, dem auf einem
+  Rechner ohne Claude Code niemand folgen konnte.
 
 ## [0.2.0] – 2026-08-19
 

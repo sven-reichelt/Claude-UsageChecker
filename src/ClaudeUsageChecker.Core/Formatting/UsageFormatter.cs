@@ -30,7 +30,7 @@ public static class UsageFormatter
         var text = state.Kind switch
         {
             UsageStateKind.Initializing => "Claude UsageChecker - Daten werden geladen ...",
-            UsageStateKind.NotConfigured => "Claude UsageChecker - kein Token hinterlegt",
+            UsageStateKind.NotConfigured => "Claude UsageChecker - nicht angemeldet",
             UsageStateKind.AuthenticationFailed => "Claude UsageChecker - Token abgelaufen",
             UsageStateKind.Unavailable => "Claude UsageChecker - keine Verbindung",
             _ => BuildTooltipText(state, now, culture)

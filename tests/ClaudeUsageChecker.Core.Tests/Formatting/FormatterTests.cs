@@ -124,7 +124,7 @@ public class FormatterTests
     }
 
     [Fact]
-    public void ToTooltip_WeistAufFehlendesTokenHin()
+    public void ToTooltip_WeistAufFehlendeAnmeldungHin()
     {
         var state = new UsageState
         {
@@ -132,7 +132,7 @@ public class FormatterTests
             Failure = UsageApiFailure.NoToken
         };
 
-        Assert.Contains("kein Token", UsageFormatter.ToTooltip(state, Now), StringComparison.Ordinal);
+        Assert.Contains("nicht angemeldet", UsageFormatter.ToTooltip(state, Now), StringComparison.Ordinal);
     }
 
     [Fact]

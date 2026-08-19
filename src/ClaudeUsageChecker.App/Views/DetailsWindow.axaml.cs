@@ -183,9 +183,13 @@ public partial class DetailsWindow : Window
     {
         var message = state.Kind switch
         {
+            // Zuerst der eigene Weg: Er funktioniert auch dort, wo Claude Code
+            // gar nicht installiert ist - und genau dort stand vorher ein
+            // Hinweis, dem niemand folgen konnte.
             UsageStateKind.NotConfigured =>
-                "Kein Token gefunden. Melde dich in Claude Code an (\"claude\" starten und "
-                + "einloggen) - die Anwendung liest das Token dann mit.",
+                "Kein Zugriffsrecht vorhanden. Unter Einstellungen → Anmelden holt sich die "
+                + "Anwendung ein eigenes. Alternativ liest sie das Token einer angemeldeten "
+                + "Claude-Code-Installation mit.",
             // Der Text der Ausnahme unterscheidet bereits zwischen abgelaufenem
             // Token und fehlendem Geltungsbereich - er ist hier hilfreicher als
             // eine allgemeine Formulierung.
