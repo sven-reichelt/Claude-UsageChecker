@@ -6,15 +6,17 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
+using ClaudeUsageChecker.Core.Localization;
+
 namespace ClaudeUsageChecker.App.Services;
 
 /// <summary>
-/// Fragt die neueste Veroeffentlichung eines GitHub-Repositorys ab.
+/// Queries the latest release of a GitHub repository.
 /// </summary>
 /// <remarks>
-/// Bewusst nur eine Pruefung mit Hinweis auf die Release-Seite: Es wird nichts
-/// automatisch heruntergeladen oder ausgefuehrt. Das Einspielen bleibt eine
-/// bewusste Entscheidung des Nutzers.
+/// Deliberately only a check with a pointer to the release page: nothing is
+/// downloaded or executed automatically. Installing stays a deliberate decision
+/// of the user.
 /// </remarks>
 public sealed class GitHubReleaseUpdateService(
     HttpClient httpClient,
@@ -38,13 +40,13 @@ public sealed class GitHubReleaseUpdateService(
             if (response.StatusCode == HttpStatusCode.NotFound)
             {
                 return UpdateCheckResult.Unavailable(
-                    "Es gibt noch keine veröffentlichte Version zum Vergleichen.");
+                    T.UpdateNoRelease);
             }
 
             if (!response.IsSuccessStatusCode)
             {
                 return UpdateCheckResult.Failed(
-                    $"GitHub antwortete mit HTTP {(int)response.StatusCode}.");
+                    T.UpdateHttpError((int)response.StatusCode));
             }
 
             var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
@@ -53,13 +55,13 @@ public sealed class GitHubReleaseUpdateService(
 
             if (!root.TryGetProperty("tag_name", out var tagElement))
             {
-                return UpdateCheckResult.Failed("Die Antwort von GitHub war unvollständig.");
+                return UpdateCheckResult.Failed(T.UpdateIncomplete);
             }
 
             var tag = tagElement.GetString();
             if (!TryParseTag(tag, out var latest))
             {
-                return UpdateCheckResult.Failed($"Unbekanntes Versionsformat: {tag}");
+                return UpdateCheckResult.Failed(T.UpdateUnknownFormat(tag ?? string.Empty));
             }
 
             if (latest <= currentVersion)
@@ -79,23 +81,22 @@ public sealed class GitHubReleaseUpdateService(
                 ReleasePage = page,
                 DownloadUrl = FindAsset(root, ".exe"),
                 ChecksumUrl = FindAsset(root, ".exe.sha256"),
-                Message = $"Version {UpdateCheckResult.Anzeigen(latest)} ist verfügbar "
-                          + $"(installiert: {UpdateCheckResult.Anzeigen(currentVersion)})."
+                Message = T.UpdateAvailable(
+                    UpdateCheckResult.Display(latest), UpdateCheckResult.Display(currentVersion))
             };
         }
         catch (Exception ex) when (ex is HttpRequestException or JsonException or TaskCanceledException)
         {
-            return UpdateCheckResult.Failed("Die Aktualisierungsprüfung ist fehlgeschlagen.");
+            return UpdateCheckResult.Failed(T.UpdateCheckFailed);
         }
     }
 
     /// <summary>
-    /// Sucht die angehaengte Datei mit der passenden Endung.
+    /// Finds the attached file with the matching extension.
     /// </summary>
     /// <remarks>
-    /// Die Adresse stammt aus der Antwort von GitHub zu genau diesem
-    /// Repository - sie wird nicht aus dem Dateinamen zusammengesetzt oder
-    /// erraten.
+    /// The address comes from GitHub's response for exactly this repository - it
+    /// is not pieced together from the file name or guessed.
     /// </remarks>
     internal static Uri? FindAsset(JsonElement release, string suffix)
     {
@@ -124,7 +125,7 @@ public sealed class GitHubReleaseUpdateService(
         return null;
     }
 
-    /// <summary>Akzeptiert Marken der Form "v1.2.3" ebenso wie "1.2.3".</summary>
+    /// <summary>Accepts tags of the form "v1.2.3" as well as "1.2.3".</summary>
     internal static bool TryParseTag(string? tag, out Version version)
     {
         version = new Version(0, 0);

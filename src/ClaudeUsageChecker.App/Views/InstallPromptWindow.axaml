@@ -1,7 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="ClaudeUsageChecker.App.Views.InstallPromptWindow"
-        Title="Claude UsageChecker einrichten"
         Width="460" SizeToContent="Height"
         CanResize="False"
         WindowStartupLocation="CenterScreen"
@@ -15,30 +14,39 @@
           CornerRadius="6">
     <StackPanel Spacing="14">
 
-      <TextBlock Text="Dauerhaft einrichten?" FontWeight="SemiBold" FontSize="15"
+      <TextBlock x:Name="HeadingText" FontWeight="SemiBold" FontSize="15"
                  Foreground="{DynamicResource AccentBrush}" />
 
-      <TextBlock TextWrapping="Wrap" FontSize="12"
-                 Text="Die Anwendung läuft gerade von dort, wo du sie heruntergeladen hast. Autostart und die Anheftung im Infobereich hängen aber am Speicherort – wird dort aufgeräumt, ist beides hinüber." />
+      <!-- The language picker sits at the top: anyone who cannot read the
+           sentences below should not have to hunt for it first. It takes effect
+           at once, and the whole window relabels itself. -->
+      <Grid ColumnDefinitions="Auto,*">
+        <TextBlock x:Name="LanguageLabel" VerticalAlignment="Center" FontSize="12" Margin="0,0,10,0" />
+        <ComboBox Grid.Column="1" x:Name="LanguageBox" HorizontalAlignment="Stretch" />
+      </Grid>
+      <TextBlock x:Name="LanguageHint" TextWrapping="Wrap" FontSize="11" Opacity="0.7" Margin="0,-6,0,0" />
 
-      <TextBlock TextWrapping="Wrap" FontSize="12" Text="Wenn du zustimmst, wird sie:" />
+      <Separator />
+
+      <TextBlock x:Name="IntroText" TextWrapping="Wrap" FontSize="12" />
+
+      <TextBlock x:Name="ListIntroText" TextWrapping="Wrap" FontSize="12" />
 
       <StackPanel Spacing="4" Margin="8,0,0,0">
-        <TextBlock FontSize="12" Text="• an einen festen Platz kopiert:" />
+        <TextBlock x:Name="BulletCopyText" FontSize="12" TextWrapping="Wrap" />
         <TextBlock x:Name="TargetText" FontSize="11" Opacity="0.75" Margin="10,0,0,0" TextWrapping="Wrap" />
-        <TextBlock FontSize="12" Text="• von dort mit Windows gestartet" />
-        <TextBlock FontSize="12" Text="• von dort neu gestartet" />
+        <TextBlock x:Name="BulletAutostartText" FontSize="12" TextWrapping="Wrap" />
+        <TextBlock x:Name="BulletRestartText" FontSize="12" TextWrapping="Wrap" />
       </StackPanel>
 
-      <TextBlock TextWrapping="Wrap" FontSize="11" Opacity="0.7"
-                 Text="Die heruntergeladene Datei bleibt liegen und kann gelöscht werden. Beides lässt sich in den Einstellungen jederzeit ändern." />
+      <TextBlock x:Name="OutroText" TextWrapping="Wrap" FontSize="11" Opacity="0.7" />
 
       <TextBlock x:Name="StatusText" TextWrapping="Wrap" FontSize="12" IsVisible="False" />
 
       <StackPanel Spacing="6">
-        <Button x:Name="InstallButton" Content="Einrichten und neu starten"
+        <Button x:Name="InstallButton"
                 HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-        <Button x:Name="LaterButton" Content="Nicht einrichten"
+        <Button x:Name="LaterButton"
                 HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
       </StackPanel>
 

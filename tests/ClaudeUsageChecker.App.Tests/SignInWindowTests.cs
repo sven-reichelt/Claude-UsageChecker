@@ -6,11 +6,11 @@ using ClaudeUsageChecker.Core.Authentication.OAuth;
 
 namespace ClaudeUsageChecker.App.Tests;
 
-/// <summary>Prueft die Fenster rund um die eigene Anmeldung.</summary>
+/// <summary>Checks the windows around the application's own sign-in.</summary>
 public class SignInWindowTests
 {
     [AvaloniaFact]
-    public void AnmeldefensterLaesstSichErzeugen()
+    public void TheSignInWindowCanBeCreated()
     {
         var window = new SignInWindow(CreateOAuthClient(), CreateTokenStore(out _));
 
@@ -20,7 +20,7 @@ public class SignInWindowTests
     }
 
     [AvaloniaFact]
-    public void OhneBegonneneAnmeldungLaesstSichNichtsAbschliessen()
+    public void WithoutAStartedSignInNothingCanBeCompleted()
     {
         var window = new SignInWindow(CreateOAuthClient(), CreateTokenStore(out _));
 
@@ -28,16 +28,16 @@ public class SignInWindowTests
     }
 
     [AvaloniaFact]
-    public void OhneAnmeldungMeldetDasFensterDasOffen()
+    public void WithoutASignInTheWindowSaysSoPlainly()
     {
         var window = new SignInWindow(CreateOAuthClient(), CreateTokenStore(out _));
 
-        Assert.Contains("Noch nicht angemeldet",
+        Assert.Contains("Not signed in yet",
             window.FindControl<TextBlock>("SignedInText")!.Text!, StringComparison.Ordinal);
     }
 
     [AvaloniaFact]
-    public void EineVorhandeneAnmeldungWirdMitRechtenAngezeigt()
+    public void AnExistingSignInIsShownWithItsScope()
     {
         var store = CreateTokenStore(out _);
         store.Write(new OAuthTokens
@@ -51,35 +51,35 @@ public class SignInWindowTests
         var window = new SignInWindow(CreateOAuthClient(), store);
 
         var text = window.FindControl<TextBlock>("SignedInText")!.Text!;
-        Assert.Contains("Angemeldet", text, StringComparison.Ordinal);
+        Assert.Contains("Signed in", text, StringComparison.Ordinal);
         Assert.Contains("user:profile", text, StringComparison.Ordinal);
     }
 
     [AvaloniaFact]
-    public void EinstellungenZeigenDenAnmeldezustand()
+    public void TheSettingsShowTheSignInState()
     {
         using var settingsFile = new TemporaryFile();
         var store = CreateTokenStore(out _);
 
         var window = new SettingsWindow(
-            new FakeSecretStore(), new SettingsStore(settingsFile.Path), new AppSettings(),
-            validateToken: null, oauthTokenStore: store);
+            new SettingsStore(settingsFile.Path), new AppSettings(),
+            oauthTokenStore: store);
 
-        Assert.Contains("Nicht angemeldet",
+        Assert.Contains("Not signed in",
             window.FindControl<TextBlock>("SignInStatus")!.Text!, StringComparison.Ordinal);
         Assert.False(window.FindControl<Button>("SignOutButton")!.IsEnabled);
     }
 
     [AvaloniaFact]
-    public void EinstellungenErlaubenAbmeldenNurWennAngemeldet()
+    public void TheSettingsAllowSigningOutOnlyWhenSignedIn()
     {
         using var settingsFile = new TemporaryFile();
         var store = CreateTokenStore(out _);
         store.Write(new OAuthTokens { AccessToken = "a1", Scope = "user:profile" });
 
         var window = new SettingsWindow(
-            new FakeSecretStore(), new SettingsStore(settingsFile.Path), new AppSettings(),
-            validateToken: null, oauthTokenStore: store);
+            new SettingsStore(settingsFile.Path), new AppSettings(),
+            oauthTokenStore: store);
 
         Assert.True(window.FindControl<Button>("SignOutButton")!.IsEnabled);
         Assert.Contains("user:profile",

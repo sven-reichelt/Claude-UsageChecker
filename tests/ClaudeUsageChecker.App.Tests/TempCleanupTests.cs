@@ -3,32 +3,31 @@ using ClaudeUsageChecker.App.Services;
 namespace ClaudeUsageChecker.App.Tests;
 
 /// <summary>
-/// Prueft die Zurueckhaltung des Aufraeumens.
+/// Checks the restraint of the cleanup.
 /// </summary>
 /// <remarks>
-/// Ein Aufraeumer, der zu viel loescht, ist schlimmer als gar keiner - er wuerde
-/// die Entpackung einer laufenden Fassung entfernen. Deshalb wird im
-/// Entwicklungsstand, wo sich der benutzte Ordner nicht bestimmen laesst,
-/// bewusst nichts angefasst.
+/// A cleaner that deletes too much is worse than none at all - it would remove
+/// the extraction of a running version. In a development build, where the folder
+/// in use cannot be determined, nothing is touched on purpose.
 /// </remarks>
 public class TempCleanupTests
 {
     [Fact]
-    public void OhneErkennbarenEigenenOrdnerWirdNichtsGeloescht()
+    public void WithoutARecognisableOwnFolderNothingIsDeleted()
     {
         // Im Entwicklungsstand liegt keine Entpackung vor, es laedt also kein
-        // Modul von dort. Damit fehlt jede Grundlage zu entscheiden, welcher
-        // Ordner in Benutzung ist - und dann wird bewusst nichts angefasst.
-        Assert.Equal(0, TempCleanup.RaeumeAlteEntpackungenWeg());
+        // module from there. That removes any basis for deciding which folder is
+        // in use - and then nothing is touched, on purpose.
+        Assert.Equal(0, TempCleanup.RemoveStaleExtractions());
     }
 
     [Fact]
-    public void DasAufraeumenLaesstDasTemporaerverzeichnisUnberuehrt()
+    public void TheCleanupLeavesTheTempDirectoryUntouched()
     {
         var basis = Path.Combine(Path.GetTempPath(), ".net");
         var vorher = Directory.Exists(basis) ? Directory.GetDirectories(basis).Length : -1;
 
-        TempCleanup.RaeumeAlteEntpackungenWeg();
+        TempCleanup.RemoveStaleExtractions();
 
         var nachher = Directory.Exists(basis) ? Directory.GetDirectories(basis).Length : -1;
         Assert.Equal(vorher, nachher);

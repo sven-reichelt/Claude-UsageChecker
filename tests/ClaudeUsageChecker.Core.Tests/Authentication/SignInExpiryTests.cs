@@ -6,14 +6,14 @@ using Microsoft.Extensions.Time.Testing;
 namespace ClaudeUsageChecker.Core.Tests.Authentication;
 
 /// <summary>
-/// Unterscheidet endgueltig verworfene Anmeldedaten von voruebergehenden
+/// Distinguishes credentials discarded for good from temporary
 /// Stoerungen.
 /// </summary>
 /// <remarks>
-/// Der Unterschied ist folgenreich: Wird eine bloss gestoerte Verbindung als
-/// Ablehnung gewertet, loescht die Anwendung eine intakte Anmeldung und der
-/// Nutzer muss sich grundlos neu anmelden. Umgekehrt liefe die Anzeige bei
-/// einer echten Ablehnung stillschweigend ueber Claude Code weiter - die
+/// The difference matters: if a merely disturbed connection counts as a
+/// rejection, the application deletes an intact sign-in and the user has to sign
+/// in again for no reason. The other way round, on a real rejection the display
+/// would carry on silently through Claude Code - and the
 /// Unabhaengigkeit waere unbemerkt verloren.
 /// </remarks>
 public class SignInExpiryTests
@@ -23,19 +23,19 @@ public class SignInExpiryTests
     [Theory]
     [InlineData(HttpStatusCode.BadRequest)]
     [InlineData(HttpStatusCode.Unauthorized)]
-    public async Task EineAblehnungEntferntDieAnmeldungUndMeldetSie(HttpStatusCode status)
+    public async Task ARejectionRemovesTheSignInAndReportsIt(HttpStatusCode status)
     {
         var handler = new OAuthFlowTests.StubHandler((status, """{"error":"invalid_grant"}"""));
         using var provider = CreateProvider(handler, AblaufendeAnmeldung(), out var store);
 
-        string? gemeldet = null;
-        provider.SignInExpired += (_, grund) => gemeldet = grund;
+        string? reported = null;
+        provider.SignInExpired += (_, grund) => reported = grund;
 
         var token = await provider.TryGetTokenAsync();
 
         Assert.Null(token);
         Assert.Null(store.Read());
-        Assert.NotNull(gemeldet);
+        Assert.NotNull(reported);
     }
 
     [Theory]
@@ -43,34 +43,34 @@ public class SignInExpiryTests
     [InlineData(HttpStatusCode.InternalServerError)]
     [InlineData(HttpStatusCode.ServiceUnavailable)]
     [InlineData(HttpStatusCode.TooManyRequests)]
-    public async Task EineStoerungLaesstDieAnmeldungUnangetastet(HttpStatusCode status)
+    public async Task ADisturbanceLeavesTheSignInUntouched(HttpStatusCode status)
     {
         var handler = new OAuthFlowTests.StubHandler((status, """{"error":"nicht erreichbar"}"""));
         using var provider = CreateProvider(handler, AblaufendeAnmeldung(), out var store);
 
-        var gemeldet = false;
-        provider.SignInExpired += (_, _) => gemeldet = true;
+        var reported = false;
+        provider.SignInExpired += (_, _) => reported = true;
 
         var token = await provider.TryGetTokenAsync();
 
-        // Kein Token diesmal - aber die Anmeldedaten bleiben erhalten.
+        // No token this time - but the credentials are kept.
         Assert.Null(token);
         Assert.NotNull(store.Read());
-        Assert.False(gemeldet);
+        Assert.False(reported);
     }
 
     [Fact]
-    public async Task EinNetzwerkausfallLaesstDieAnmeldungUnangetastet()
+    public async Task ANetworkOutageLeavesTheSignInUntouched()
     {
         var handler = new ThrowingHandler();
         using var provider = CreateProvider(handler, AblaufendeAnmeldung(), out var store);
 
-        var gemeldet = false;
-        provider.SignInExpired += (_, _) => gemeldet = true;
+        var reported = false;
+        provider.SignInExpired += (_, _) => reported = true;
 
         Assert.Null(await provider.TryGetTokenAsync());
         Assert.NotNull(store.Read());
-        Assert.False(gemeldet);
+        Assert.False(reported);
     }
 
     [Fact]
@@ -105,10 +105,10 @@ public class SignInExpiryTests
     };
 
     private static OAuthTokenProvider CreateProvider(
-        HttpMessageHandler handler, OAuthTokens gespeichert, out OAuthTokenStore store)
+        HttpMessageHandler handler, OAuthTokens saved, out OAuthTokenStore store)
     {
         store = new OAuthTokenStore(new FakeSecretStore());
-        store.Write(gespeichert);
+        store.Write(saved);
 
         return new OAuthTokenProvider(
             store,

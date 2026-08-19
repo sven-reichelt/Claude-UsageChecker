@@ -1,60 +1,96 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="ClaudeUsageChecker.App.Views.SettingsWindow"
-        Title="Claude UsageChecker - Einstellungen"
         Width="460" SizeToContent="Height"
         CanResize="False"
         WindowStartupLocation="CenterScreen">
 
-  <StackPanel Margin="20" Spacing="18">
+  <!-- The window grows with its content and cannot be resized. On a low screen
+       it therefore reached past the bottom edge - and took the "save" button
+       with it. Hence two safeguards: the button row is docked at the bottom and
+       stays outside the scroll area, so that it remains reachable however low
+       the screen; and the content above it is capped to the working area when
+       the window opens. The value here applies until a screen is known. -->
+  <DockPanel LastChildFill="True">
 
-    <StackPanel Spacing="8">
-      <TextBlock Text="Eigene Anmeldung (empfohlen)" FontWeight="SemiBold" />
-      <TextBlock x:Name="SignInStatus" TextWrapping="Wrap" FontSize="12" Opacity="0.8" />
-      <StackPanel Orientation="Horizontal" Spacing="8">
-        <Button x:Name="SignInButton" Content="Anmelden ..." />
-        <Button x:Name="SignOutButton" Content="Abmelden" />
-      </StackPanel>
-    </StackPanel>
-
-    <Separator />
-
-    <StackPanel Spacing="6">
-      <TextBlock Text="Einzelnes Token (Sonderfall)" FontWeight="SemiBold" />
-      <TextBlock TextWrapping="Wrap" FontSize="12" Opacity="0.8"
-                 Text="Nur nötig, wenn ein Token aus anderer Quelle verwendet werden soll. Es muss das Recht user:profile tragen - Tokens aus &quot;claude setup-token&quot; taugen dafür nicht. Ablage verschlüsselt in der Windows-Anmeldeinformationsverwaltung." />
-      <TextBox x:Name="TokenBox" PasswordChar="•" Watermark="sk-ant-oat01-..." />
-      <TextBlock x:Name="TokenStatus" FontSize="11" Opacity="0.75" TextWrapping="Wrap" />
-      <StackPanel Orientation="Horizontal" Spacing="8">
-        <Button x:Name="SaveTokenButton" Content="Token speichern" />
-        <Button x:Name="DeleteTokenButton" Content="Token entfernen" />
-      </StackPanel>
-    </StackPanel>
-
-    <Separator />
-
-    <StackPanel Spacing="10">
-      <TextBlock Text="Verhalten" FontWeight="SemiBold" />
-
-      <Grid ColumnDefinitions="*,Auto" >
-        <TextBlock Text="Abrufintervall (Sekunden, mindestens 180)" VerticalAlignment="Center" FontSize="12" />
-        <NumericUpDown Grid.Column="1" x:Name="IntervalBox"
-                       Minimum="180" Maximum="3600" Increment="60" Width="120" />
+    <StackPanel DockPanel.Dock="Bottom" Margin="20,0,20,20" Spacing="18">
+      <Separator />
+      <Grid ColumnDefinitions="*,Auto,Auto">
+        <TextBlock x:Name="VersionText" FontSize="11" Opacity="0.6" VerticalAlignment="Center" />
+        <Button Grid.Column="1" x:Name="CancelButton" Margin="0,0,8,0" />
+        <Button Grid.Column="2" x:Name="SaveButton" IsDefault="True" />
       </Grid>
-
-      <CheckBox x:Name="LaunchAtLoginBox" Content="Mit Windows starten" />
-      <TextBlock x:Name="RelocationHint" IsVisible="False" TextWrapping="Wrap"
-                 FontSize="11" Opacity="0.75" Margin="24,-4,0,0" />
-      <CheckBox x:Name="CheckUpdatesBox" Content="Beim Start auf Aktualisierungen prüfen" />
     </StackPanel>
 
-    <Separator />
+    <ScrollViewer x:Name="ContentScroller" MaxHeight="760"
+                  HorizontalScrollBarVisibility="Disabled"
+                  VerticalScrollBarVisibility="Auto">
+      <StackPanel Margin="20" Spacing="18">
 
-    <Grid ColumnDefinitions="*,Auto,Auto">
-      <TextBlock x:Name="VersionText" FontSize="11" Opacity="0.6" VerticalAlignment="Center" />
-      <Button Grid.Column="1" x:Name="CancelButton" Content="Abbrechen" Margin="0,0,8,0" />
-      <Button Grid.Column="2" x:Name="SaveButton" Content="Speichern" IsDefault="True" />
-    </Grid>
+        <StackPanel Spacing="8">
+          <TextBlock x:Name="SignInHeading" FontWeight="SemiBold" />
+          <TextBlock x:Name="SignInStatus" TextWrapping="Wrap" FontSize="12" Opacity="0.8" />
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button x:Name="SignInButton" />
+            <Button x:Name="SignOutButton" />
+          </StackPanel>
+        </StackPanel>
 
-  </StackPanel>
+        <Separator />
+
+        <StackPanel Spacing="10">
+          <TextBlock x:Name="BehaviourHeading" FontWeight="SemiBold" />
+
+          <Grid ColumnDefinitions="*,Auto" >
+            <TextBlock x:Name="IntervalLabel" VerticalAlignment="Center" FontSize="12" />
+            <NumericUpDown Grid.Column="1" x:Name="IntervalBox"
+                           Minimum="180" Maximum="3600" Increment="60" Width="120" />
+          </Grid>
+
+          <CheckBox x:Name="LaunchAtLoginBox" />
+          <TextBlock x:Name="RelocationHint" IsVisible="False" TextWrapping="Wrap"
+                     FontSize="11" Opacity="0.75" Margin="24,-4,0,0" />
+          <CheckBox x:Name="CheckUpdatesBox" />
+        </StackPanel>
+
+        <Separator />
+
+        <StackPanel Spacing="10">
+          <TextBlock x:Name="LanguageHeading" FontWeight="SemiBold" />
+          <TextBlock x:Name="LanguageHint" TextWrapping="Wrap" FontSize="12" Opacity="0.8" />
+
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock x:Name="LanguageLabel" VerticalAlignment="Center" FontSize="12" />
+            <!-- The language names are each written in their own language and are
+                 therefore not translated - someone who switched the interface to
+                 Russian by accident will recognise "Deutsch". -->
+            <ComboBox Grid.Column="1" x:Name="LanguageBox" Width="200" />
+          </Grid>
+        </StackPanel>
+
+        <Separator />
+
+        <StackPanel Spacing="10">
+          <TextBlock x:Name="ThresholdHeading" FontWeight="SemiBold" />
+          <TextBlock x:Name="ThresholdIntro" TextWrapping="Wrap" FontSize="12" Opacity="0.8" />
+
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock x:Name="WarningLabel" VerticalAlignment="Center" FontSize="12" />
+            <NumericUpDown Grid.Column="1" x:Name="WarningThresholdBox"
+                           Minimum="5" Maximum="100" Increment="5" Width="120" />
+          </Grid>
+
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock x:Name="CriticalLabel" VerticalAlignment="Center" FontSize="12" />
+            <NumericUpDown Grid.Column="1" x:Name="CriticalThresholdBox"
+                           Minimum="5" Maximum="100" Increment="5" Width="120" />
+          </Grid>
+
+          <TextBlock x:Name="ThresholdHint" IsVisible="False" TextWrapping="Wrap"
+                     FontSize="11" Foreground="{DynamicResource CriticalBrush}" />
+        </StackPanel>
+      </StackPanel>
+    </ScrollViewer>
+
+  </DockPanel>
 </Window>

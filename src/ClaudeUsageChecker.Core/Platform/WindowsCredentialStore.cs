@@ -5,9 +5,9 @@ using System.Text;
 namespace ClaudeUsageChecker.Core.Platform;
 
 /// <summary>
-/// Ablage im Windows-Anmeldeinformationsverwaltung (Credential Manager).
-/// Eintraege werden von Windows benutzergebunden per DPAPI verschluesselt;
-/// die Anwendung speichert zu keinem Zeitpunkt Klartext auf der Platte.
+/// Storage in the Windows Credential Manager. Entries are encrypted by Windows
+/// through DPAPI and bound to the user account; the application never writes
+/// plaintext to disk.
 /// </summary>
 [SupportedOSPlatform("windows")]
 public sealed class WindowsCredentialStore : ISecretStore
@@ -89,10 +89,10 @@ public sealed class WindowsCredentialStore : ISecretStore
         }
         finally
         {
-            // Erst ueberschreiben, dann freigeben: Der Tokenwert soll nicht im
-            // freigegebenen Speicher zurueckbleiben. ZeroFreeGlobalAllocUnicode
-            // waere hier falsch - es erwartet einen Zeiger aus
-            // SecureStringToGlobalAllocUnicode und ermittelt die Laenge selbst.
+            // Overwrite first, then free: the token value must not linger in
+            // released memory. ZeroFreeGlobalAllocUnicode would be wrong here -
+            // it expects a pointer from SecureStringToGlobalAllocUnicode and
+            // works out the length itself.
             NativeMemory.Clear((void*)blobHandle, (nuint)blob.Length);
             Marshal.FreeHGlobal(blobHandle);
             Array.Clear(blob);

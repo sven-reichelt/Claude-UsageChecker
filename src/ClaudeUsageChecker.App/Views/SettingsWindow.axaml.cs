@@ -5,78 +5,133 @@ using Avalonia.Controls;
 using ClaudeUsageChecker.App.Services;
 using ClaudeUsageChecker.App.Settings;
 using ClaudeUsageChecker.Core.Authentication;
+using ClaudeUsageChecker.Core.Localization;
 using ClaudeUsageChecker.Core.Authentication.OAuth;
 using ClaudeUsageChecker.Core.Platform;
 
 namespace ClaudeUsageChecker.App.Views;
 
 /// <summary>
-/// Einstellungen samt Hinterlegung des Zugriffstokens.
-/// Der Tokenwert wird nie in die Einstellungsdatei geschrieben, sondern
-/// ausschliesslich an den verschluesselten Secret-Store uebergeben.
+/// Settings. Holds no token: the application reads the one belonging to the
+/// Claude Code installation, or signs in on its own - see docs/api-research.md.
 /// </summary>
 public partial class SettingsWindow : Window
 {
-    private readonly ISecretStore _secretStore;
     private readonly SettingsStore _settingsStore;
-    private readonly Func<string, Task<TokenValidationResult>>? _validateToken;
     private readonly OAuthTokenStore? _oauthTokenStore;
     private readonly Func<InstallResult>? _relocate;
+    private readonly Action<bool> _applyAutostart;
     private AppSettings _settings;
 
-    public SettingsWindow() : this(SecretStoreFactory.CreateForCurrentPlatform(), new SettingsStore(), new AppSettings())
+    public SettingsWindow() : this(new SettingsStore(), new AppSettings())
     {
     }
 
     public SettingsWindow(
-        ISecretStore secretStore,
         SettingsStore settingsStore,
         AppSettings settings,
-        Func<string, Task<TokenValidationResult>>? validateToken = null,
         OAuthTokenStore? oauthTokenStore = null,
-        Func<InstallResult>? relocate = null)
+        Func<InstallResult>? relocate = null,
+        Action<bool>? applyAutostart = null)
     {
-        _secretStore = secretStore;
         _settingsStore = settingsStore;
         _settings = settings;
-        _validateToken = validateToken;
         _oauthTokenStore = oauthTokenStore;
         _relocate = relocate;
 
+        // Injectable purely for the tests: the real route writes to the Run key
+        // of the registry. A test that presses "save" would otherwise delete the
+        // autostart entry of the user on whose machine it happens to run.
+        _applyAutostart = applyAutostart ?? (enabled => AutostartManager.Apply(enabled));
+
         InitializeComponent();
+
+        // The picker is filled before the labelling: it populates the field whose
+        // content is not touched afterwards.
+        LanguageBox.ItemsSource = Language.All.Select(l => l.NativeName).ToList();
+        LanguageBox.SelectedIndex = Language.All.ToList()
+            .FindIndex(l => l.Code == (Language.Find(settings.Language) ?? Localizer.Current.Language).Code);
+
+        ApplyTexts();
 
         IntervalBox.Value = settings.PollIntervalSeconds;
         LaunchAtLoginBox.IsChecked = settings.LaunchAtLogin;
         CheckUpdatesBox.IsChecked = settings.CheckForUpdates;
+        WarningThresholdBox.Value = (decimal)settings.WarningThreshold;
+        CriticalThresholdBox.Value = (decimal)settings.CriticalThreshold;
 
-        VersionText.Text = "Version "
-            + (Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "unbekannt");
+        VersionText.Text = T.Version(
+            Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? T.Unknown);
 
-        SaveTokenButton.Click += (_, _) => SaveToken();
-        DeleteTokenButton.Click += (_, _) => DeleteToken();
         SignInButton.Click += (_, _) => SignInRequested?.Invoke(this, EventArgs.Empty);
         SignOutButton.Click += (_, _) => SignOut();
         SaveButton.Click += (_, _) => SaveAndClose();
         CancelButton.Click += (_, _) => Close();
 
         LaunchAtLoginBox.IsCheckedChanged += (_, _) => UpdateRelocationHint();
+        Opened += (_, _) => LimitToScreen();
 
-        UpdateTokenStatus();
         UpdateSignInStatus();
         UpdateRelocationHint();
     }
 
-    /// <summary>Der Nutzer moechte die eigene Anmeldung starten.</summary>
+    /// <summary>Sets every fixed label from the language file.</summary>
+    private void ApplyTexts()
+    {
+        Title = T.SettingsTitle;
+
+        SignInHeading.Text = T.SettingsSignInSection;
+        SignInButton.Content = T.SettingsSignIn;
+        SignOutButton.Content = T.SettingsSignOut;
+
+
+        BehaviourHeading.Text = T.SettingsBehaviourSection;
+        IntervalLabel.Text = T.SettingsInterval;
+        LaunchAtLoginBox.Content = T.SettingsLaunchAtLogin;
+        CheckUpdatesBox.Content = T.SettingsCheckForUpdates;
+
+        LanguageHeading.Text = T.SettingsLanguageSection;
+        LanguageHint.Text = T.SettingsLanguageHint;
+        LanguageLabel.Text = T.SettingsLanguageLabel;
+
+        ThresholdHeading.Text = T.SettingsThresholdSection;
+        ThresholdIntro.Text = T.SettingsThresholdHint;
+        WarningLabel.Text = T.SettingsWarningThreshold;
+        CriticalLabel.Text = T.SettingsCriticalThreshold;
+
+        CancelButton.Content = T.Cancel;
+        SaveButton.Content = T.Save;
+    }
+
+    /// <summary>The language currently selected in the picker.</summary>
+    private Language SelectedLanguage =>
+        LanguageBox.SelectedIndex >= 0 && LanguageBox.SelectedIndex < Language.All.Count
+            ? Language.All[LanguageBox.SelectedIndex]
+            : Localizer.Current.Language;
+
+    /// <summary>The user wants to start the sign-in.</summary>
     public event EventHandler? SignInRequested;
 
-    /// <summary>Aktualisiert die Anzeige der eigenen Anmeldung von aussen.</summary>
+    /// <summary>
+    /// Keeps the window inside the working area of the screen it appears on.
+    /// </summary>
+    /// <remarks>
+    /// The window grows with its content and cannot be resized. On a low screen
+    /// it therefore extended past the bottom edge - taking the "save" button
+    /// with it. The screen is only known once the window is open, hence here
+    /// rather than in the constructor. The arithmetic sits in
+    /// <see cref="ScreenFit"/>, because every window here has the same problem.
+    /// </remarks>
+    private void LimitToScreen() => ScreenFit.Apply(this, ContentScroller);
+
+    /// <summary>Refreshes the sign-in display from outside.</summary>
     public void RefreshSignInStatus() => UpdateSignInStatus();
 
     private void UpdateSignInStatus()
     {
         if (_oauthTokenStore is not { IsSupported: true })
         {
-            SignInStatus.Text = "Auf diesem System steht kein sicherer Speicher zur Verfuegung.";
+            SignInStatus.Text = T.NoSecureStore;
             SignInButton.IsEnabled = false;
             SignOutButton.IsEnabled = false;
             return;
@@ -84,10 +139,9 @@ public partial class SettingsWindow : Window
 
         var tokens = _oauthTokenStore.Read();
         SignInStatus.Text = tokens is null
-            ? "Nicht angemeldet. Ohne eigene Anmeldung wird das Token einer laufenden "
-              + "Claude-Code-Installation mitgelesen."
-            : $"Angemeldet. Rechte: {tokens.Scope ?? "unbekannt"}. "
-              + $"Token gültig bis {tokens.ExpiresAt?.ToLocalTime():g} und wird selbsttätig erneuert.";
+            ? T.SettingsNotSignedIn
+            : T.SettingsSignedIn(
+                tokens.Scope ?? T.Unknown, tokens.ExpiresAt?.ToLocalTime() ?? default);
 
         SignOutButton.IsEnabled = tokens is not null;
     }
@@ -111,97 +165,17 @@ public partial class SettingsWindow : Window
         }
     }
 
-    /// <summary>Wird ausgeloest, wenn Einstellungen oder Token geaendert wurden.</summary>
+    /// <summary>Raised when settings or the token have changed.</summary>
     public event EventHandler<AppSettings>? SettingsChanged;
 
-    private void UpdateTokenStatus()
-    {
-        if (!_secretStore.IsSupported)
-        {
-            TokenStatus.Text = "Auf diesem System steht kein sicherer Speicher zur Verfuegung.";
-            SaveTokenButton.IsEnabled = false;
-            DeleteTokenButton.IsEnabled = false;
-            return;
-        }
-
-        var hasToken = !string.IsNullOrEmpty(_secretStore.Read(SecretStoreTokenProvider.DefaultKey));
-        TokenStatus.Text = hasToken
-            ? "Ein Token ist hinterlegt."
-            : "Kein eigenes Token hinterlegt - es wird versucht, das Token der "
-              + "Claude-Code-Installation mitzulesen.";
-        DeleteTokenButton.IsEnabled = hasToken;
-    }
-
-    private async void SaveToken()
-    {
-        var value = TokenBox.Text?.Trim();
-        if (string.IsNullOrEmpty(value))
-        {
-            TokenStatus.Text = "Bitte zuerst ein Token einfügen.";
-            return;
-        }
-
-        // Erst pruefen, dann speichern: Ein untaugliches Token soll gar nicht
-        // erst in den Secret-Store gelangen.
-        if (_validateToken is not null)
-        {
-            SaveTokenButton.IsEnabled = false;
-            TokenStatus.Text = "Token wird geprüft ...";
-            try
-            {
-                var result = await _validateToken(value).ConfigureAwait(true);
-                if (!result.IsUsable)
-                {
-                    TokenStatus.Text = "Nicht gespeichert. " + result.Message;
-                    return;
-                }
-            }
-            catch (Exception ex) when (ex is not OperationCanceledException)
-            {
-                TokenStatus.Text = "Die Pruefung ist fehlgeschlagen: " + ex.Message;
-                return;
-            }
-            finally
-            {
-                SaveTokenButton.IsEnabled = true;
-            }
-        }
-
-        try
-        {
-            _secretStore.Write(SecretStoreTokenProvider.DefaultKey, value);
-            TokenBox.Text = string.Empty;
-            UpdateTokenStatus();
-            SettingsChanged?.Invoke(this, _settings);
-        }
-        catch (InvalidOperationException ex)
-        {
-            TokenStatus.Text = ex.Message;
-        }
-    }
-
-    private void DeleteToken()
-    {
-        try
-        {
-            _secretStore.Delete(SecretStoreTokenProvider.DefaultKey);
-            UpdateTokenStatus();
-            SettingsChanged?.Invoke(this, _settings);
-        }
-        catch (InvalidOperationException ex)
-        {
-            TokenStatus.Text = ex.Message;
-        }
-    }
-
     /// <summary>
-    /// Weist darauf hin, dass der Autostart ein Umziehen nach sich zieht.
+    /// Points out that autostart entails moving the application.
     /// </summary>
     /// <remarks>
-    /// Ein Autostart-Eintrag, der in den Download-Ordner zeigt, bricht beim
-    /// ersten Aufraeumen dort. Deshalb wird die Anwendung mit dem Haken auch
-    /// gleich an ihren festen Platz gebracht - das soll aber niemanden
-    /// ueberraschen.
+    /// An autostart entry pointing into the downloads folder breaks the first
+    /// time that folder is cleaned out. Ticking the box therefore moves the
+    /// application to its permanent location as well - but nobody should be
+    /// surprised by that.
     /// </remarks>
     private void UpdateRelocationHint()
     {
@@ -209,33 +183,57 @@ public partial class SettingsWindow : Window
 
         RelocationHint.IsVisible = noetig;
         RelocationHint.Text = noetig
-            ? $"Beim Speichern wird die Anwendung nach {SelfInstaller.TargetPath} kopiert "
-              + "und von dort neu gestartet. Ein Autostart aus dem Download-Ordner wäre brüchig."
+            ? T.SettingsRelocationHint(SelfInstaller.TargetPath)
             : null;
     }
 
     private void SaveAndClose()
     {
+        var warnung = (double)(WarningThresholdBox.Value ?? 75m);
+        var kritisch = (double)(CriticalThresholdBox.Value ?? 90m);
+
+        // A warning threshold above the critical one would never take effect.
+        // Rather than quietly correcting it, the window stays open and says what
+        // is wrong - otherwise something else would end up there than was typed.
+        if (AppSettings.ValidateThresholds(warnung, kritisch) is { } fehler)
+        {
+            ThresholdHint.Text = fehler;
+            ThresholdHint.IsVisible = true;
+            return;
+        }
+
+        ThresholdHint.IsVisible = false;
+
+        var sprache = SelectedLanguage;
+
         _settings = new AppSettings
         {
             PollIntervalSeconds = (int)(IntervalBox.Value ?? 300),
             LaunchAtLogin = LaunchAtLoginBox.IsChecked ?? false,
             CheckForUpdates = CheckUpdatesBox.IsChecked ?? true,
-            WarningThreshold = _settings.WarningThreshold,
-            CriticalThreshold = _settings.CriticalThreshold,
-            InstallPromptShown = _settings.InstallPromptShown
+            WarningThreshold = warnung,
+            CriticalThreshold = kritisch,
+            Language = sprache.Code,
+            InstallPromptShown = _settings.InstallPromptShown,
+            LastRunVersion = _settings.LastRunVersion
         };
 
         _settingsStore.Save(_settings);
 
-        // Der Autostart braucht einen festen Platz. Beim Abwaehlen wird dagegen
-        // nur der Eintrag entfernt - die einmal eingerichtete Anwendung bleibt,
-        // wo sie ist.
+        // Switch before reporting: whoever reacts to the change - the context
+        // menu, say - should already find the new texts in place.
+        if (sprache.Code != Localizer.Current.Language.Code)
+        {
+            Localizer.Use(sprache);
+        }
+
+        // Autostart needs a permanent location. Unticking, by contrast, only
+        // removes the entry - an application once installed stays where it is.
         if (_settings.LaunchAtLogin && _relocate is not null && SelfInstaller.ShouldOffer)
         {
             SaveButton.IsEnabled = false;
             RelocationHint.IsVisible = true;
-            RelocationHint.Text = "Wird eingerichtet ...";
+            RelocationHint.Text = T.SettingsRelocating;
 
             var ergebnis = _relocate();
             if (!ergebnis.Succeeded)
@@ -251,7 +249,7 @@ public partial class SettingsWindow : Window
             return;
         }
 
-        AutostartManager.Apply(_settings.LaunchAtLogin);
+        _applyAutostart(_settings.LaunchAtLogin);
         SettingsChanged?.Invoke(this, _settings);
         Close();
     }

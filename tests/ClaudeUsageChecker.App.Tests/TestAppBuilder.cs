@@ -7,9 +7,9 @@ using ClaudeUsageChecker.App;
 namespace ClaudeUsageChecker.App.Tests;
 
 /// <summary>
-/// Startet die echte Anwendungsklasse auf der kopflosen Avalonia-Plattform.
-/// Die Zusammenstellung der Dienste bleibt dabei aus, weil sie an eine
-/// Desktop-Lebensdauer gebunden ist - genau das ist hier erwuenscht.
+/// Starts the real application class on the headless Avalonia platform. The
+/// composition of services is skipped, because it is tied to a desktop lifetime -
+/// which is exactly what is wanted here.
 /// </summary>
 public static class TestAppBuilder
 {

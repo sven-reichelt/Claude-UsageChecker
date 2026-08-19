@@ -15,7 +15,7 @@ public class OAuthFlowTests
     {
         var pkce = PkceChallenge.Create();
 
-        // Der Verifier muss zwischen 43 und 128 Zeichen lang sein.
+        // The verifier has to be between 43 and 128 characters long.
         Assert.InRange(pkce.Verifier.Length, 43, 128);
 
         // base64url: keine Auffuellzeichen, kein Plus, kein Schraegstrich.
@@ -30,14 +30,14 @@ public class OAuthFlowTests
     {
         var pkce = PkceChallenge.Create();
 
-        var erwartet = Convert.ToBase64String(SHA256.HashData(Encoding.ASCII.GetBytes(pkce.Verifier)))
+        var expected = Convert.ToBase64String(SHA256.HashData(Encoding.ASCII.GetBytes(pkce.Verifier)))
             .TrimEnd('=').Replace('+', '-').Replace('/', '_');
 
-        Assert.Equal(erwartet, pkce.Challenge);
+        Assert.Equal(expected, pkce.Challenge);
     }
 
     [Fact]
-    public void JedeAnfrageBekommtEigeneGeheimnisse()
+    public void EveryRequestGetsItsOwnSecrets()
     {
         var client = CreateClient(new StubHandler());
 
@@ -49,7 +49,7 @@ public class OAuthFlowTests
     }
 
     [Fact]
-    public void DieAnmeldeadresseTraegtAlleErforderlichenParameter()
+    public void TheSignInAddressCarriesEveryRequiredParameter()
     {
         var client = CreateClient(new StubHandler());
 
@@ -66,14 +66,14 @@ public class OAuthFlowTests
     }
 
     [Fact]
-    public void DerAngeforderteGeltungsbereichBleibtBeimNoetigenMinimum()
+    public void TheRequestedScopeStaysAtTheNecessaryMinimum()
     {
         var client = CreateClient(new StubHandler());
 
         var query = HttpUtility.ParseQueryString(client.CreateAuthorizationRequest().Url.Query);
 
-        // Genau das verlangt der Nutzungsendpunkt - und nichts darueber hinaus.
-        // Insbesondere kein user:inference und kein org:create_api_key.
+        // Exactly what the usage endpoint demands - and nothing beyond it. In
+        // particular no user:inference and no org:create_api_key.
         Assert.Equal("user:profile", query["scope"]);
     }
 
@@ -82,7 +82,7 @@ public class OAuthFlowTests
     [InlineData("abc123#xyz", "abc123", "xyz")]
     [InlineData("  abc123#xyz  ", "abc123", "xyz")]
     [InlineData("abc123#", "abc123", null)]
-    public void EingefuegterCodeWirdRichtigZerlegt(string eingabe, string code, string? state)
+    public void APastedCodeIsSplitCorrectly(string eingabe, string code, string? state)
     {
         var (tatsaechlichCode, tatsaechlichState) = AnthropicOAuthClient.SplitPastedCode(eingabe);
 
@@ -91,7 +91,7 @@ public class OAuthFlowTests
     }
 
     [Fact]
-    public async Task DerTauschSchicktVerifierUndCodeMit()
+    public async Task TheExchangeSendsVerifierAndCode()
     {
         var handler = new StubHandler((HttpStatusCode.OK,
             """{"access_token":"neu","refresh_token":"r1","expires_in":3600,"scope":"user:profile"}"""));
@@ -111,7 +111,7 @@ public class OAuthFlowTests
     }
 
     [Fact]
-    public async Task EinCodeAusEinemAnderenVorgangWirdAbgelehnt()
+    public async Task ACodeFromAnotherFlowIsRejected()
     {
         var handler = new StubHandler();
         var client = CreateClient(handler);
@@ -120,13 +120,13 @@ public class OAuthFlowTests
         var ex = await Assert.ThrowsAsync<OAuthException>(
             () => client.ExchangeCodeAsync("code42#fremder-vorgang", request));
 
-        Assert.Contains("anderen Anmeldevorgang", ex.Message, StringComparison.Ordinal);
-        // Ein solcher Code darf gar nicht erst abgeschickt werden.
+        Assert.Contains("different sign-in attempt", ex.Message, StringComparison.Ordinal);
+        // Such a code must not even be sent.
         Assert.Equal(0, handler.RequestCount);
     }
 
     [Fact]
-    public async Task EineFehlerantwortWirdVerstaendlichGemeldet()
+    public async Task AnErrorResponseIsReportedIntelligibly()
     {
         var handler = new StubHandler((HttpStatusCode.BadRequest,
             """{"error":"invalid_grant","error_description":"Der Code ist abgelaufen."}"""));
@@ -140,7 +140,7 @@ public class OAuthFlowTests
     }
 
     [Fact]
-    public async Task EineAntwortOhneTokenGiltAlsFehlschlag()
+    public async Task AResponseWithoutATokenCountsAsAFailure()
     {
         var handler = new StubHandler((HttpStatusCode.OK, """{"scope":"user:profile"}"""));
         var client = CreateClient(handler);
@@ -150,7 +150,7 @@ public class OAuthFlowTests
     }
 
     [Fact]
-    public async Task DasErneuernSchicktDenRefreshTokenMit()
+    public async Task RefreshingSendsTheRefreshTokenAlong()
     {
         var handler = new StubHandler((HttpStatusCode.OK,
             """{"access_token":"neu2","refresh_token":"r2","expires_in":3600}"""));
@@ -161,7 +161,7 @@ public class OAuthFlowTests
         Assert.Equal("neu2", tokens.AccessToken);
         Assert.Contains("\"grant_type\":\"refresh_token\"", handler.LastBody, StringComparison.Ordinal);
         Assert.Contains("\"refresh_token\":\"r1\"", handler.LastBody, StringComparison.Ordinal);
-        // Beim Erneuern gehoeren Code und Verifier nicht in die Anfrage.
+        // When refreshing, code and verifier do not belong in the request.
         Assert.DoesNotContain("code_verifier", handler.LastBody, StringComparison.Ordinal);
     }
 

@@ -5,20 +5,20 @@ namespace ClaudeUsageChecker.App;
 
 internal static class Program
 {
-    // Initialisierung vor dem Start von Avalonia ist nicht erlaubt:
-    // SynchronizationContext und Logging werden erst hier aufgesetzt.
+    // No initialisation before Avalonia starts: the synchronization context and
+    // logging are only set up here.
     [STAThread]
     public static int Main(string[] args)
     {
         CrashReporter.InstallGlobalHandlers();
 
-        // Nach einer Aktualisierung laeuft die ersetzte Fassung noch kurz und
-        // haelt den Riegel auf eine Instanz. Erst abwarten, dann weiter.
+        // After an update the replaced version runs a moment longer and holds
+        // the single-instance lock. Wait for it, then continue.
         StartupArguments.WaitForPredecessor(args);
-        Services.UpdateInstaller.RaeumeAltfassungWeg();
+        Services.UpdateInstaller.RemovePreviousVersion();
 
-        // Eine zweite Instanz wuerde ein zweites Symbol im Infobereich anlegen
-        // und die API doppelt abfragen. Sie beendet sich deshalb stillschweigend.
+        // A second instance would add a second tray icon and poll the API twice.
+        // It therefore ends itself without a word.
         using var instance = SingleInstance.TryAcquire();
         if (instance is null)
         {

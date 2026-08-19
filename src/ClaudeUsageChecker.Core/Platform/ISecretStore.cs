@@ -1,20 +1,20 @@
 namespace ClaudeUsageChecker.Core.Platform;
 
 /// <summary>
-/// Verschluesselter Ablageort fuer Geheimnisse, bereitgestellt vom Betriebssystem
-/// (Windows Credential Manager, macOS-Schluesselbund).
+/// Encrypted storage for secrets, provided by the operating system (Windows
+/// Credential Manager, macOS keychain).
 /// </summary>
 public interface ISecretStore
 {
-    /// <summary>Ob dieser Store auf dem laufenden System nutzbar ist.</summary>
+    /// <summary>Whether this store is usable on the running system.</summary>
     bool IsSupported { get; }
 
-    /// <summary>Liest ein Geheimnis oder liefert null, wenn keines hinterlegt ist.</summary>
+    /// <summary>Reads a secret, or returns null when none is stored.</summary>
     string? Read(string key);
 
-    /// <summary>Legt ein Geheimnis verschluesselt und benutzergebunden ab.</summary>
+    /// <summary>Stores a secret, encrypted and bound to the user account.</summary>
     void Write(string key, string secret);
 
-    /// <summary>Entfernt ein Geheimnis. Nicht vorhandene Eintraege sind kein Fehler.</summary>
+    /// <summary>Removes a secret. A missing entry is not an error.</summary>
     void Delete(string key);
 }

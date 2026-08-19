@@ -3,27 +3,28 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Web;
+using ClaudeUsageChecker.Core.Localization;
 
 namespace ClaudeUsageChecker.Core.Authentication.OAuth;
 
 /// <summary>
-/// Fuehrt den Autorisierungscode-Fluss mit PKCE gegen Anthropic durch.
+/// Runs the authorization code flow with PKCE against Anthropic.
 /// </summary>
 /// <remarks>
-/// Damit erhaelt die Anwendung eigene Anmeldedaten mit dem Geltungsbereich
-/// <c>user:profile</c> und ist nicht mehr darauf angewiesen, das Token einer
-/// Claude-Code-Installation mitzulesen.
+/// This gives the application credentials of its own with the <c>user:profile</c>
+/// scope, so that it no longer depends on reading the token of a Claude Code
+/// installation.
 /// </remarks>
 public sealed class AnthropicOAuthClient(HttpClient httpClient, OAuthOptions? options = null)
 {
     private readonly OAuthOptions _options = options ?? new OAuthOptions();
 
-    /// <summary>Die verwendeten Parameter - fuer Anzeige und Diagnose.</summary>
+    /// <summary>The parameters in use - for display and diagnostics.</summary>
     public OAuthOptions Options => _options;
 
     /// <summary>
-    /// Baut die Adresse, die der Nutzer im Browser oeffnet, samt frischem
-    /// PKCE-Paar und Zufallswert gegen Verwechslung von Vorgaengen.
+    /// Builds the address the user opens in the browser, complete with a fresh
+    /// PKCE pair and a random value guarding against mixed-up flows.
     /// </summary>
     public AuthorizationRequest CreateAuthorizationRequest()
     {
@@ -45,13 +46,13 @@ public sealed class AnthropicOAuthClient(HttpClient httpClient, OAuthOptions? op
     }
 
     /// <summary>
-    /// Loest den vom Nutzer eingefuegten Code ein.
+    /// Redeems the code the user pasted.
     /// </summary>
     /// <param name="pastedCode">
-    /// Der Text von der Anthropic-Seite. Diese liefert ihn je nach Fall als
-    /// blossen Code oder in der Form <c>CODE#STATE</c>.
+    /// The text from the Anthropic page. Depending on the case it arrives as a
+    /// bare code or in the form <c>CODE#STATE</c>.
     /// </param>
-    /// <exception cref="OAuthException">Bei jedem Fehlschlag des Tauschs.</exception>
+    /// <exception cref="OAuthException">On any failure of the exchange.</exception>
     public async Task<OAuthTokens> ExchangeCodeAsync(
         string pastedCode,
         AuthorizationRequest request,
@@ -64,8 +65,7 @@ public sealed class AnthropicOAuthClient(HttpClient httpClient, OAuthOptions? op
         if (state is not null && !string.Equals(state, request.State, StringComparison.Ordinal))
         {
             throw new OAuthException(
-                "Der eingefügte Code gehört zu einem anderen Anmeldevorgang. "
-                + "Bitte die Anmeldung erneut starten.");
+                T.OAuthWrongFlow);
         }
 
         var payload = new TokenRequestDto
@@ -78,12 +78,12 @@ public sealed class AnthropicOAuthClient(HttpClient httpClient, OAuthOptions? op
             CodeVerifier = request.CodeVerifier
         };
 
-        return await PostAsync(payload, "Der Code konnte nicht eingelöst werden", cancellationToken)
+        return await PostAsync(payload, T.OAuthRedeemFailed, cancellationToken)
             .ConfigureAwait(false);
     }
 
-    /// <summary>Erneuert ein Token. Der Refresh-Token gehoert dieser Anwendung allein.</summary>
-    /// <exception cref="OAuthException">Wenn die Erneuerung scheitert.</exception>
+    /// <summary>Refreshes a token. The refresh token belongs to this application alone.</summary>
+    /// <exception cref="OAuthException">When the refresh fails.</exception>
     public async Task<OAuthTokens> RefreshAsync(
         string refreshToken, CancellationToken cancellationToken = default)
     {
@@ -96,7 +96,7 @@ public sealed class AnthropicOAuthClient(HttpClient httpClient, OAuthOptions? op
             ClientId = _options.ClientId
         };
 
-        return await PostAsync(payload, "Die Anmeldung konnte nicht erneuert werden", cancellationToken)
+        return await PostAsync(payload, T.OAuthRefreshFailed, cancellationToken)
             .ConfigureAwait(false);
     }
 
@@ -117,7 +117,7 @@ public sealed class AnthropicOAuthClient(HttpClient httpClient, OAuthOptions? op
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
-            throw new OAuthException($"{fehlertext}: Anthropic ist nicht erreichbar.", ex);
+            throw new OAuthException(T.OAuthUnreachable(fehlertext), ex);
         }
 
         using (response)
@@ -126,8 +126,8 @@ public sealed class AnthropicOAuthClient(HttpClient httpClient, OAuthOptions? op
 
             if (!response.IsSuccessStatusCode)
             {
-                // 400/401 heisst: Der Server hat die Anmeldedaten selbst verworfen.
-                // Alles andere (404, 5xx, Drosselung) sagt nichts ueber sie aus.
+                // 400/401 means the server discarded the credentials themselves.
+                // Everything else (404, 5xx, throttling) says nothing about them.
                 var abgewiesen = response.StatusCode is System.Net.HttpStatusCode.BadRequest
                     or System.Net.HttpStatusCode.Unauthorized;
 
@@ -143,12 +143,12 @@ public sealed class AnthropicOAuthClient(HttpClient httpClient, OAuthOptions? op
             }
             catch (JsonException ex)
             {
-                throw new OAuthException($"{fehlertext}: Die Antwort war nicht lesbar.", ex);
+                throw new OAuthException(T.OAuthUnreadable(fehlertext), ex);
             }
 
             if (dto?.AccessToken is not { Length: > 0 })
             {
-                throw new OAuthException($"{fehlertext}: Die Antwort enthielt kein Token.");
+                throw new OAuthException(T.OAuthNoToken(fehlertext));
             }
 
             return new OAuthTokens
@@ -167,8 +167,8 @@ public sealed class AnthropicOAuthClient(HttpClient httpClient, OAuthOptions? op
     }
 
     /// <summary>
-    /// Trennt <c>CODE#STATE</c> auf. Die Anthropic-Seite zeigt den Code je nach
-    /// Fall mit oder ohne angehaengten Zufallswert an.
+    /// Splits <c>CODE#STATE</c>. Depending on the case, the Anthropic page shows
+    /// the code with or without the random value appended.
     /// </summary>
     internal static (string Code, string? State) SplitPastedCode(string pasted)
     {
@@ -180,7 +180,7 @@ public sealed class AnthropicOAuthClient(HttpClient httpClient, OAuthOptions? op
             : (teile[0], null);
     }
 
-    /// <summary>Zieht die Meldung aus einer Fehlerantwort, ohne sie ungefiltert durchzureichen.</summary>
+    /// <summary>Extracts the message from an error response without passing it through unfiltered.</summary>
     private static string Beschreibe(string body)
     {
         if (string.IsNullOrWhiteSpace(body))
@@ -212,24 +212,24 @@ public sealed class AnthropicOAuthClient(HttpClient httpClient, OAuthOptions? op
     }
 }
 
-/// <summary>Fehler im Anmeldevorgang.</summary>
+/// <summary>A failure in the sign-in flow.</summary>
 public sealed class OAuthException(
     string message,
     Exception? innerException = null,
     bool isCredentialRejected = false) : Exception(message, innerException)
 {
     /// <summary>
-    /// Der Server hat die Anmeldedaten selbst abgewiesen - im Gegensatz zu einem
-    /// Netzwerkproblem, das nichts ueber ihre Gueltigkeit aussagt. Nur in diesem
-    /// Fall ist eine erneute Anmeldung noetig.
+    /// The server refused the credentials themselves - as opposed to a network
+    /// problem, which says nothing about their validity. Only in this case is a
+    /// fresh sign-in needed.
     /// </summary>
     public bool IsCredentialRejected { get; } = isCredentialRejected;
 }
 
-/// <summary>Eine begonnene Anmeldung: Adresse fuer den Browser plus die Geheimnisse dazu.</summary>
-/// <param name="Url">Die im Browser zu oeffnende Adresse.</param>
-/// <param name="CodeVerifier">Das PKCE-Geheimnis, erst beim Tausch mitzuschicken.</param>
-/// <param name="State">Zufallswert zur Zuordnung des Vorgangs.</param>
+/// <summary>A sign-in in progress: the browser address plus the secrets that belong to it.</summary>
+/// <param name="Url">The address to open in the browser.</param>
+/// <param name="CodeVerifier">The PKCE secret, sent only when the code is exchanged.</param>
+/// <param name="State">Random value that ties the response to this flow.</param>
 public sealed record AuthorizationRequest(Uri Url, string CodeVerifier, string State);
 
 internal sealed class TokenRequestDto
@@ -249,8 +249,8 @@ internal sealed class TokenResponseDto
     [JsonPropertyName("refresh_token")] public string? RefreshToken { get; set; }
     [JsonPropertyName("expires_in")] public int? ExpiresIn { get; set; }
 
-    // Ob Anthropic dieses Feld ueberhaupt liefert, ist unbekannt - erfasst wird
-    // es trotzdem, damit sich die Frage beim naechsten Erneuern von selbst klaert.
+    // Whether Anthropic supplies this field at all is unknown - it is captured
+    // regardless, so that the question answers itself on the next refresh.
     [JsonPropertyName("refresh_token_expires_in")] public int? RefreshTokenExpiresIn { get; set; }
     [JsonPropertyName("scope")] public string? Scope { get; set; }
 }

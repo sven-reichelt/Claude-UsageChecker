@@ -7,52 +7,52 @@ using ClaudeUsageChecker.App.Views;
 namespace ClaudeUsageChecker.App.Tests;
 
 /// <summary>
-/// Prueft, dass der Autostart das Umziehen nach sich zieht - und das Abwaehlen
-/// eben nicht.
+/// Checks that autostart entails moving the application - and that unticking
+/// does not.
 /// </summary>
 /// <remarks>
-/// Ein Autostart-Eintrag, der in den Download-Ordner zeigt, bricht beim ersten
-/// Aufraeumen dort. Wer den Haken setzt, erwartet aber, dass die Anwendung
+/// An autostart entry pointing into the downloads folder breaks the first time
+/// that folder is cleaned out. Whoever ticks the box expects the application to
 /// danach zuverlaessig startet.
 /// </remarks>
 public class RelocationTests
 {
     [AvaloniaFact]
-    public void OhneHakenKeinHinweisAufsUmziehen()
+    public void WithoutTheTickNoNoticeAboutMoving()
     {
-        using var datei = new TemporaereDatei();
-        var window = Erzeuge(datei, new AppSettings { LaunchAtLogin = false }, out _);
+        using var file = new TemporaryFile();
+        var window = Erzeuge(file, new AppSettings { LaunchAtLogin = false }, out _);
 
         Assert.False(window.FindControl<TextBlock>("RelocationHint")!.IsVisible);
     }
 
     [AvaloniaFact]
-    public void DasAbwaehlenZiehtKeinUmziehenNachSich()
+    public void UntickingDoesNotEntailMoving()
     {
-        using var datei = new TemporaereDatei();
-        var window = Erzeuge(datei, new AppSettings { LaunchAtLogin = true }, out var aufrufe);
+        using var file = new TemporaryFile();
+        var window = Erzeuge(file, new AppSettings { LaunchAtLogin = true }, out var aufrufe);
 
         window.FindControl<CheckBox>("LaunchAtLoginBox")!.IsChecked = false;
         Klicke(window, "SaveButton");
 
-        // Die einmal eingerichtete Anwendung bleibt, wo sie ist - entfernt wird
-        // nur der Autostart-Eintrag.
+        // An application once installed stays where it is - only the autostart
+        // entry is removed.
         Assert.Equal(0, aufrufe.Anzahl);
     }
 
     [AvaloniaFact]
-    public void DerHinweisNenntDenZielpfad()
+    public void TheNoticeNamesTheTargetPath()
     {
-        using var datei = new TemporaereDatei();
-        var window = Erzeuge(datei, new AppSettings { LaunchAtLogin = false }, out _);
+        using var file = new TemporaryFile();
+        var window = Erzeuge(file, new AppSettings { LaunchAtLogin = false }, out _);
 
         window.FindControl<CheckBox>("LaunchAtLoginBox")!.IsChecked = true;
 
         var hinweis = window.FindControl<TextBlock>("RelocationHint")!;
 
-        // Im Entwicklungsstand ist kein Umzug moeglich, also auch kein Hinweis.
-        // Steht er, muss er den Zielpfad nennen - eine Ueberraschung waere hier
-        // das Schlechteste.
+        // In a development build no move is possible, so no notice either. Where
+        // it does appear, it has to name the target path - a surprise would be
+        // the worst outcome here.
         if (hinweis.IsVisible)
         {
             Assert.Contains(SelfInstaller.TargetPath, hinweis.Text!, StringComparison.Ordinal);
@@ -69,16 +69,14 @@ public class RelocationTests
         knopf.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
     }
 
-    private static SettingsWindow Erzeuge(TemporaereDatei datei, AppSettings settings, out Zaehler aufrufe)
+    private static SettingsWindow Erzeuge(TemporaryFile file, AppSettings settings, out Zaehler aufrufe)
     {
         var zaehler = new Zaehler();
         aufrufe = zaehler;
 
         return new SettingsWindow(
-            new FakeSecretStore(),
-            new SettingsStore(datei.Path),
+            new SettingsStore(file.Path),
             settings,
-            validateToken: null,
             oauthTokenStore: null,
             relocate: () =>
             {
@@ -92,7 +90,7 @@ public class RelocationTests
         public int Anzahl { get; set; }
     }
 
-    private sealed class TemporaereDatei : IDisposable
+    private sealed class TemporaryFile : IDisposable
     {
         public string Path { get; } = System.IO.Path.Combine(
             System.IO.Path.GetTempPath(), $"cuc-test-{Guid.NewGuid():N}.json");

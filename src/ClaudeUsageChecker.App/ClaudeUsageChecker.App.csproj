@@ -52,6 +52,13 @@
   <ItemGroup>
     <AvaloniaResource Include="../../assets/icons/*.png" Link="Assets/%(Filename)%(Extension)" />
     <AvaloniaResource Include="../../assets/icons/*.ico" Link="Assets/%(Filename)%(Extension)" />
+    <!-- Der Aenderungsverlauf reist mit: Die Uebersicht nach einer
+         Aktualisierung soll ohne Netzzugriff auskommen und genau das zeigen,
+         was zur laufenden Fassung gehoert. Gut zehn Kilobyte Text. -->
+    <AvaloniaResource Include="../../CHANGELOG.md" Link="Assets/CHANGELOG.md" />
+    <!-- Die Uebersetzungen des Verlaufs. Deutsch ist die Quelle und bleibt in
+         der Wurzel; das Repository fuehrt den Verlauf weiterhin auf Deutsch. -->
+    <AvaloniaResource Include="../../docs/changelog/*.md" Link="Assets/changelog/%(Filename)%(Extension)" />
   </ItemGroup>
 
 </Project>

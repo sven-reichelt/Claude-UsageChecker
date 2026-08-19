@@ -9,9 +9,9 @@
         SystemDecorations="None"
         Background="Transparent">
 
-  <!-- Ohne Fensterrahmen des Systems, dafuer ein eigener in der Farbe des
-       Symbols. Das bindet das Fenster sichtbar an die Anwendung, statt es wie
-       einen beliebigen Dialog aussehen zu lassen. -->
+  <!-- No system window frame, but one of our own in the colour of the icon.
+       That visibly ties the window to the application instead of letting it
+       look like any old dialog. -->
   <Border Padding="18"
           Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
           BorderBrush="{DynamicResource AccentBrush}"
@@ -47,15 +47,15 @@
               CornerRadius="4" Padding="10">
         <StackPanel Spacing="8">
           <TextBlock x:Name="UpdateText" TextWrapping="Wrap" FontSize="12" />
-          <!-- Untereinander, nicht nebeneinander: Bei 380 Pixel Fensterbreite
-               bleiben nach den Rändern rund 324 Pixel, die beiden Beschriftungen
-               brauchen zusammen aber gut 420. Nebeneinander ragte die zweite
-               Schaltfläche aus dem Fenster heraus. -->
+          <!-- Stacked, not side by side: with a 380 pixel window some 324 pixels
+               remain after the margins, while the two labels need a good 420
+               together. Side by side, the second button extended past the
+               window. -->
           <StackPanel Spacing="6" HorizontalAlignment="Stretch">
-            <Button x:Name="InstallButton" Content="Jetzt einspielen und neu starten"
+            <Button x:Name="InstallButton"
                     IsVisible="False" HorizontalAlignment="Stretch"
                     HorizontalContentAlignment="Center" />
-            <Button x:Name="UpdateButton" Content="Release-Seite öffnen"
+            <Button x:Name="UpdateButton"
                     IsVisible="False" HorizontalAlignment="Stretch"
                     HorizontalContentAlignment="Center" />
           </StackPanel>
@@ -66,7 +66,7 @@
 
       <Grid ColumnDefinitions="*,Auto">
         <TextBlock x:Name="FooterText" FontSize="11" Opacity="0.7" VerticalAlignment="Center" />
-        <Button Grid.Column="1" x:Name="RefreshButton" Content="Aktualisieren" />
+        <Button Grid.Column="1" x:Name="RefreshButton" />
       </Grid>
 
     </StackPanel>

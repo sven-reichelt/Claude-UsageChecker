@@ -3,15 +3,15 @@ using Microsoft.Extensions.Logging;
 namespace ClaudeUsageChecker.Core.Authentication.OAuth;
 
 /// <summary>
-/// Liefert das Token aus der eigenen Anmeldung und erneuert es selbsttaetig,
-/// bevor es ablaeuft.
+/// Supplies the token from the application's own sign-in and refreshes it by
+/// itself before it expires.
 /// </summary>
 /// <remarks>
-/// Hier wird bewusst erneuert - anders als beim mitgelesenen Token der
-/// Claude-Code-Installation. Diese Anmeldedaten gehoeren der Anwendung allein,
-/// ein rotierender Refresh-Token entwertet also keine fremde Sitzung. Genau das
-/// macht die Anwendung unabhaengig: Sie braucht keine laufende
-/// Claude-Code-Installation mehr.
+/// Refreshing happens here on purpose - unlike with the token read from the
+/// Claude Code installation. These credentials belong to the application alone,
+/// so a rotating refresh token invalidates nobody else's session. That is
+/// precisely what makes the application independent: it no longer needs a
+/// running Claude Code installation.
 /// </remarks>
 public sealed class OAuthTokenProvider(
     OAuthTokenStore tokenStore,
@@ -27,12 +27,12 @@ public sealed class OAuthTokenProvider(
     public string Name => "oauth";
 
     /// <summary>
-    /// Die eigene Anmeldung wurde vom Server endgueltig abgewiesen und entfernt.
-    /// Der Nutzer muss sich neu anmelden.
+    /// The application's own sign-in was refused for good by the server and has
+    /// been removed. The user has to sign in again.
     /// </summary>
     public event EventHandler<string>? SignInExpired;
 
-    /// <summary>Ob eine eigene Anmeldung vorliegt.</summary>
+    /// <summary>Whether the application has a sign-in of its own.</summary>
     public bool IsSignedIn => tokenStore.Read() is not null;
 
     public async ValueTask<AccessToken?> TryGetTokenAsync(CancellationToken cancellationToken = default)
@@ -50,9 +50,9 @@ public sealed class OAuthTokenProvider(
 
         if (tokens.RefreshToken is not { Length: > 0 } refreshToken)
         {
-            // Abgelaufen und nicht erneuerbar - lieber nichts liefern, damit die
-            // naechste Quelle zum Zuge kommt.
-            logger?.LogWarning("Die eigene Anmeldung ist abgelaufen und nicht erneuerbar.");
+            // Expired and not refreshable - better to supply nothing, so that the
+            // next source gets its turn.
+            logger?.LogWarning("The application's own sign-in has expired and cannot be refreshed.");
             return null;
         }
 
@@ -64,7 +64,7 @@ public sealed class OAuthTokenProvider(
         await _refreshGate.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
-            // Ein paralleler Aufruf koennte inzwischen erneuert haben.
+            // A parallel call may have refreshed in the meantime.
             var aktuell = tokenStore.Read();
             if (aktuell is not null && !aktuell.NeedsRefresh(_timeProvider.GetUtcNow(), _options.RefreshSkew))
             {
@@ -73,8 +73,8 @@ public sealed class OAuthTokenProvider(
 
             var erneuert = await oauthClient.RefreshAsync(refreshToken, cancellationToken).ConfigureAwait(false);
 
-            // Manche Server liefern beim Erneuern keinen neuen Refresh-Token mit;
-            // dann behaelt der bisherige seine Gueltigkeit.
+            // Some servers send no new refresh token when refreshing; the previous
+            // one then keeps its validity.
             var zuSpeichern = erneuert.RefreshToken is { Length: > 0 }
                 ? erneuert
                 : new OAuthTokens
@@ -87,27 +87,26 @@ public sealed class OAuthTokenProvider(
                 };
 
             tokenStore.Write(zuSpeichern);
-            logger?.LogInformation("Die eigene Anmeldung wurde erneuert.");
+            logger?.LogInformation("The application's own sign-in was refreshed.");
             return ToAccessToken(zuSpeichern);
         }
         catch (OAuthException ex) when (ex.IsCredentialRejected)
         {
-            // Der Server hat die Anmeldedaten verworfen - sie sind endgueltig hin.
-            // Sie werden entfernt, damit die Oberflaeche nicht faelschlich eine
-            // bestehende Anmeldung anzeigt, und der Nutzer wird darauf
-            // hingewiesen. Stillschweigend auf Claude Code zurueckzufallen waere
-            // hier das Schlechteste: Die Anzeige liefe weiter, und die
-            // Unabhaengigkeit waere unbemerkt verloren.
-            logger?.LogWarning(ex, "Die eigene Anmeldung wurde abgewiesen und wird entfernt.");
+            // The server discarded the credentials - they are gone for good. They
+            // are removed so that the interface does not falsely show an existing
+            // sign-in, and the user is told about it. Falling back to Claude Code
+            // in silence would be the worst outcome here: the display would carry
+            // on, and the independence would be lost unnoticed.
+            logger?.LogWarning(ex, "The application's own sign-in was refused and is being removed.");
             tokenStore.Clear();
             SignInExpired?.Invoke(this, ex.Message);
             return null;
         }
         catch (OAuthException ex)
         {
-            // Netzwerkproblem oder Serverfehler: Die Anmeldedaten bleiben, was
-            // sie sind. Beim naechsten Versuch kann es wieder klappen.
-            logger?.LogWarning(ex, "Die eigene Anmeldung konnte gerade nicht erneuert werden.");
+            // Network problem or server error: the credentials stay as they are.
+            // The next attempt may well succeed.
+            logger?.LogWarning(ex, "The application's own sign-in could not be refreshed just now.");
             return null;
         }
         finally

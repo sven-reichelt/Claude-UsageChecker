@@ -7,12 +7,12 @@ using ClaudeUsageChecker.Core.Configuration;
 namespace ClaudeUsageChecker.Core.Tests.Api;
 
 /// <summary>
-/// Sichert ab, dass eine abgelehnte Tokenquelle die naechste nicht blockiert.
+/// Makes sure a rejected token source does not block the next one.
 /// </summary>
 /// <remarks>
-/// Der Anlass ist konkret: Ein Token aus <c>claude setup-token</c> ist gueltig,
-/// traegt aber den Geltungsbereich <c>user:profile</c> nicht und wird vom
-/// Nutzungsendpunkt mit HTTP 403 abgewiesen. Reicht die Anwendung nicht an die
+/// The occasion is concrete: a token from <c>claude setup-token</c> is valid but
+/// does not carry the <c>user:profile</c> scope and is turned away by the usage
+/// endpoint with HTTP 403. If the application does not pass on to the
 /// naechste Quelle weiter, legt ein solches Token sie vollstaendig lahm.
 /// </remarks>
 public class TokenFallbackTests
@@ -24,7 +24,7 @@ public class TokenFallbackTests
         """{"five_hour":{"utilization":19.0,"resets_at":"2026-04-11T07:00:00+00:00"}}""";
 
     [Fact]
-    public async Task AbgelehntesTokenReichtAnDieNaechsteQuelleWeiter()
+    public async Task ARejectedTokenMovesOnToTheNextSource()
     {
         var handler = new StubHandler(
             (HttpStatusCode.Forbidden, ScopeError),
@@ -40,7 +40,7 @@ public class TokenFallbackTests
     }
 
     [Fact]
-    public async Task DieErsteBrauchbareQuelleGewinntOhneWeitereAufrufe()
+    public async Task TheFirstUsableSourceWinsWithoutFurtherCalls()
     {
         var handler = new StubHandler((HttpStatusCode.OK, UsageJson));
 
@@ -53,7 +53,7 @@ public class TokenFallbackTests
     }
 
     [Fact]
-    public async Task LeereQuellenWerdenUebersprungen()
+    public async Task EmptySourcesAreSkipped()
     {
         var handler = new StubHandler((HttpStatusCode.OK, UsageJson));
 
@@ -66,7 +66,7 @@ public class TokenFallbackTests
     }
 
     [Fact]
-    public async Task WennAlleAbgelehntWerdenBleibtDieLetzteMeldungStehen()
+    public async Task WhenAllAreRejectedTheLastMessageStands()
     {
         var handler = new StubHandler(
             (HttpStatusCode.Forbidden, ScopeError),
@@ -83,7 +83,7 @@ public class TokenFallbackTests
     }
 
     [Fact]
-    public async Task DerHinweisAufDenGeltungsbereichWirdWeitergereicht()
+    public async Task TheScopeHintIsPassedOn()
     {
         var handler = new StubHandler((HttpStatusCode.Forbidden, ScopeError));
 
@@ -96,7 +96,7 @@ public class TokenFallbackTests
     }
 
     [Fact]
-    public async Task OhneJedeQuelleWirdFehlendeEinrichtungGemeldet()
+    public async Task WithoutAnySourceAMissingSetupIsReported()
     {
         var handler = new StubHandler();
 
@@ -109,7 +109,7 @@ public class TokenFallbackTests
     }
 
     [Fact]
-    public async Task EineFehlerhafteQuelleBeendetDieSucheNicht()
+    public async Task AFaultySourceDoesNotEndTheSearch()
     {
         var handler = new StubHandler((HttpStatusCode.OK, UsageJson));
 
@@ -121,10 +121,10 @@ public class TokenFallbackTests
     }
 
     [Fact]
-    public async Task EinNetzwerkfehlerWirdNichtAlsAblehnungBehandelt()
+    public async Task ANetworkErrorIsNotTreatedAsARejection()
     {
-        // Ein Ausfall darf nicht dazu fuehren, dass alle Quellen durchprobiert
-        // und damit unnoetig Anfragen abgesetzt werden.
+        // An outage must not lead to every source being tried and needless
+        // requests being sent.
         var handler = new StubHandler((HttpStatusCode.ServiceUnavailable, "{}"));
 
         var client = CreateClient(handler,
@@ -163,7 +163,7 @@ public class TokenFallbackTests
             throw new IOException("Quelle nicht lesbar");
     }
 
-    /// <summary>Liefert die vorgegebenen Antworten der Reihe nach.</summary>
+    /// <summary>Returns the prepared responses in order.</summary>
     private sealed class StubHandler(params (HttpStatusCode Status, string Body)[] responses) : HttpMessageHandler
     {
         public int RequestCount { get; private set; }

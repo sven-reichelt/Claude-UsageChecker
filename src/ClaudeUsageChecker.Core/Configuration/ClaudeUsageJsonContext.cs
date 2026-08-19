@@ -6,8 +6,8 @@ using ClaudeUsageChecker.Core.Models.Api;
 namespace ClaudeUsageChecker.Core;
 
 /// <summary>
-/// Quellcode-generierter JSON-Kontext. Vermeidet Reflexion zur Laufzeit und
-/// haelt die Anwendung fuer Trimming/AOT tauglich.
+/// Source-generated JSON context. Avoids reflection at runtime and keeps the
+/// application fit for trimming and AOT.
 /// </summary>
 [JsonSourceGenerationOptions(
     PropertyNameCaseInsensitive = true,

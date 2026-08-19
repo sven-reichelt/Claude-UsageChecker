@@ -2,7 +2,7 @@ using System.Net;
 
 namespace ClaudeUsageChecker.Core.Api;
 
-/// <summary>Fehler beim Abruf des Nutzungsstands.</summary>
+/// <summary>A failure while fetching the usage status.</summary>
 public sealed class UsageApiException(
     string message,
     UsageApiFailure failure,
@@ -10,33 +10,33 @@ public sealed class UsageApiException(
     TimeSpan? retryAfter = null,
     Exception? innerException = null) : Exception(message, innerException)
 {
-    /// <summary>Grobe Fehlerklasse - steuert die Darstellung im Infobereich.</summary>
+    /// <summary>Broad failure category - drives what the tray icon shows.</summary>
     public UsageApiFailure Failure { get; } = failure;
 
     public HttpStatusCode? StatusCode { get; } = statusCode;
 
-    /// <summary>Vom Server vorgegebene Wartezeit, sofern uebermittelt.</summary>
+    /// <summary>Wait time demanded by the server, where one was supplied.</summary>
     public TimeSpan? RetryAfter { get; } = retryAfter;
 }
 
-/// <summary>Fehlerklassen des Nutzungsabrufs.</summary>
+/// <summary>Failure categories of the usage call.</summary>
 public enum UsageApiFailure
 {
-    /// <summary>Kein Token verfuegbar - Einrichtung erforderlich.</summary>
+    /// <summary>No token available - sign-in required.</summary>
     NoToken,
 
-    /// <summary>Token abgelaufen oder ungueltig (401/403).</summary>
+    /// <summary>Token expired or invalid (401/403).</summary>
     Unauthorized,
 
-    /// <summary>Zu viele Anfragen (429).</summary>
+    /// <summary>Too many requests (429).</summary>
     RateLimited,
 
-    /// <summary>Netzwerkproblem oder Zeitueberschreitung.</summary>
+    /// <summary>Network problem or timeout.</summary>
     Network,
 
-    /// <summary>Serverfehler (5xx).</summary>
+    /// <summary>Server error (5xx).</summary>
     Server,
 
-    /// <summary>Antwort nicht interpretierbar.</summary>
+    /// <summary>Response could not be interpreted.</summary>
     InvalidResponse
 }

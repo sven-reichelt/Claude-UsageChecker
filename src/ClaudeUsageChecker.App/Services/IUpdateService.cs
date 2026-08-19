@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 namespace ClaudeUsageChecker.App.Services;
 
 /// <summary>
-/// Prueft, ob eine neuere Version vorliegt. Die konkrete Bezugsquelle
-/// (oeffentliche GitHub-Releases, eigener Feed) ist bewusst austauschbar.
+/// Checks whether a newer version exists. The actual source (public GitHub
+/// releases, a feed of one's own) is deliberately interchangeable.
 /// </summary>
 public interface IUpdateService
 {

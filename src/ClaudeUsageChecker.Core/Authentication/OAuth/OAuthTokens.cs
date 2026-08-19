@@ -3,13 +3,13 @@ using System.Text.Json.Serialization;
 namespace ClaudeUsageChecker.Core.Authentication.OAuth;
 
 /// <summary>
-/// Die eigenen Anmeldedaten dieser Anwendung - streng getrennt von denen der
-/// Claude-Code-Installation.
+/// This application's own credentials - strictly separate from those of the
+/// Claude Code installation.
 /// </summary>
 /// <remarks>
-/// Anders als beim mitgelesenen Token darf und muss dieses hier erneuert
-/// werden: Es gehoert der Anwendung allein, ein rotierender Refresh-Token
-/// entwertet also keine fremde Anmeldung.
+/// Unlike the token read from the CLI, this one may and must be refreshed: it
+/// belongs to the application alone, so a rotating refresh token invalidates
+/// nobody else's sign-in.
 /// </remarks>
 public sealed class OAuthTokens
 {
@@ -23,8 +23,8 @@ public sealed class OAuthTokens
     public DateTimeOffset? ExpiresAt { get; init; }
 
     /// <summary>
-    /// Ablauf des Refresh-Tokens, sofern der Server ihn mitteilt. Ist er
-    /// unbekannt, laesst sich ueber die Haltbarkeit der Anmeldung nichts sagen.
+    /// Expiry of the refresh token, where the server states one. Where it is
+    /// unknown, nothing can be said about how long the sign-in will last.
     /// </summary>
     [JsonPropertyName("refreshTokenExpiresAt")]
     public DateTimeOffset? RefreshTokenExpiresAt { get; init; }
@@ -32,11 +32,11 @@ public sealed class OAuthTokens
     [JsonPropertyName("scope")]
     public string? Scope { get; init; }
 
-    /// <summary>Ob das Token innerhalb der Vorlaufzeit ablaeuft.</summary>
+    /// <summary>Whether the token expires within the lead time.</summary>
     public bool NeedsRefresh(DateTimeOffset now, TimeSpan skew) =>
         ExpiresAt is { } expiry && expiry - skew <= now;
 
-    /// <summary>Maskierte Darstellung. Enthaelt nie ein Geheimnis.</summary>
+    /// <summary>Masked representation. Never contains a secret.</summary>
     public override string ToString() =>
         $"OAuthTokens(expiresAt={ExpiresAt:o}, scope={Scope}, refreshable={RefreshToken is not null})";
 }

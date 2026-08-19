@@ -6,13 +6,13 @@ using Microsoft.Extensions.Logging;
 namespace ClaudeUsageChecker.Core.Authentication;
 
 /// <summary>
-/// Liest das Access-Token der Claude-Code-CLI mit - unter Windows/Linux aus
-/// ~/.claude/.credentials.json, unter macOS aus dem Schluesselbund.
+/// Reads along the access token of the Claude Code CLI - on Windows and Linux
+/// from ~/.claude/.credentials.json, on macOS from the keychain.
 /// </summary>
 /// <remarks>
-/// Ausschliesslich lesend. Ein abgelaufenes Token wird als solches gemeldet und
-/// NICHT erneuert: Der Refresh-Token rotiert bei Anthropic, ein Erneuern durch diese
-/// Anwendung wuerde die Anmeldung der CLI ungueltig machen.
+/// Read-only throughout. An expired token is reported as such and NOT refreshed:
+/// the refresh token rotates at Anthropic, and refreshing it here would
+/// invalidate the CLI's own sign-in.
 /// </remarks>
 public sealed class ClaudeCliTokenProvider : ITokenProvider
 {
@@ -43,7 +43,7 @@ public sealed class ClaudeCliTokenProvider : ITokenProvider
         return Parse(json, _timeProvider.GetUtcNow(), _logger);
     }
 
-    /// <summary>Zerlegt den JSON-Inhalt. Intern fuer Tests zugaenglich.</summary>
+    /// <summary>Parses the JSON content. Internal so that tests can reach it.</summary>
     internal static AccessToken? Parse(string json, DateTimeOffset now, ILogger? logger = null)
     {
         ClaudeCliCredentials? credentials;
@@ -53,7 +53,7 @@ public sealed class ClaudeCliTokenProvider : ITokenProvider
         }
         catch (JsonException ex)
         {
-            logger?.LogWarning(ex, "Anmeldedaten der Claude-CLI konnten nicht gelesen werden.");
+            logger?.LogWarning(ex, "Could not read the credentials of the Claude CLI.");
             return null;
         }
 

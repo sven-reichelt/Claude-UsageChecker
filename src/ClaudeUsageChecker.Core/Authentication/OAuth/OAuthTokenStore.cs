@@ -4,16 +4,16 @@ using ClaudeUsageChecker.Core.Platform;
 namespace ClaudeUsageChecker.Core.Authentication.OAuth;
 
 /// <summary>
-/// Legt die eigenen Anmeldedaten im verschluesselten Speicher des
-/// Betriebssystems ab - getrennt vom Eintrag fuer ein von Hand hinterlegtes
-/// Einzeltoken.
+/// Stores the application's own credentials in the encrypted storage of the
+/// operating system - separate from the entry for a manually stored single
+/// token.
 /// </summary>
 public sealed class OAuthTokenStore(ISecretStore store, string key = "ClaudeUsageChecker:OAuth")
 {
-    /// <summary>Bezeichner des Eintrags im Secret-Store.</summary>
+    /// <summary>Name of the entry in the secret store.</summary>
     public const string DefaultKey = "ClaudeUsageChecker:OAuth";
 
-    /// <summary>Ob auf diesem System ueberhaupt sicher gespeichert werden kann.</summary>
+    /// <summary>Whether this system can store anything securely at all.</summary>
     public bool IsSupported => store.IsSupported;
 
     public OAuthTokens? Read()
@@ -35,7 +35,7 @@ public sealed class OAuthTokenStore(ISecretStore store, string key = "ClaudeUsag
         }
         catch (JsonException)
         {
-            // Beschaedigter Eintrag zaehlt wie kein Eintrag - der Nutzer meldet sich neu an.
+            // A corrupted entry counts as no entry - the user signs in again.
             return null;
         }
     }

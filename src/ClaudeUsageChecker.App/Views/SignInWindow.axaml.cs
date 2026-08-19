@@ -3,16 +3,18 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using ClaudeUsageChecker.Core.Authentication.OAuth;
+using ClaudeUsageChecker.Core.Localization;
 
 namespace ClaudeUsageChecker.App.Views;
 
 /// <summary>
-/// Fuehrt durch die eigene Anmeldung: Seite oeffnen, Code einfuegen, fertig.
+/// Guides through the application's own sign-in: open the page, paste the code,
+/// done.
 /// </summary>
 /// <remarks>
-/// Bewusst mit Einfuegen von Hand statt mit einem lokalen Webserver: Die
-/// Anwendung muss dafuer keinen Port oeffnen und keinen Netzwerkdienst
-/// betreiben - eine Angriffsflaeche weniger auf dem Rechner des Nutzers.
+/// Pasting by hand rather than a local web server, on purpose: the application
+/// needs to open no port and run no network service for it - one attack surface
+/// less on the user's machine.
 /// </remarks>
 public partial class SignInWindow : Window
 {
@@ -32,6 +34,11 @@ public partial class SignInWindow : Window
 
         InitializeComponent();
 
+        // Longer translations grow the window downwards; without this it
+        // can end up reaching past the bottom edge of the screen.
+        Opened += (_, _) => ScreenFit.Apply(this);
+        ApplyTexts();
+
         OpenBrowserButton.Click += (_, _) => StartSignIn();
         CompleteButton.Click += (_, _) => CompleteSignIn();
         CloseButton.Click += (_, _) => Close();
@@ -40,29 +47,45 @@ public partial class SignInWindow : Window
         UpdateSignedInState();
     }
 
-    /// <summary>Wird ausgeloest, wenn eine Anmeldung erfolgreich abgeschlossen wurde.</summary>
+    /// <summary>Sets every fixed label from the language file.</summary>
+    private void ApplyTexts()
+    {
+        Title = T.SignInTitle;
+        Heading.Text = T.SignInHeading;
+        Intro.Text = T.SignInIntro;
+        Step1.Text = T.SignInStep1;
+        OpenBrowserButton.Content = T.SignInOpenBrowser;
+        UrlHint.Text = T.SignInUrlHint;
+        Step2.Text = T.SignInStep2;
+        CodeBox.Watermark = T.SignInCodeWatermark;
+        CompleteButton.Content = T.SignInComplete;
+        CloseButton.Content = T.Close;
+    }
+
+    /// <summary>Raised when a sign-in has been completed successfully.</summary>
     public event EventHandler? SignedIn;
 
     private void UpdateSignedInState()
     {
         var vorhanden = _tokenStore?.Read();
         SignedInText.Text = vorhanden is null
-            ? "Noch nicht angemeldet."
-            : $"Angemeldet. Gültig bis {vorhanden.ExpiresAt?.ToLocalTime():g}, Rechte: {vorhanden.Scope ?? "unbekannt"}.";
+            ? T.SignInNotYet
+            : T.SignInSignedIn(
+                vorhanden.ExpiresAt?.ToLocalTime() ?? default, vorhanden.Scope ?? T.Unknown);
     }
 
     private void StartSignIn()
     {
         if (_oauthClient is null)
         {
-            StatusText.Text = "Die Anmeldung ist in dieser Ansicht nicht verfügbar.";
+            StatusText.Text = T.SignInUnavailable;
             return;
         }
 
         _pendingRequest = _oauthClient.CreateAuthorizationRequest();
         UrlBox.Text = _pendingRequest.Url.ToString();
         CompleteButton.IsEnabled = true;
-        StatusText.Text = "Bitte im Browser die Freigabe erteilen und den angezeigten Code hier einfügen.";
+        StatusText.Text = T.SignInGrantInBrowser;
 
         try
         {
@@ -70,7 +93,7 @@ public partial class SignInWindow : Window
         }
         catch (Exception ex) when (ex is System.ComponentModel.Win32Exception or InvalidOperationException)
         {
-            StatusText.Text = "Der Browser ließ sich nicht öffnen. Bitte die Adresse oben kopieren.";
+            StatusText.Text = T.SignInBrowserFailed;
         }
     }
 
@@ -83,19 +106,19 @@ public partial class SignInWindow : Window
 
         if (_pendingRequest is null)
         {
-            StatusText.Text = "Bitte zuerst die Anmeldeseite öffnen.";
+            StatusText.Text = T.SignInOpenPageFirst;
             return;
         }
 
         var code = CodeBox.Text?.Trim();
         if (string.IsNullOrEmpty(code))
         {
-            StatusText.Text = "Bitte den Code von der Anthropic-Seite einfügen.";
+            StatusText.Text = T.SignInPasteCode;
             return;
         }
 
         CompleteButton.IsEnabled = false;
-        StatusText.Text = "Code wird eingelöst ...";
+        StatusText.Text = T.SignInRedeeming;
 
         try
         {
@@ -104,7 +127,7 @@ public partial class SignInWindow : Window
 
             CodeBox.Text = string.Empty;
             _pendingRequest = null;
-            StatusText.Text = "Anmeldung erfolgreich. Die Anwendung nutzt ab sofort ihr eigenes Zugriffsrecht.";
+            StatusText.Text = T.SignInSuccess;
             UpdateSignedInState();
             SignedIn?.Invoke(this, EventArgs.Empty);
         }
@@ -115,7 +138,7 @@ public partial class SignInWindow : Window
         }
         catch (Exception ex) when (ex is InvalidOperationException or ArgumentException)
         {
-            StatusText.Text = "Die Anmeldung konnte nicht gespeichert werden: " + ex.Message;
+            StatusText.Text = T.SignInSaveFailed(ex.Message);
             CompleteButton.IsEnabled = true;
         }
     }

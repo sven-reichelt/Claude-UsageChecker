@@ -1,70 +1,73 @@
-using System.Globalization;
 using System.Text;
+using ClaudeUsageChecker.Core.Localization;
 using ClaudeUsageChecker.Core.Models;
 using ClaudeUsageChecker.Core.Services;
 
 namespace ClaudeUsageChecker.Core.Formatting;
 
 /// <summary>
-/// Erzeugt die Texte fuer Infobereich-Tooltip, Kontextmenue und Detailansicht.
+/// Produces the text for the tray tooltip, the context menu and the details window.
 /// </summary>
 /// <remarks>
-/// Die Aufteilung folgt dem verfuegbaren Platz: Der Tooltip fasst die beiden
-/// wichtigsten Fenster samt Reset-Uhrzeit zusammen, das Kontextmenue listet
-/// alle gemeldeten Limits mit Restzeit auf.
+/// The split follows the space available: the tooltip condenses the two most
+/// important windows including the reset time, the context menu lists every
+/// reported limit with its remaining time.
+///
+/// All building blocks come from the language file of the selected language.
+/// That includes the order within a line: where English says "2 h left", another
+/// language may want the parts the other way round - which is why the file holds
+/// whole sentences with placeholders rather than fragments to be pieced together.
 /// </remarks>
 public static class UsageFormatter
 {
-    /// <summary>Windows kuerzt Tooltips im Infobereich hart nach 127 Zeichen.</summary>
+    /// <summary>Windows truncates tray tooltips hard at 127 characters.</summary>
     public const int WindowsTooltipMaxLength = 127;
 
     /// <summary>
-    /// Kurztext fuer den Tooltip, z. B.
-    /// "Sitzung 33 % - Reset 16:30 (2 Std 14 Min)".
-    /// Zeigt bewusst nur Sitzung und Wochenlimit, damit die Laengenbegrenzung haelt.
+    /// Short text for the tooltip, for example
+    /// "Session 33 % - resets 16:30 (2 h 14 min)".
+    /// Deliberately limited to session and weekly limit, so the length cap holds.
     /// </summary>
-    public static string ToTooltip(UsageState state, DateTimeOffset now, CultureInfo? culture = null)
+    public static string ToTooltip(UsageState state, DateTimeOffset now)
     {
-        culture ??= CultureInfo.CurrentCulture;
-
         var text = state.Kind switch
         {
-            UsageStateKind.Initializing => "Claude UsageChecker - Daten werden geladen ...",
-            UsageStateKind.NotConfigured => "Claude UsageChecker - nicht angemeldet",
-            UsageStateKind.AuthenticationFailed => "Claude UsageChecker - Token abgelaufen",
-            UsageStateKind.Unavailable => "Claude UsageChecker - keine Verbindung",
-            _ => BuildTooltipText(state, now, culture)
+            UsageStateKind.Initializing => T.TooltipLoading,
+            UsageStateKind.NotConfigured => T.TooltipNotSignedIn,
+            UsageStateKind.AuthenticationFailed => T.TooltipTokenExpired,
+            UsageStateKind.Unavailable => T.TooltipOffline,
+            _ => BuildTooltipText(state, now)
         };
 
         return Truncate(text, WindowsTooltipMaxLength);
     }
 
-    private static string BuildTooltipText(UsageState state, DateTimeOffset now, CultureInfo culture)
+    private static string BuildTooltipText(UsageState state, DateTimeOffset now)
     {
         if (state.Snapshot is not { } snapshot)
         {
-            return "Claude UsageChecker - keine Daten";
+            return T.TooltipNoData;
         }
 
         var builder = new StringBuilder();
-        AppendTooltipLine(builder, "Sitzung", snapshot.Session, now, culture);
-        AppendTooltipLine(builder, "Woche", snapshot.Weekly, now, culture);
+        AppendTooltipLine(builder, T.TooltipSession, snapshot.Session, now);
+        AppendTooltipLine(builder, T.TooltipWeekly, snapshot.Weekly, now);
 
         if (builder.Length == 0)
         {
-            return "Claude UsageChecker - keine Limits gemeldet";
+            return T.TooltipNoLimits;
         }
 
         if (state.Kind == UsageStateKind.Stale)
         {
-            builder.Append("\n(veraltet)");
+            builder.Append('\n').Append(T.TooltipStale);
         }
 
         return builder.ToString();
     }
 
     private static void AppendTooltipLine(
-        StringBuilder builder, string label, UsageWindow? window, DateTimeOffset now, CultureInfo culture)
+        StringBuilder builder, string label, UsageWindow? window, DateTimeOffset now)
     {
         if (window is null)
         {
@@ -76,19 +79,17 @@ public static class UsageFormatter
             builder.Append('\n');
         }
 
-        builder.AppendFormat(
-            culture,
-            "{0} {1:0} % - Reset {2} ({3})",
+        builder.Append(T.TooltipLine(
             label,
             window.Utilization,
-            DurationFormatter.ToResetMoment(window.ResetsAt, now, culture),
-            DurationFormatter.ToCompact(window.TimeUntilReset(now), culture));
+            DurationFormatter.ToResetMoment(window.ResetsAt, now),
+            DurationFormatter.ToCompact(window.TimeUntilReset(now))));
     }
 
     /// <summary>
-    /// Die gemeldeten Nutzungsfenster in fester Reihenfolge, jeweils mit Beschriftung.
-    /// Nicht gemeldete Fenster entfallen - je nach Abonnement liefert die API etwa
-    /// kein Opus-Wochenlimit.
+    /// The reported usage windows in a fixed order, each with its label. Windows
+    /// that are not reported are left out - depending on the subscription the API
+    /// may report no model-specific weekly limit at all.
     /// </summary>
     public static IEnumerable<(string Label, UsageWindow Window)> EnumerateWindows(UsageSnapshot? snapshot)
     {
@@ -99,97 +100,78 @@ public static class UsageFormatter
 
         if (snapshot.Session is { } session)
         {
-            yield return ("Sitzung (5 Std)", session);
+            yield return (T.WindowSession, session);
         }
 
         if (snapshot.Weekly is { } weekly)
         {
-            yield return ("Woche gesamt", weekly);
+            yield return (T.WindowWeeklyAll, weekly);
         }
 
-        if (snapshot.WeeklyOpus is { } opus)
+        // The model name comes from the response and is not translated.
+        foreach (var scoped in snapshot.ScopedWeekly)
         {
-            yield return ("Woche Opus", opus);
-        }
-
-        if (snapshot.WeeklySonnet is { } sonnet)
-        {
-            yield return ("Woche Sonnet", sonnet);
+            yield return (T.WindowWeeklyModel(scoped.ModelName), scoped.Window);
         }
     }
 
     /// <summary>
-    /// Zeile fuer das Kontextmenue, z. B. "Sitzung (5 Std): 33 % - noch 2 Std 14 Min".
-    /// Ohne Uhrzeit - die steht im Tooltip.
+    /// A line for the context menu, for example "Session (5 h): 33 % - 2 h 14 min left".
+    /// Without the time of day - that one is in the tooltip.
     /// </summary>
-    public static string ToMenuLine(
-        string label, UsageWindow window, DateTimeOffset now, CultureInfo? culture = null)
+    public static string ToMenuLine(string label, UsageWindow window, DateTimeOffset now)
     {
         ArgumentNullException.ThrowIfNull(window);
-        culture ??= CultureInfo.CurrentCulture;
 
-        return string.Format(
-            culture,
-            "{0}: {1:0.#} % - noch {2}",
-            label,
-            window.Utilization,
-            DurationFormatter.ToCompact(window.TimeUntilReset(now), culture));
+        return T.MenuLine(
+            label, window.Utilization, DurationFormatter.ToCompact(window.TimeUntilReset(now)));
     }
 
     /// <summary>
-    /// Zeile fuer das Zusatzkontingent, z. B.
-    /// "Zusatzkontingent: 24 % - 12,00 von 50,00 Credits".
-    /// Liefert null, wenn kein Zusatzkontingent aktiv ist.
+    /// The line for extra usage, for example
+    /// "Extra usage: 24 % - 12.00 of 50.00 credits".
+    /// Returns null when no extra usage is active.
     /// </summary>
-    public static string? ToExtraUsageLine(ExtraUsage? extraUsage, CultureInfo? culture = null)
+    public static string? ToExtraUsageLine(ExtraUsage? extraUsage)
     {
         if (extraUsage is not { IsEnabled: true })
         {
             return null;
         }
 
-        culture ??= CultureInfo.CurrentCulture;
-
         var parts = new List<string>(2);
 
         if (extraUsage.Utilization is { } utilization)
         {
-            parts.Add(string.Format(culture, "{0:0.#} %", utilization));
+            parts.Add(T.Percent(utilization));
         }
 
         if (extraUsage is { UsedCredits: { } used, MonthlyLimit: { } limit })
         {
-            parts.Add(string.Format(culture, "{0:0.00} von {1:0.00} Credits", used, limit));
+            parts.Add(T.ExtraUsedOfLimit(used, limit));
         }
         else if (extraUsage.UsedCredits is { } usedOnly)
         {
-            parts.Add(string.Format(culture, "{0:0.00} Credits verbraucht", usedOnly));
+            parts.Add(T.ExtraUsedOnly(usedOnly));
         }
 
-        // Die API meldet das Kontingent mitunter als aktiv, ohne Zahlen zu liefern.
-        return parts.Count == 0
-            ? "Zusatzkontingent: aktiv"
-            : "Zusatzkontingent: " + string.Join(" - ", parts);
+        // The API sometimes reports the quota as enabled without supplying figures.
+        return parts.Count == 0 ? T.ExtraLineActive : T.ExtraLine(string.Join(" - ", parts));
     }
 
-    /// <summary>Beschriftung einer einzelnen Zeile der Detailansicht.</summary>
-    public static string ToDetailLine(
-        string label, UsageWindow? window, DateTimeOffset now, CultureInfo? culture = null)
+    /// <summary>The label of a single row in the details window.</summary>
+    public static string ToDetailLine(string label, UsageWindow? window, DateTimeOffset now)
     {
-        culture ??= CultureInfo.CurrentCulture;
-
         if (window is null)
         {
-            return string.Format(culture, "{0}: nicht verfügbar", label);
+            return T.NotAvailable(label);
         }
 
-        return string.Format(
-            culture,
-            "{0}: {1:0.#} % belegt - Reset in {2} (um {3})",
+        return T.DetailLine(
             label,
             window.Utilization,
-            DurationFormatter.ToCompact(window.TimeUntilReset(now), culture),
-            DurationFormatter.ToResetMoment(window.ResetsAt, now, culture));
+            DurationFormatter.ToCompact(window.TimeUntilReset(now)),
+            DurationFormatter.ToResetMoment(window.ResetsAt, now));
     }
 
     private static string Truncate(string value, int maxLength) =>

@@ -1,15 +1,15 @@
 namespace ClaudeUsageChecker.Core.Authentication;
 
 /// <summary>
-/// Beschafft ein OAuth-Access-Token. Implementierungen lesen ausschliesslich -
-/// es wird zu keinem Zeitpunkt ein Token erneuert oder zurueckgeschrieben,
-/// damit die Anmeldedaten der Claude-Code-CLI unangetastet bleiben.
+/// Obtains an OAuth access token. Implementations only ever read - no token is
+/// refreshed or written back at any point, so that the credentials of the
+/// Claude Code CLI stay untouched.
 /// </summary>
 public interface ITokenProvider
 {
-    /// <summary>Sprechender Name fuer Diagnoseausgaben.</summary>
+    /// <summary>Readable name for diagnostic output.</summary>
     string Name { get; }
 
-    /// <summary>Liefert ein Token oder null, wenn diese Quelle nichts anzubieten hat.</summary>
+    /// <summary>Returns a token, or null when this source has nothing to offer.</summary>
     ValueTask<AccessToken?> TryGetTokenAsync(CancellationToken cancellationToken = default);
 }

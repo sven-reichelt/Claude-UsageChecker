@@ -6,9 +6,9 @@ using Microsoft.Win32;
 namespace ClaudeUsageChecker.App.Views;
 
 /// <summary>
-/// Traegt die Anwendung fuer den automatischen Start ein bzw. aus.
-/// Unter Windows ueber den Run-Schluessel des aktuellen Nutzers -
-/// kein Eingriff in systemweite Einstellungen, keine erhoehten Rechte noetig.
+/// Registers or unregisters the application for automatic startup. On Windows
+/// through the Run key of the current user - no interference with system-wide
+/// settings, no elevated rights needed.
 /// </summary>
 internal static class AutostartManager
 {
@@ -16,9 +16,9 @@ internal static class AutostartManager
     private const string ValueName = "ClaudeUsageChecker";
 
     /// <param name="path">
-    /// Der einzutragende Pfad. Ohne Angabe der aktuelle - beim Installieren muss
-    /// aber der Zielpfad eingetragen werden, nicht der, von dem gerade
-    /// gestartet wurde.
+    /// The path to register. Without one, the current path is used - but when
+    /// installing, the target path has to be registered, not the one the
+    /// application happens to be running from.
     /// </param>
     public static void Apply(bool enabled, string? path = null)
     {
@@ -56,7 +56,7 @@ internal static class AutostartManager
         }
         catch (Exception ex) when (ex is UnauthorizedAccessException or System.Security.SecurityException)
         {
-            // Ein fehlgeschlagener Autostart-Eintrag darf die Anwendung nicht stoeren.
+            // A failed autostart entry must not disturb the application.
         }
     }
 }

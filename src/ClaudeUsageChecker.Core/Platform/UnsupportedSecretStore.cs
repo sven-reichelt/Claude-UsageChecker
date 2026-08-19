@@ -1,9 +1,10 @@
+using ClaudeUsageChecker.Core.Localization;
+
 namespace ClaudeUsageChecker.Core.Platform;
 
 /// <summary>
-/// Platzhalter fuer Plattformen ohne angebundenen Secret-Store.
-/// Meldet ehrlich, dass nichts gespeichert werden kann, statt auf eine
-/// unsichere Notloesung auszuweichen.
+/// Stand-in for platforms without a secret store of their own. Says plainly that
+/// nothing can be stored, instead of falling back on an insecure improvisation.
 /// </summary>
 public sealed class UnsupportedSecretStore : ISecretStore
 {
@@ -12,11 +13,10 @@ public sealed class UnsupportedSecretStore : ISecretStore
     public string? Read(string key) => null;
 
     public void Write(string key, string secret) =>
-        throw new NotSupportedException(
-            "Auf dieser Plattform steht noch kein sicherer Speicher zur Verfuegung.");
+        throw new NotSupportedException(T.ErrorNoSecureStore);
 
     public void Delete(string key)
     {
-        // Nichts zu tun.
+        // Nothing to do.
     }
 }

@@ -6,53 +6,52 @@ using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 
+using ClaudeUsageChecker.Core.Localization;
+
 namespace ClaudeUsageChecker.App.Services;
 
-/// <summary>Ergebnis eines Einspielversuchs.</summary>
+/// <summary>Result of an attempt to install.</summary>
 public sealed record InstallResult(bool Succeeded, string Message)
 {
     public static InstallResult Failed(string message) => new(false, message);
 }
 
 /// <summary>
-/// Laedt eine neue Fassung herunter und ersetzt die laufende Datei.
+/// Downloads a new version and replaces the running file.
 /// </summary>
 /// <remarks>
 /// <para>
-/// Hier wird bewusst Fremdcode heruntergeladen und ausgefuehrt - eine
-/// Abweichung von der urspruenglichen Zurueckhaltung, getroffen weil ein
-/// blosser Hinweis in der Praxis liegen bleibt. Die Absicherung liegt deshalb
-/// auf der Pruefsumme: Ohne veroeffentlichte SHA-256-Summe und ohne
-/// Uebereinstimmung wird nichts eingespielt. Die Adressen stammen aus der
-/// GitHub-Antwort zu genau diesem Repository, nicht aus zusammengesetzten
-/// Zeichenketten.
+/// This deliberately downloads and executes foreign code - a departure from the
+/// original restraint, made because a mere notice tends to be left lying around.
+/// The safeguard therefore rests on the checksum: without a published SHA-256 sum
+/// and without a match, nothing is installed. The addresses come from the GitHub
+/// response for exactly this repository, not from strings pieced together.
 /// </para>
 /// <para>
-/// Windows laesst eine laufende Datei nicht ueberschreiben, wohl aber
-/// umbenennen. Genau darauf beruht das Verfahren: umbenennen, neue Datei an den
-/// alten Platz legen, neue Fassung starten, selbst beenden. Die neue Instanz
-/// raeumt die umbenannte Altfassung beim Start weg.
+/// Windows does not allow a running file to be overwritten, but it does allow
+/// renaming. The procedure rests on exactly that: rename, put the new file in the
+/// old place, start the new version, end this one. The new instance clears away
+/// the renamed old version on startup.
 /// </para>
 /// </remarks>
 public sealed class UpdateInstaller(HttpClient httpClient)
 {
-    /// <summary>Endung der beiseitegelegten Altfassung.</summary>
+    /// <summary>Extension of the old version that has been set aside.</summary>
     public const string BackupSuffix = ".alt";
 
-    /// <summary>Schalter, mit dem die neue Fassung auf das Ende der alten wartet.</summary>
+    /// <summary>Switch that makes the new version wait for the old one to end.</summary>
     public const string WaitArgument = "--nach-update";
 
     /// <summary>
-    /// Ob sich die laufende Fassung selbst ersetzen kann. Das setzt eine
-    /// Veroeffentlichung als Einzeldatei voraus - im Entwicklungsstand liegen
-    /// Dutzende Dateien nebeneinander, die einzeln zu tauschen waeren.
+    /// Whether the running version can replace itself. That requires a release
+    /// as a single file - in a development build dozens of files sit side by
+    /// side, each of which would have to be swapped.
     /// </summary>
     /// <remarks>
-    /// Erkannt wird das am Fehlen der gleichnamigen Bibliothek neben der
-    /// ausfuehrbaren Datei. Das trifft genau die Frage, auf die es ankommt:
-    /// Genuegt es, diese eine Datei zu tauschen? Ueber
-    /// <c>Assembly.Location</c> waere es zwar auch zu ermitteln, doch dessen
-    /// Verhalten in Einzeldateien gilt zu Recht als Stolperstein.
+    /// It is recognised from the absence of the like-named library next to the
+    /// executable. That answers precisely the question that matters: is swapping
+    /// this one file enough? <c>Assembly.Location</c> could tell as well, but its
+    /// behaviour in single files is rightly considered a pitfall.
     /// </remarks>
     public static bool IsSupported
     {
@@ -68,9 +67,9 @@ public sealed class UpdateInstaller(HttpClient httpClient)
     }
 
     /// <summary>
-    /// Laedt die neue Fassung, prueft sie und legt sie an die Stelle der alten.
-    /// Bei Erfolg laeuft bereits die neue Instanz - der Aufrufer muss sich
-    /// danach beenden.
+    /// Downloads the new version, verifies it and puts it in place of the old
+    /// one. On success the new instance is already running - the caller has to end
+    /// itself afterwards.
     /// </summary>
     public async Task<InstallResult> InstallAsync(
         UpdateCheckResult update, CancellationToken cancellationToken = default)
@@ -80,15 +79,13 @@ public sealed class UpdateInstaller(HttpClient httpClient)
         if (!IsSupported)
         {
             return InstallResult.Failed(
-                "Diese Fassung kann sich nicht selbst ersetzen. "
-                + "Bitte die neue Version von der Release-Seite laden.");
+                T.UpdaterNotSelfReplaceable);
         }
 
         if (update is not { DownloadUrl: { } downloadUrl, ChecksumUrl: { } checksumUrl })
         {
             return InstallResult.Failed(
-                "Zur neuen Version fehlt die Datei oder die Prüfsumme. "
-                + "Ohne beides wird nichts eingespielt.");
+                T.UpdaterMissingFileOrChecksum);
         }
 
         var eigenerPfad = Environment.ProcessPath!;
@@ -101,26 +98,25 @@ public sealed class UpdateInstaller(HttpClient httpClient)
             var erwartet = await LadePruefsummeAsync(checksumUrl, cancellationToken).ConfigureAwait(false);
             if (erwartet is null)
             {
-                return InstallResult.Failed("Die Prüfsumme war nicht lesbar. Es wird nichts eingespielt.");
+                return InstallResult.Failed(T.UpdaterChecksumUnreadable);
             }
 
             var tatsaechlich = await BerechnePruefsummeAsync(temp, cancellationToken).ConfigureAwait(false);
             if (!string.Equals(erwartet, tatsaechlich, StringComparison.OrdinalIgnoreCase))
             {
                 return InstallResult.Failed(
-                    "Die Prüfsumme der heruntergeladenen Datei stimmt nicht. "
-                    + "Sie wird verworfen und nicht ausgeführt.");
+                    T.UpdaterChecksumMismatch);
             }
 
             return Tausche(eigenerPfad, temp);
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
-            return InstallResult.Failed("Die neue Fassung konnte nicht geladen werden: " + ex.Message);
+            return InstallResult.Failed(T.UpdaterDownloadFailed(ex.Message));
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
-            return InstallResult.Failed("Die neue Fassung konnte nicht gespeichert werden: " + ex.Message);
+            return InstallResult.Failed(T.UpdaterSaveFailed(ex.Message));
         }
         finally
         {
@@ -146,7 +142,7 @@ public sealed class UpdateInstaller(HttpClient httpClient)
     }
 
     /// <summary>
-    /// Zieht die Summe aus einer Datei der Form "&lt;hash&gt;  &lt;dateiname&gt;".
+    /// Extracts the sum from a file of the form "&lt;hash&gt;  &lt;filename&gt;".
     /// </summary>
     internal static string? LiesPruefsumme(string inhalt)
     {
@@ -200,7 +196,7 @@ public sealed class UpdateInstaller(HttpClient httpClient)
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             File.Move(beiseite, eigenerPfad);
-            return InstallResult.Failed("Die neue Fassung ließ sich nicht einsetzen: " + ex.Message);
+            return InstallResult.Failed(T.UpdaterReplaceFailed(ex.Message));
         }
 
         var start = new ProcessStartInfo(eigenerPfad) { UseShellExecute = false };
@@ -208,14 +204,14 @@ public sealed class UpdateInstaller(HttpClient httpClient)
         start.ArgumentList.Add(Environment.ProcessId.ToString(System.Globalization.CultureInfo.InvariantCulture));
         Process.Start(start);
 
-        return new InstallResult(true, "Die neue Fassung wurde eingespielt und startet gerade.");
+        return new InstallResult(true, T.UpdaterDone);
     }
 
     /// <summary>
     /// Entfernt eine beiseitegelegte Altfassung. Wird beim Start aufgerufen,
     /// denn erst dann laeuft sie nicht mehr.
     /// </summary>
-    public static void RaeumeAltfassungWeg()
+    public static void RemovePreviousVersion()
     {
         if (Environment.ProcessPath is { } pfad)
         {

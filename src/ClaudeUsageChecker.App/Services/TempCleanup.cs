@@ -6,37 +6,34 @@ using System.IO;
 namespace ClaudeUsageChecker.App.Services;
 
 /// <summary>
-/// Entfernt die Entpackungsordner frueherer Fassungen aus dem
-/// Temporaerverzeichnis.
+/// Removes the extraction folders of earlier versions from the temporary
+/// directory.
 /// </summary>
 /// <remarks>
 /// <para>
-/// Eine komprimierte Einzeldatei kann ihre nativen Bibliotheken nicht aus dem
-/// Buendel laden - die .NET-Laufzeit packt sie beim Start nach
-/// <c>%TEMP%\.net\&lt;Anwendung&gt;\&lt;Kennung&gt;</c> aus. Die Kennung haengt am Inhalt,
-/// jede neue Fassung legt also einen eigenen Ordner an. Aufgeraeumt wird dabei
-/// nichts: Ohne Zutun waechst das Verzeichnis mit jeder Aktualisierung um rund
-/// 16 MB.
+/// A compressed single file cannot load its native libraries from the bundle -
+/// the .NET runtime extracts them at startup to
+/// <c>%TEMP%\.net\&lt;application&gt;\&lt;id&gt;</c>. The id depends on the content, so every
+/// new version creates a folder of its own. Nothing is cleaned up in the
+/// process: left alone, the directory grows by some 16 MB per update.
 /// </para>
 /// <para>
-/// Der eigene Ordner wird an den geladenen Modulen erkannt, nicht ueber
-/// <c>AppContext.BaseDirectory</c>. Letzteres zeigt bei einer Einzeldatei auf das
-/// Verzeichnis der ausfuehrbaren Datei und nicht auf die Entpackung - wer sich
-/// darauf verlaesst, loescht den Ordner, aus dem die laufende Anwendung ihre
-/// Bibliotheken laedt.
+/// The application's own folder is recognised from the loaded modules, not
+/// through <c>AppContext.BaseDirectory</c>. For a single file the latter points at
+/// the directory of the executable rather than at the extraction - relying on it
+/// deletes the very folder the running application loads its libraries from.
 /// </para>
 /// <para>
-/// Laesst sich der eigene Ordner nicht bestimmen, wird nichts geloescht. Ein
-/// Aufraeumer, der im Zweifel zuschlaegt, richtet mehr Schaden an als der
-/// belegte Platz.
+/// Where the own folder cannot be determined, nothing is deleted. A cleaner
+/// that strikes when in doubt does more damage than the disk space it frees.
 /// </para>
 /// </remarks>
 public static class TempCleanup
 {
     private const string AppFolderPrefix = "ClaudeUsageChecker";
 
-    /// <summary>Raeumt auf und meldet, wie viele Ordner entfernt wurden.</summary>
-    public static int RaeumeAlteEntpackungenWeg()
+    /// <summary>Cleans up and reports how many folders were removed.</summary>
+    public static int RemoveStaleExtractions()
     {
         var basis = Path.Combine(Path.GetTempPath(), ".net");
         if (!Directory.Exists(basis))
@@ -47,7 +44,7 @@ public static class TempCleanup
         var eigene = FindeEigeneEntpackungen(basis);
         if (eigene.Count == 0)
         {
-            // Ohne Kenntnis des eigenen Ordners lieber nichts anfassen.
+            // Without knowing our own folder, better to touch nothing.
             return 0;
         }
 
@@ -84,9 +81,8 @@ public static class TempCleanup
     }
 
     /// <summary>
-    /// Die Entpackungsordner, aus denen dieser Prozess gerade Bibliotheken
-    /// geladen hat. Das ist die verlaessliche Auskunft darueber, was in
-    /// Benutzung ist.
+    /// The extraction folders this process has actually loaded libraries from.
+    /// That is the reliable answer to what is in use.
     /// </summary>
     private static HashSet<string> FindeEigeneEntpackungen(string basis)
     {
@@ -113,7 +109,7 @@ public static class TempCleanup
         }
         catch (Exception ex) when (ex is InvalidOperationException or NotSupportedException)
         {
-            // Ohne Modulliste keine Aussage - dann wird nicht aufgeraeumt.
+            // No module list, no answer - then nothing is cleaned up.
         }
 
         return gefunden;
@@ -155,7 +151,7 @@ public static class TempCleanup
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
-            // Belegt oder gesperrt - beim naechsten Start noch einmal.
+            // In use or locked - try again on the next start.
             return false;
         }
     }

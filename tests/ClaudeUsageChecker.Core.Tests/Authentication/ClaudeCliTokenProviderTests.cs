@@ -7,7 +7,7 @@ public class ClaudeCliTokenProviderTests
     private static readonly DateTimeOffset Now = new(2026, 4, 11, 5, 0, 0, TimeSpan.Zero);
 
     [Fact]
-    public void Parse_LiestAccessTokenUndAblauf()
+    public void Parse_ReadsAccessTokenAndExpiry()
     {
         var expiresAt = Now.AddHours(1);
         var json = $$"""
@@ -30,7 +30,7 @@ public class ClaudeCliTokenProviderTests
     }
 
     [Fact]
-    public void Parse_LiefertNullOhneAccessToken()
+    public void Parse_ReturnsNullWithoutAnAccessToken()
     {
         const string json = """{ "claudeAiOauth": { "refreshToken": "nur-refresh" } }""";
 
@@ -38,13 +38,13 @@ public class ClaudeCliTokenProviderTests
     }
 
     [Fact]
-    public void Parse_LiefertNullBeiUngueltigemJson()
+    public void Parse_ReturnsNullForInvalidJson()
     {
         Assert.Null(ClaudeCliTokenProvider.Parse("kein json", Now));
     }
 
     [Fact]
-    public void Parse_KommtOhneAblaufzeitpunktZurecht()
+    public void Parse_CopesWithoutAnExpiry()
     {
         const string json = """{ "claudeAiOauth": { "accessToken": "abc" } }""";
 
@@ -56,7 +56,7 @@ public class ClaudeCliTokenProviderTests
     }
 
     [Fact]
-    public void ToString_GibtDenTokenwertNichtPreis()
+    public void ToString_DoesNotGiveAwayTheTokenValue()
     {
         var token = new AccessToken("streng-geheim", TokenSource.SecretStore);
 
@@ -66,7 +66,7 @@ public class ClaudeCliTokenProviderTests
     [Theory]
     [InlineData(-10, true)]
     [InlineData(10, false)]
-    public void IsExpired_BeruecksichtigtToleranz(int minutesFromNow, bool expected)
+    public void IsExpired_HonoursTheSkew(int minutesFromNow, bool expected)
     {
         var token = new AccessToken("t", TokenSource.ClaudeCli, Now.AddMinutes(minutesFromNow));
 

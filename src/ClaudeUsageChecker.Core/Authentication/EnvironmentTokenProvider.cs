@@ -1,8 +1,8 @@
 namespace ClaudeUsageChecker.Core.Authentication;
 
 /// <summary>
-/// Liest das Token aus der Umgebungsvariable CLAUDE_CODE_OAUTH_TOKEN.
-/// Primaer fuer Entwicklung und automatisierte Tests gedacht.
+/// Reads the token from the CLAUDE_CODE_OAUTH_TOKEN environment variable.
+/// Mainly meant for development and automated tests.
 /// </summary>
 public sealed class EnvironmentTokenProvider(string variableName = "CLAUDE_CODE_OAUTH_TOKEN") : ITokenProvider
 {

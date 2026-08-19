@@ -11,19 +11,18 @@ public class FormatterTests
     private static readonly DateTimeOffset Now = new(2026, 4, 11, 5, 0, 0, TimeSpan.Zero);
 
     [Theory]
-    [InlineData(0, "gleich")]
-    [InlineData(30, "1 Min")]
-    [InlineData(90, "2 Min")]
-    [InlineData(3600, "1 Std")]
-    [InlineData(8040, "2 Std 14 Min")]
-    [InlineData(356400, "4 Tg 3 Std")]
-    [InlineData(345600, "4 Tg")]
-    public void ToCompact_FormatiertRestzeiten(int seconds, string expected) =>
-        Assert.Equal(expected, DurationFormatter.ToCompact(
-            TimeSpan.FromSeconds(seconds), CultureInfo.InvariantCulture));
+    [InlineData(0, "now")]
+    [InlineData(30, "1 min")]
+    [InlineData(90, "2 min")]
+    [InlineData(3600, "1 h")]
+    [InlineData(8040, "2 h 14 min")]
+    [InlineData(356400, "4 d 3 h")]
+    [InlineData(345600, "4 d")]
+    public void ToCompact_FormatsRemainingTimes(int seconds, string expected) =>
+        Assert.Equal(expected, DurationFormatter.ToCompact(TimeSpan.FromSeconds(seconds)));
 
     [Fact]
-    public void ToResetMoment_ZeigtAmSelbenTagNurDieUhrzeit()
+    public void ToResetMoment_ShowsOnlyTheTimeOnTheSameDay()
     {
         var now = new DateTimeOffset(2026, 4, 11, 5, 0, 0, TimeSpan.Zero).ToLocalTime();
         var reset = now.AddHours(2);
@@ -34,7 +33,7 @@ public class FormatterTests
     }
 
     [Fact]
-    public void ToResetMoment_NenntDenWochentagInnerhalbDerWoche()
+    public void ToResetMoment_NamesTheWeekdayWithinTheWeek()
     {
         var now = new DateTimeOffset(2026, 4, 11, 5, 0, 0, TimeSpan.Zero).ToLocalTime();
         var reset = now.AddDays(3);
@@ -47,12 +46,12 @@ public class FormatterTests
     }
 
     /// <summary>
-    /// Der kuerzestmoegliche Wochentagsname ist im Deutschen ein einzelner
-    /// Buchstabe: "S" stuende fuer Samstag wie fuer Sonntag, "D" fuer Dienstag
-    /// wie fuer Donnerstag. Eine solche Angabe waere wertlos.
+    /// The shortest weekday name is a single letter in German: "S" would stand
+    /// for Samstag as well as for Sonntag, "D" for Dienstag as well as for
+    /// Donnerstag. Such a label would be worthless.
     /// </summary>
     [Fact]
-    public void ToResetMoment_VerwendetKeineMehrdeutigeWochentagsabkuerzung()
+    public void ToResetMoment_AvoidsAmbiguousWeekdayAbbreviations()
     {
         var german = new CultureInfo("de-DE");
         var now = new DateTimeOffset(2026, 4, 11, 5, 0, 0, TimeSpan.Zero).ToLocalTime();
@@ -64,12 +63,12 @@ public class FormatterTests
             namesUsed.Add(text.Split(' ')[0]);
         }
 
-        Assert.All(namesUsed, name => Assert.True(name.Length >= 2, $"'{name}' ist zu kurz."));
+        Assert.All(namesUsed, name => Assert.True(name.Length >= 2, $"'{name}' is too short."));
         Assert.Equal(namesUsed.Count, namesUsed.Distinct(StringComparer.Ordinal).Count());
     }
 
     [Fact]
-    public void ToResetMoment_NenntAbEinerWocheDasDatum()
+    public void ToResetMoment_NamesTheDateFromAWeekOnwards()
     {
         var now = new DateTimeOffset(2026, 4, 11, 5, 0, 0, TimeSpan.Zero).ToLocalTime();
         var reset = now.AddDays(10);
@@ -80,31 +79,31 @@ public class FormatterTests
     }
 
     [Fact]
-    public void ToTooltip_ZeigtSitzungUndWoche()
+    public void ToTooltip_ShowsSessionAndWeek()
     {
-        var tooltip = UsageFormatter.ToTooltip(ReadyState(33, 13), Now, CultureInfo.InvariantCulture);
+        var tooltip = UsageFormatter.ToTooltip(ReadyState(33, 13), Now);
 
-        Assert.Contains("Sitzung 33 %", tooltip, StringComparison.Ordinal);
-        Assert.Contains("Woche 13 %", tooltip, StringComparison.Ordinal);
+        Assert.Contains("Session 33 %", tooltip, StringComparison.Ordinal);
+        Assert.Contains("Week 13 %", tooltip, StringComparison.Ordinal);
     }
 
     [Fact]
-    public void ToTooltip_EnthaeltDieResetUhrzeit()
+    public void ToTooltip_ContainsTheResetTime()
     {
         var state = ReadyState(33, 13);
         var expected = DurationFormatter.ToResetMoment(
             state.Snapshot!.Session!.ResetsAt, Now, CultureInfo.InvariantCulture);
 
-        var tooltip = UsageFormatter.ToTooltip(state, Now, CultureInfo.InvariantCulture);
+        var tooltip = UsageFormatter.ToTooltip(state, Now);
 
         Assert.Contains(expected, tooltip, StringComparison.Ordinal);
     }
 
     [Fact]
-    public void ToTooltip_BleibtInnerhalbDerWindowsGrenze()
+    public void ToTooltip_StaysWithinTheWindowsLimit()
     {
-        // Ungünstigster Fall: dreistellige Werte und ein weit entfernter Reset,
-        // der als Datum statt als Wochentag ausgegeben wird.
+        // Worst case: three-digit values and a distant reset that is printed as
+        // a date rather than a weekday.
         var state = new UsageState
         {
             Kind = UsageStateKind.Stale,
@@ -114,17 +113,17 @@ public class FormatterTests
                 Weekly = new UsageWindow(100, Now.AddDays(30)),
                 RetrievedAt = Now
             },
-            Message = "Die Anthropic-API ist nicht erreichbar."
+            Message = "The Anthropic API is unreachable."
         };
 
-        var tooltip = UsageFormatter.ToTooltip(state, Now, CultureInfo.InvariantCulture);
+        var tooltip = UsageFormatter.ToTooltip(state, Now);
 
         Assert.True(tooltip.Length <= UsageFormatter.WindowsTooltipMaxLength,
-            $"Tooltip ist {tooltip.Length} Zeichen lang: {tooltip}");
+            $"Tooltip is {tooltip.Length} characters long: {tooltip}");
     }
 
     [Fact]
-    public void ToTooltip_WeistAufFehlendeAnmeldungHin()
+    public void ToTooltip_PointsOutTheMissingSignIn()
     {
         var state = new UsageState
         {
@@ -132,81 +131,77 @@ public class FormatterTests
             Failure = UsageApiFailure.NoToken
         };
 
-        Assert.Contains("nicht angemeldet", UsageFormatter.ToTooltip(state, Now), StringComparison.Ordinal);
+        Assert.Contains("not signed in", UsageFormatter.ToTooltip(state, Now), StringComparison.Ordinal);
     }
 
     [Fact]
-    public void ToTooltip_MarkiertVeralteteDaten()
+    public void ToTooltip_MarksOutdatedData()
     {
         var state = ReadyState(33, 13) with { Kind = UsageStateKind.Stale };
 
-        Assert.Contains("veraltet", UsageFormatter.ToTooltip(state, Now, CultureInfo.InvariantCulture),
+        Assert.Contains("outdated", UsageFormatter.ToTooltip(state, Now),
             StringComparison.Ordinal);
     }
 
     [Fact]
-    public void ToMenuLine_NenntProzentUndRestzeitOhneUhrzeit()
+    public void ToMenuLine_NamesPercentAndRemainingTimeWithoutTheClock()
     {
         var window = new UsageWindow(33, Now.AddHours(2).AddMinutes(14));
 
-        var line = UsageFormatter.ToMenuLine("Sitzung (5 Std)", window, Now, CultureInfo.InvariantCulture);
+        var line = UsageFormatter.ToMenuLine("Session (5 h)", window, Now);
 
-        Assert.Equal("Sitzung (5 Std): 33 % - noch 2 Std 14 Min", line);
+        Assert.Equal("Session (5 h): 33 % - 2 h 14 min left", line);
     }
 
     [Fact]
-    public void EnumerateWindows_LiefertNurGemeldeteFensterInFesterReihenfolge()
+    public void EnumerateWindows_ReturnsOnlyReportedWindowsInAFixedOrder()
     {
         var snapshot = new UsageSnapshot
         {
             Session = new UsageWindow(10, Now.AddHours(1)),
             Weekly = new UsageWindow(20, Now.AddDays(3)),
-            WeeklyOpus = null,
-            WeeklySonnet = new UsageWindow(30, Now.AddDays(4)),
+            ScopedWeekly = [new ScopedUsageWindow("Fable", new UsageWindow(30, Now.AddDays(4)))],
             RetrievedAt = Now
         };
 
         var labels = UsageFormatter.EnumerateWindows(snapshot).Select(w => w.Label).ToList();
 
-        Assert.Equal(["Sitzung (5 Std)", "Woche gesamt", "Woche Sonnet"], labels);
+        Assert.Equal(["Session (5 h)", "Weekly total", "Weekly Fable"], labels);
     }
 
     [Fact]
-    public void EnumerateWindows_KommtMitFehlendemSnapshotZurecht() =>
+    public void EnumerateWindows_CopesWithAMissingSnapshot() =>
         Assert.Empty(UsageFormatter.EnumerateWindows(null));
 
     [Fact]
-    public void ToExtraUsageLine_LiefertNullWennNichtAktiv()
+    public void ToExtraUsageLine_ReturnsNullWhenNotActive()
     {
         Assert.Null(UsageFormatter.ToExtraUsageLine(null));
         Assert.Null(UsageFormatter.ToExtraUsageLine(new ExtraUsage(false, 50m, 12m, 24d)));
     }
 
     [Fact]
-    public void ToExtraUsageLine_NenntAuslastungUndCredits()
+    public void ToExtraUsageLine_NamesUtilizationAndCredits()
     {
-        var line = UsageFormatter.ToExtraUsageLine(
-            new ExtraUsage(true, 50m, 12m, 24d), CultureInfo.InvariantCulture);
+        var line = UsageFormatter.ToExtraUsageLine(new ExtraUsage(true, 50m, 12m, 24d));
 
-        Assert.Equal("Zusatzkontingent: 24 % - 12.00 von 50.00 Credits", line);
+        Assert.Equal("Extra usage: 24 % - 12.00 of 50.00 credits", line);
     }
 
     [Fact]
-    public void ToExtraUsageLine_KommtMitTeilangabenZurecht()
+    public void ToExtraUsageLine_CopesWithPartialFigures()
     {
-        var onlyUsed = UsageFormatter.ToExtraUsageLine(
-            new ExtraUsage(true, null, 12m, null), CultureInfo.InvariantCulture);
+        var onlyUsed = UsageFormatter.ToExtraUsageLine(new ExtraUsage(true, null, 12m, null));
 
-        Assert.Equal("Zusatzkontingent: 12.00 Credits verbraucht", onlyUsed);
+        Assert.Equal("Extra usage: 12.00 credits used", onlyUsed);
     }
 
     [Fact]
-    public void ToExtraUsageLine_MeldetAktivOhneZahlen()
+    public void ToExtraUsageLine_ReportsActiveWithoutFigures()
     {
-        var line = UsageFormatter.ToExtraUsageLine(
-            new ExtraUsage(true, null, null, null), CultureInfo.InvariantCulture);
+        var line = UsageFormatter.ToExtraUsageLine(new ExtraUsage(true, null, null, null));
 
-        Assert.Equal("Zusatzkontingent: aktiv", line);
+        Assert.Equal("Extra usage: active", line);
     }
 
     private static UsageState ReadyState(double session, double weekly) => new()

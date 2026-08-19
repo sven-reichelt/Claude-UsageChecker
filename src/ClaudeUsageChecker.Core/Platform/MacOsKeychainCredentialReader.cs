@@ -5,8 +5,8 @@ using ClaudeUsageChecker.Core.Authentication;
 namespace ClaudeUsageChecker.Core.Platform;
 
 /// <summary>
-/// Liest die CLI-Anmeldedaten aus dem macOS-Schluesselbund
-/// (Dienst "Claude Code-credentials") ueber das Systemwerkzeug /usr/bin/security.
+/// Reads the CLI credentials from the macOS keychain (service
+/// "Claude Code-credentials") through the system tool /usr/bin/security.
 /// </summary>
 [SupportedOSPlatform("macos")]
 public sealed class MacOsKeychainCredentialReader(string serviceName = "Claude Code-credentials")
@@ -39,7 +39,7 @@ public sealed class MacOsKeychainCredentialReader(string serviceName = "Claude C
             var stdout = await process.StandardOutput.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
             await process.WaitForExitAsync(cancellationToken).ConfigureAwait(false);
 
-            // Exit-Code 44 bedeutet schlicht "Eintrag nicht gefunden".
+            // Exit code 44 simply means "entry not found".
             return process.ExitCode == 0 && !string.IsNullOrWhiteSpace(stdout) ? stdout.Trim() : null;
         }
         catch (Exception ex) when (ex is not OperationCanceledException)

@@ -3,7 +3,7 @@ using ClaudeUsageChecker.Core.Services;
 
 namespace ClaudeUsageChecker.App.Tray;
 
-/// <summary>Optische Stufe des Infobereich-Symbols.</summary>
+/// <summary>Visual severity of the tray icon.</summary>
 public enum TrayIconSeverity
 {
     Normal,
@@ -12,7 +12,7 @@ public enum TrayIconSeverity
     Inactive
 }
 
-/// <summary>Leitet aus dem Nutzungszustand die Symbolstufe ab.</summary>
+/// <summary>Derives the icon severity from the usage state.</summary>
 public static class TrayIconSeverityResolver
 {
     public static TrayIconSeverity Resolve(UsageState state, double warningThreshold, double criticalThreshold)
@@ -30,8 +30,16 @@ public static class TrayIconSeverityResolver
             return TrayIconSeverity.Inactive;
         }
 
-        // Der jeweils angespannteste Wert bestimmt die Farbe.
-        var peak = Max(snapshot.Session, snapshot.Weekly, snapshot.WeeklyOpus, snapshot.WeeklySonnet);
+        // Whichever value is tightest decides the colour - including the
+        // model-specific weekly limits, whose number the API dictates.
+        var peak = 0d;
+        foreach (var window in snapshot.AllWindows())
+        {
+            if (window.Utilization > peak)
+            {
+                peak = window.Utilization;
+            }
+        }
 
         return peak switch
         {
@@ -39,19 +47,5 @@ public static class TrayIconSeverityResolver
             var p when p >= warningThreshold => TrayIconSeverity.Warning,
             _ => TrayIconSeverity.Normal
         };
-    }
-
-    private static double Max(params UsageWindow?[] windows)
-    {
-        var peak = 0d;
-        foreach (var window in windows)
-        {
-            if (window is not null && window.Utilization > peak)
-            {
-                peak = window.Utilization;
-            }
-        }
-
-        return peak;
     }
 }

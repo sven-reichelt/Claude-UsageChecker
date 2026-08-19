@@ -1,11 +1,11 @@
 namespace ClaudeUsageChecker.Core.Authentication;
 
 /// <summary>
-/// Beschafft den rohen JSON-Inhalt der CLI-Anmeldedaten. Die plattformspezifische
-/// Ablage (Datei bzw. Schluesselbund) wird hinter dieser Schnittstelle gekapselt.
+/// Obtains the raw JSON of the CLI credentials. The platform-specific storage
+/// (file or keychain) is hidden behind this interface.
 /// </summary>
 public interface IClaudeCliCredentialReader
 {
-    /// <summary>Liefert den JSON-Inhalt oder null, wenn keine Anmeldedaten vorliegen.</summary>
+    /// <summary>Returns the JSON content, or null when no credentials exist.</summary>
     ValueTask<string?> ReadRawAsync(CancellationToken cancellationToken = default);
 }

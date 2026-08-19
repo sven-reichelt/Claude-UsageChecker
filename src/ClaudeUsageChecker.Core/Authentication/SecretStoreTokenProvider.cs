@@ -3,13 +3,14 @@ using ClaudeUsageChecker.Core.Platform;
 namespace ClaudeUsageChecker.Core.Authentication;
 
 /// <summary>
-/// Liest das vom Nutzer hinterlegte Langzeit-Token (erzeugt per <c>claude setup-token</c>)
-/// aus dem verschluesselten Secret-Store des Betriebssystems. Dies ist die bevorzugte
-/// Quelle, weil sie voellig unabhaengig von einer laufenden Claude-Code-Installation ist.
+/// Reads the long-lived token the user stored (created with <c>claude setup-token</c>)
+/// from the encrypted secret store of the operating system. This source is
+/// preferred over the CLI credentials because it is entirely independent of a
+/// running Claude Code installation.
 /// </summary>
 public sealed class SecretStoreTokenProvider(ISecretStore store, string key = "ClaudeUsageChecker:OAuthToken") : ITokenProvider
 {
-    /// <summary>Bezeichner des Eintrags im Secret-Store.</summary>
+    /// <summary>Name of the entry in the secret store.</summary>
     public const string DefaultKey = "ClaudeUsageChecker:OAuthToken";
 
     public string Name => "secret-store";

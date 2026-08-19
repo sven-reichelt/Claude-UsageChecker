@@ -6,13 +6,14 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using ClaudeUsageChecker.Core.Authentication;
 using ClaudeUsageChecker.Core.Formatting;
+using ClaudeUsageChecker.Core.Localization;
 using ClaudeUsageChecker.Core.Models;
 using ClaudeUsageChecker.Core.Services;
 
 namespace ClaudeUsageChecker.App.Views;
 
 /// <summary>
-/// Kompakte Detailansicht, die sich beim Klick auf das Infobereich-Symbol oeffnet.
+/// Compact details window that opens on a click on the tray icon.
 /// </summary>
 public partial class DetailsWindow : Window
 {
@@ -28,6 +29,11 @@ public partial class DetailsWindow : Window
         _timeProvider = timeProvider;
         InitializeComponent();
 
+        // Longer translations grow the window downwards; without this it
+        // can end up reaching past the bottom edge of the screen.
+        Opened += (_, _) => ScreenFit.Apply(this);
+        ApplyTexts();
+
         RefreshButton.Click += (_, _) => RefreshRequested?.Invoke(this, EventArgs.Empty);
         UpdateButton.Click += (_, _) =>
         {
@@ -38,7 +44,7 @@ public partial class DetailsWindow : Window
         };
         InstallButton.Click += (_, _) => InstallRequested?.Invoke(this, EventArgs.Empty);
 
-        // Das Fenster verhaelt sich wie ein Aufklappmenue: Fokusverlust schliesst es.
+        // The window behaves like a drop-down: losing focus closes it.
         Deactivated += (_, _) => Hide();
         KeyDown += (_, e) =>
         {
@@ -49,18 +55,34 @@ public partial class DetailsWindow : Window
         };
     }
 
-    /// <summary>Der Nutzer hat einen sofortigen Abruf angefordert.</summary>
+    /// <summary>
+    /// Sets every fixed label from the language file.
+    /// </summary>
+    /// <remarks>
+    /// The texts deliberately do not live in the XAML: they have to be
+    /// refreshable on a language change, and that only works from here. Called
+    /// again after every language change.
+    /// </remarks>
+    public void ApplyTexts()
+    {
+        Title = T.AppName;
+        InstallButton.Content = T.DetailsInstall;
+        UpdateButton.Content = T.DetailsReleasePage;
+        RefreshButton.Content = T.Refresh;
+    }
+
+    /// <summary>The user asked for an immediate call.</summary>
     public event EventHandler? RefreshRequested;
 
-    /// <summary>Der Nutzer moechte die Release-Seite der neuen Version oeffnen.</summary>
+    /// <summary>The user wants to open the release page of the new version.</summary>
     public event EventHandler<Uri>? ReleasePageRequested;
 
-    /// <summary>Der Nutzer moechte die neue Fassung einspielen lassen.</summary>
+    /// <summary>The user wants the new version installed.</summary>
     public event EventHandler? InstallRequested;
 
     /// <summary>
-    /// Zeigt einen dauerhaften Hinweis an, etwa dass die eigene Anmeldung
-    /// abgelaufen ist. Ohne Text wird er ausgeblendet.
+    /// Shows a standing notice, for instance that the application's own sign-in
+    /// has expired. Without text it is hidden.
     /// </summary>
     public void SetSignInNotice(string? message)
     {
@@ -68,7 +90,7 @@ public partial class DetailsWindow : Window
         SignInNoticeBorder.IsVisible = !string.IsNullOrWhiteSpace(message);
     }
 
-    /// <summary>Stellt den uebergebenen Zustand dar.</summary>
+    /// <summary>Renders the state that was handed in.</summary>
     public void Render(UsageState state)
     {
         var now = _timeProvider.GetLocalNow();
@@ -78,22 +100,17 @@ public partial class DetailsWindow : Window
         RenderMessage(state);
 
         FooterText.Text = state.Snapshot is { } snapshot
-            ? string.Format(
-                CultureInfo.CurrentCulture,
-                "Stand: {0:t} - Quelle: {1}",
-                snapshot.RetrievedAt.ToLocalTime(),
-                QuellenName(snapshot.TokenSource))
-            : "Noch keine Daten";
+            ? T.DetailsFooter(snapshot.RetrievedAt.ToLocalTime(), SourceName(snapshot.TokenSource))
+            : T.DetailsNoDataYet;
     }
 
     /// <summary>
-    /// Zeigt das Ergebnis einer Aktualisierungspruefung an. Ohne Text wird der
-    /// Hinweis ausgeblendet.
+    /// Shows the result of an update check. Without text the notice is hidden.
     /// </summary>
     /// <param name="canInstall">
-    /// Ob die neue Fassung selbst eingespielt werden kann. Nur dann wird die
-    /// entsprechende Schaltflaeche angeboten - ein Knopf, der nicht funktioniert,
-    /// ist schlimmer als keiner.
+    /// Whether the new version can be installed by the application itself. Only
+    /// then is the button offered - a button that does not work is worse than no
+    /// button.
     /// </param>
     public void SetUpdateNotice(string? message, Uri? releasePage = null, bool canInstall = false)
     {
@@ -105,7 +122,7 @@ public partial class DetailsWindow : Window
         InstallButton.IsEnabled = canInstall;
     }
 
-    /// <summary>Meldet den Fortschritt des Einspielens.</summary>
+    /// <summary>Reports the progress of the installation.</summary>
     public void SetInstallProgress(string message, bool busy)
     {
         UpdateText.Text = message;
@@ -136,7 +153,7 @@ public partial class DetailsWindow : Window
         ExtraUsageBorder.IsVisible = true;
         ExtraUsagePanel.Children.Add(new TextBlock
         {
-            Text = "Zusatzkontingent",
+            Text = T.ExtraTitle,
             FontSize = 12,
             FontWeight = FontWeight.Medium
         });
@@ -153,49 +170,43 @@ public partial class DetailsWindow : Window
             });
         }
 
-        // Die API meldet je nach Konto nur einen Teil der Werte - jede Angabe
-        // wird nur dann gezeigt, wenn sie tatsaechlich vorliegt.
+        // Depending on the account the API reports only some of the values - each
+        // one is shown only where it is actually present.
         var detail = extraUsage switch
         {
-            { UsedCredits: { } used, MonthlyLimit: { } limit } => string.Format(
-                CultureInfo.CurrentCulture, "{0:0.00} von {1:0.00} Credits verbraucht", used, limit),
-            { UsedCredits: { } usedOnly } => string.Format(
-                CultureInfo.CurrentCulture, "{0:0.00} Credits verbraucht", usedOnly),
-            { MonthlyLimit: { } limitOnly } => string.Format(
-                CultureInfo.CurrentCulture, "Monatsgrenze: {0:0.00} Credits", limitOnly),
-            _ => "aktiv"
+            { UsedCredits: { } used, MonthlyLimit: { } limit } => T.ExtraUsedOfLimitLong(used, limit),
+            { UsedCredits: { } usedOnly } => T.ExtraUsedOnly(usedOnly),
+            { MonthlyLimit: { } limitOnly } => T.ExtraMonthlyLimit(limitOnly),
+            _ => T.ExtraActive
         };
 
         ExtraUsagePanel.Children.Add(new TextBlock { Text = detail, FontSize = 11, Opacity = 0.7 });
     }
 
-    /// <summary>Sprechender Name der Tokenquelle fuer die Fusszeile.</summary>
-    internal static string QuellenName(TokenSource source) => source switch
+    /// <summary>Readable name of the token source for the footer.</summary>
+    internal static string SourceName(TokenSource source) => source switch
     {
-        TokenSource.OAuth => "eigene Anmeldung",
-        TokenSource.SecretStore => "hinterlegtes Token",
-        TokenSource.Environment => "Umgebungsvariable",
-        TokenSource.ClaudeCli => "Claude Code",
-        _ => "unbekannt"
+        TokenSource.OAuth => T.SourceOAuth,
+        TokenSource.SecretStore => T.SourceSecretStore,
+        TokenSource.Environment => T.SourceEnvironment,
+        TokenSource.ClaudeCli => T.SourceClaudeCli,
+        _ => T.Unknown
     };
 
     private void RenderMessage(UsageState state)
     {
         var message = state.Kind switch
         {
-            // Zuerst der eigene Weg: Er funktioniert auch dort, wo Claude Code
-            // gar nicht installiert ist - und genau dort stand vorher ein
-            // Hinweis, dem niemand folgen konnte.
-            UsageStateKind.NotConfigured =>
-                "Kein Zugriffsrecht vorhanden. Unter Einstellungen → Anmelden holt sich die "
-                + "Anwendung ein eigenes. Alternativ liest sie das Token einer angemeldeten "
-                + "Claude-Code-Installation mit.",
-            // Der Text der Ausnahme unterscheidet bereits zwischen abgelaufenem
-            // Token und fehlendem Geltungsbereich - er ist hier hilfreicher als
-            // eine allgemeine Formulierung.
+            // The application's own route first: it works even where Claude Code
+            // is not installed at all - and it was exactly there that the old
+            // notice gave advice nobody could follow.
+            UsageStateKind.NotConfigured => T.DetailsNotConfigured,
+            // The text of the exception already distinguishes an expired token
+            // from a missing scope - it is more helpful here than a general
+            // phrasing.
             UsageStateKind.AuthenticationFailed => state.Message,
             UsageStateKind.Unavailable => state.Message,
-            UsageStateKind.Stale => "Die Anzeige ist veraltet: " + state.Message,
+            UsageStateKind.Stale => T.DetailsStale(state.Message ?? string.Empty),
             _ => null
         };
 
@@ -210,7 +221,7 @@ public partial class DetailsWindow : Window
         var title = new TextBlock { Text = label, FontSize = 12, FontWeight = FontWeight.Medium };
         var value = new TextBlock
         {
-            Text = string.Format(CultureInfo.CurrentCulture, "{0:0.#} %", window.Utilization),
+            Text = T.Percent(window.Utilization),
             FontSize = 12,
             HorizontalAlignment = HorizontalAlignment.Right
         };
@@ -229,9 +240,7 @@ public partial class DetailsWindow : Window
 
         var reset = new TextBlock
         {
-            Text = string.Format(
-                CultureInfo.CurrentCulture,
-                "Reset in {0} - um {1}",
+            Text = T.ResetIn(
                 DurationFormatter.ToCompact(window.TimeUntilReset(now)),
                 DurationFormatter.ToResetMoment(window.ResetsAt, now)),
             FontSize = 11,

@@ -3,19 +3,19 @@ using System.IO;
 
 namespace ClaudeUsageChecker.App;
 
-/// <summary>Zentrale Ablageorte der Anwendung im Benutzerprofil.</summary>
+/// <summary>Central storage locations of the application inside the user profile.</summary>
 internal static class AppPaths
 {
     public const string ProductName = "ClaudeUsageChecker";
 
     /// <summary>
-    /// Geraetelokale Daten (Protokolle, Zwischenspeicher). Bewusst LocalApplicationData,
-    /// damit nichts in ein Roaming-Profil oder eine Cloud-Sicherung wandert.
+    /// Machine-local data (logs, caches). LocalApplicationData on purpose, so
+    /// that nothing travels into a roaming profile or a cloud backup.
     /// </summary>
     public static string LocalDataDirectory { get; } = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         ProductName);
 
-    /// <summary>Datei der Benutzereinstellungen. Enthaelt keine Geheimnisse.</summary>
+    /// <summary>File holding the user settings. Contains no secrets.</summary>
     public static string SettingsFile { get; } = Path.Combine(LocalDataDirectory, "settings.json");
 }

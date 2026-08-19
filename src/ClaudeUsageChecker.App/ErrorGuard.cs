@@ -4,19 +4,19 @@ using System.Threading.Tasks;
 namespace ClaudeUsageChecker.App;
 
 /// <summary>
-/// Kapselt Aktionen aus der Oberflaeche, damit ein Fehler darin die Anwendung
-/// nicht beendet.
+/// Wraps actions triggered from the interface, so that a failure in one does not
+/// terminate the application.
 /// </summary>
 /// <remarks>
-/// Eine Anwendung im Infobereich hat kein Fenster, in dem ein Fehler auffallen
-/// wuerde: Eine Ausnahme in einem Menue-Handler laeuft bis in die Nachrichtenschleife
-/// durch und beendet den Prozess kommentarlos. Der Nutzer sieht dann nur, dass das
-/// Symbol verschwunden ist. Deshalb faengt dieser Wachposten jede Ausnahme ab,
-/// protokolliert sie mit Kontext und laesst die Anwendung weiterlaufen.
+/// A tray application has no window in which a failure would show: an exception
+/// in a menu handler travels all the way to the message loop and ends the
+/// process without a word. All the user sees is that the icon has vanished. This
+/// guard therefore catches every exception, records it with its context, and
+/// lets the application carry on.
 /// </remarks>
 internal static class ErrorGuard
 {
-    /// <summary>Fuehrt eine Aktion aus und faengt jeden Fehler ab.</summary>
+    /// <summary>Runs an action and catches every failure.</summary>
     public static void Run(string context, Action action)
     {
         try
@@ -30,15 +30,15 @@ internal static class ErrorGuard
     }
 
     /// <summary>
-    /// Startet eine asynchrone Aktion, ohne auf sie zu warten, und faengt jeden
-    /// Fehler ab. Ersetzt das blosse Verwerfen der Aufgabe per Unterstrich.
+    /// Starts an asynchronous action without awaiting it, and catches every
+    /// failure. Replaces discarding the task with an underscore.
     /// </summary>
     public static void Forget(string context, Func<Task> action)
     {
         _ = RunAsync(context, action);
     }
 
-    /// <summary>Fuehrt eine asynchrone Aktion aus und faengt jeden Fehler ab.</summary>
+    /// <summary>Runs an asynchronous action and catches every failure.</summary>
     public static async Task RunAsync(string context, Func<Task> action)
     {
         try
@@ -47,7 +47,7 @@ internal static class ErrorGuard
         }
         catch (OperationCanceledException)
         {
-            // Beim Beenden erwartet.
+            // Expected during shutdown.
         }
         catch (Exception ex)
         {

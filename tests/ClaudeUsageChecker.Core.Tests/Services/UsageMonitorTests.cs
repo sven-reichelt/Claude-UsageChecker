@@ -8,7 +8,7 @@ namespace ClaudeUsageChecker.Core.Tests.Services;
 public class UsageMonitorTests
 {
     [Fact]
-    public async Task ErfolgreicherAbrufFuehrtZuReady()
+    public async Task ASuccessfulCallLeadsToReady()
     {
         var client = new StubClient { Snapshot = Snapshot(20) };
         await using var monitor = new UsageMonitor(client);
@@ -20,7 +20,7 @@ public class UsageMonitorTests
     }
 
     [Fact]
-    public async Task FehlendesTokenFuehrtZuNotConfigured()
+    public async Task AMissingTokenLeadsToNotConfigured()
     {
         var client = new StubClient
         {
@@ -49,7 +49,7 @@ public class UsageMonitorTests
     }
 
     [Fact]
-    public async Task OhneVorherigeDatenFuehrtEinFehlschlagZuUnavailable()
+    public async Task WithoutEarlierDataAFailureLeadsToUnavailable()
     {
         var client = new StubClient
         {
@@ -63,7 +63,7 @@ public class UsageMonitorTests
     }
 
     [Fact]
-    public async Task ZustandsaenderungWirdGemeldet()
+    public async Task AStateChangeIsReported()
     {
         var client = new StubClient { Snapshot = Snapshot(5) };
         await using var monitor = new UsageMonitor(client);
@@ -78,7 +78,7 @@ public class UsageMonitorTests
     }
 
     [Fact]
-    public void DasAbrufintervallFaelltNieUnterDieSichereUntergrenze()
+    public void ThePollingIntervalNeverFallsBelowTheSafeMinimum()
     {
         var options = new MonitorOptions { PollInterval = TimeSpan.FromSeconds(5) };
 

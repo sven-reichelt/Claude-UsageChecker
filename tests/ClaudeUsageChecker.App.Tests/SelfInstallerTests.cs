@@ -7,26 +7,26 @@ using ClaudeUsageChecker.App.Views;
 namespace ClaudeUsageChecker.App.Tests;
 
 /// <summary>
-/// Prueft die dauerhafte Einrichtung, soweit das ohne echtes Kopieren geht.
+/// Checks the permanent setup, as far as that works without really copying.
 /// </summary>
 public class SelfInstallerTests
 {
     [Fact]
-    public void DerZielortLiegtUnterProgramsImLokalenProfil()
+    public void TheTargetSitsUnderProgramsInTheLocalProfile()
     {
-        // %LOCALAPPDATA%\Programs ist der von Windows vorgesehene Ort fuer
-        // Anwendungen ohne Administratorrechte. Die Wurzel des Benutzerprofils
+        // %LOCALAPPDATA%\Programs is the location Windows intends for
+        // applications without administrator rights. The root of the user profile
         // bleibt damit frei.
-        var erwartet = Path.Combine(
+        var expected = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "Programs",
             "ClaudeUsageChecker");
 
-        Assert.Equal(erwartet, SelfInstaller.TargetDirectory);
+        Assert.Equal(expected, SelfInstaller.TargetDirectory);
     }
 
     [Fact]
-    public void DerZielortLiegtNichtInDerWurzelDesBenutzerprofils()
+    public void TheTargetIsNotInTheRootOfTheUserProfile()
     {
         var wurzel = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
@@ -36,27 +36,27 @@ public class SelfInstallerTests
     }
 
     [Fact]
-    public void DieZieldateiHeisstOhneVersionsnummer()
+    public void TheTargetFileIsNamedWithoutAVersionNumber()
     {
-        // Der Selbstaustausch schreibt an diesen Pfad; eine Versionsnummer darin
-        // wuerde nach der ersten Aktualisierung nicht mehr stimmen. Ausserdem
-        // haengt die Anheftung im Infobereich am Pfad.
+        // The self-update writes to this path; a version number in it would be
+        // wrong after the first update. On top of that, the tray pinning depends
+        // on the path.
         Assert.Equal("ClaudeUsageChecker.exe", Path.GetFileName(SelfInstaller.TargetPath));
     }
 
     [Fact]
-    public void ImEntwicklungsstandWirdNichtsAngeboten()
+    public void NothingIsOfferedInADevelopmentBuild()
     {
-        // Dort liegen Dutzende Dateien nebeneinander - eine einzelne zu kopieren
+        // Dozens of files sit side by side there - copying a single one
         // ergaebe nichts Lauffaehiges.
         Assert.False(UpdateInstaller.IsSupported);
         Assert.False(SelfInstaller.ShouldOffer);
     }
 
     [Fact]
-    public void DieFrageKommtNurEinmal()
+    public void TheQuestionComesOnlyOnce()
     {
-        // Steht das Merkmal, wird nicht erneut gefragt - unabhaengig davon, ob
+        // Once the flag is set, the question does not return - regardless of
         // zugestimmt oder abgelehnt wurde.
         var abgelehnt = new AppSettings { InstallPromptShown = true };
 
@@ -65,11 +65,11 @@ public class SelfInstallerTests
     }
 
     [Fact]
-    public void EineFrischeEinstellungHatNochNichtGefragt() =>
+    public void FreshSettingsHaveNotAskedYet() =>
         Assert.False(new AppSettings().InstallPromptShown);
 
     [AvaloniaFact]
-    public void DasNachfragefensterNenntDenZielpfad()
+    public void ThePromptWindowNamesTheTargetPath()
     {
         var window = new InstallPromptWindow();
 
@@ -79,6 +79,6 @@ public class SelfInstallerTests
     }
 
     [AvaloniaFact]
-    public void DasNachfragefensterZeigtNochKeinenStatus() =>
+    public void ThePromptWindowShowsNoStatusYet() =>
         Assert.False(new InstallPromptWindow().FindControl<TextBlock>("StatusText")!.IsVisible);
 }

@@ -5,17 +5,17 @@ using System.Threading.Tasks;
 namespace ClaudeUsageChecker.App;
 
 /// <summary>
-/// Schreibt Ausnahmen in eine lokale Datei. Der Bericht bleibt ausschliesslich
-/// auf dem Geraet und wird nirgendwohin uebertragen.
+/// Writes exceptions to a local file. The report stays on the machine and is
+/// transmitted nowhere.
 /// </summary>
 internal static class CrashReporter
 {
     private static readonly object WriteLock = new();
 
-    /// <summary>Pfad der Protokolldatei im lokalen Profil.</summary>
+    /// <summary>Path of the log file inside the local profile.</summary>
     public static string LogFile { get; } = Path.Combine(AppPaths.LocalDataDirectory, "crash.log");
 
-    /// <summary>Hinterlegt Ausnahmen, die ausserhalb jedes Handlers auftreten.</summary>
+    /// <summary>Records exceptions that occur outside any handler.</summary>
     public static void InstallGlobalHandlers()
     {
         AppDomain.CurrentDomain.UnhandledException += (_, e) =>
@@ -29,7 +29,7 @@ internal static class CrashReporter
         TaskScheduler.UnobservedTaskException += (_, e) =>
         {
             Write(e.Exception, "TaskScheduler.UnobservedTaskException");
-            // Ein nicht abgewarteter Fehler im Hintergrund darf den Prozess nicht beenden.
+            // An unobserved background failure must not end the process.
             e.SetObserved();
         };
     }
@@ -53,7 +53,7 @@ internal static class CrashReporter
         }
         catch (Exception)
         {
-            // Beim Schreiben des Fehlerberichts darf nichts mehr schiefgehen.
+            // Nothing may go wrong while writing the crash report itself.
         }
     }
 }

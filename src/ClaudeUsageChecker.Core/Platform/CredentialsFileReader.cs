@@ -3,11 +3,11 @@ using ClaudeUsageChecker.Core.Authentication;
 namespace ClaudeUsageChecker.Core.Platform;
 
 /// <summary>
-/// Liest ~/.claude/.credentials.json (Windows und Linux).
+/// Reads ~/.claude/.credentials.json (Windows and Linux).
 /// </summary>
 public sealed class CredentialsFileReader(string? path = null) : IClaudeCliCredentialReader
 {
-    /// <summary>Standardpfad der Anmeldedaten im Benutzerprofil.</summary>
+    /// <summary>Default path of the credentials inside the user profile.</summary>
     public static string DefaultPath { get; } = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
         ".claude",
@@ -28,8 +28,8 @@ public sealed class CredentialsFileReader(string? path = null) : IClaudeCliCrede
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
-            // Die CLI schreibt die Datei beim Token-Refresh neu - kurzzeitige Lesefehler
-            // sind erwartbar und werden beim naechsten Abruf von selbst behoben.
+            // The CLI rewrites the file when it refreshes its token - brief read
+            // failures are to be expected and resolve themselves on the next call.
             return null;
         }
     }

@@ -4,14 +4,14 @@ using System.Threading;
 namespace ClaudeUsageChecker.App;
 
 /// <summary>
-/// Stellt sicher, dass die Anwendung nur einmal je Benutzersitzung laeuft.
+/// Makes sure the application runs only once per login session.
 /// </summary>
 /// <remarks>
-/// Ohne diese Sperre erscheint bei jedem weiteren Start ein zusaetzliches Symbol
-/// im Infobereich, und jede Instanz fragt die API eigenstaendig ab - was den
-/// drosselungsempfindlichen Endpunkt unnoetig belastet.
-/// Der Name traegt das Praefix "Local\", damit die Sperre je Anmeldesitzung gilt
-/// und mehrere Nutzer auf demselben Rechner sich nicht gegenseitig aussperren.
+/// Without this lock every further start adds another tray icon, and each
+/// instance polls the API on its own - which burdens the throttle-sensitive
+/// endpoint for nothing.
+/// The name carries the "Local\" prefix so that the lock applies per login
+/// session and several users on the same machine do not lock each other out.
 /// </remarks>
 internal sealed class SingleInstance : IDisposable
 {
@@ -22,7 +22,7 @@ internal sealed class SingleInstance : IDisposable
     private SingleInstance(Mutex mutex) => _mutex = mutex;
 
     /// <summary>
-    /// Versucht, die Sperre zu belegen. Liefert null, wenn bereits eine Instanz laeuft.
+    /// Tries to take the lock. Returns null when an instance is already running.
     /// </summary>
     public static SingleInstance? TryAcquire()
     {
@@ -38,7 +38,7 @@ internal sealed class SingleInstance : IDisposable
         }
         catch (AbandonedMutexException)
         {
-            // Die vorherige Instanz wurde hart beendet. Die Sperre gehoert nun uns.
+            // The previous instance was killed. The lock is ours now.
         }
 
         return new SingleInstance(mutex);
@@ -52,7 +52,7 @@ internal sealed class SingleInstance : IDisposable
         }
         catch (ApplicationException)
         {
-            // Die Sperre war nicht mehr belegt - beim Beenden unerheblich.
+            // The lock was no longer held - irrelevant during shutdown.
         }
 
         _mutex.Dispose();

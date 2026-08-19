@@ -1,14 +1,15 @@
 using ClaudeUsageChecker.Core.Api;
 using ClaudeUsageChecker.Core.Configuration;
+using ClaudeUsageChecker.Core.Localization;
 using ClaudeUsageChecker.Core.Models;
 using Microsoft.Extensions.Logging;
 
 namespace ClaudeUsageChecker.Core.Services;
 
 /// <summary>
-/// Ruft den Nutzungsstand in festem Takt ab und meldet jede Zustandsaenderung.
-/// Nach Fehlschlaegen wird das Intervall exponentiell gedehnt, damit der
-/// drosselungsempfindliche Endpunkt nicht weiter belastet wird.
+/// Fetches the usage status at a fixed cadence and reports every change of
+/// state. After failures the interval is stretched exponentially, so that the
+/// throttle-sensitive endpoint is not burdened further.
 /// </summary>
 public sealed class UsageMonitor : IAsyncDisposable
 {
@@ -37,13 +38,13 @@ public sealed class UsageMonitor : IAsyncDisposable
         _currentBackoff = _options.InitialBackoff;
     }
 
-    /// <summary>Wird bei jeder Zustandsaenderung ausgeloest.</summary>
+    /// <summary>Raised on every change of state.</summary>
     public event EventHandler<UsageState>? StateChanged;
 
-    /// <summary>Der zuletzt bekannte Zustand.</summary>
+    /// <summary>The most recently known state.</summary>
     public UsageState State => Volatile.Read(ref _state);
 
-    /// <summary>Startet die Abrufschleife. Mehrfachaufrufe sind wirkungslos.</summary>
+    /// <summary>Starts the polling loop. Calling it again has no effect.</summary>
     public void Start()
     {
         if (_loop is not null)
@@ -55,8 +56,8 @@ public sealed class UsageMonitor : IAsyncDisposable
     }
 
     /// <summary>
-    /// Erzwingt einen sofortigen Abruf, etwa nach dem Hinterlegen eines Tokens.
-    /// Laeuft bereits ein Abruf, wird auf dessen Ergebnis gewartet.
+    /// Forces an immediate call, for instance after a token has been stored.
+    /// If a call is already running, this waits for its result.
     /// </summary>
     public async Task RefreshNowAsync(CancellationToken cancellationToken = default)
     {
@@ -81,7 +82,7 @@ public sealed class UsageMonitor : IAsyncDisposable
         }
     }
 
-    /// <summary>Fuehrt genau einen Abruf durch und liefert die Wartezeit bis zum naechsten.</summary>
+    /// <summary>Performs exactly one call and returns the wait until the next.</summary>
     private async Task<TimeSpan> PollOnceAsync(CancellationToken cancellationToken)
     {
         await _refreshGate.WaitAsync(cancellationToken).ConfigureAwait(false);
@@ -110,9 +111,9 @@ public sealed class UsageMonitor : IAsyncDisposable
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "Unerwarteter Fehler beim Abruf des Nutzungsstands.");
+            _logger?.LogError(ex, "Unexpected error while fetching the usage status.");
             return HandleFailure(new UsageApiException(
-                "Unerwarteter Fehler beim Abruf.", UsageApiFailure.Network, innerException: ex));
+                T.ErrorUnexpectedFetch, UsageApiFailure.Network, innerException: ex));
         }
         finally
         {
@@ -134,7 +135,7 @@ public sealed class UsageMonitor : IAsyncDisposable
 
         var delay = DetermineRetryDelay(ex);
 
-        _logger?.LogWarning("Abruf fehlgeschlagen ({Failure}). Naechster Versuch in {Delay}.",
+        _logger?.LogWarning("Call failed ({Failure}). Next attempt in {Delay}.",
             ex.Failure, delay);
 
         Publish(new UsageState
@@ -151,13 +152,13 @@ public sealed class UsageMonitor : IAsyncDisposable
 
     private TimeSpan DetermineRetryDelay(UsageApiException ex)
     {
-        // Eine Vorgabe des Servers hat immer Vorrang.
+        // An instruction from the server always takes precedence.
         if (ex.RetryAfter is { } retryAfter && retryAfter > TimeSpan.Zero)
         {
             return retryAfter < MonitorOptions.MinimumInterval ? MonitorOptions.MinimumInterval : retryAfter;
         }
 
-        // Fehlende Einrichtung behebt sich nicht durch schnelles Wiederholen.
+        // A missing sign-in does not fix itself by retrying quickly.
         if (ex.Failure is UsageApiFailure.NoToken or UsageApiFailure.Unauthorized)
         {
             return _options.PollInterval;
@@ -189,7 +190,7 @@ public sealed class UsageMonitor : IAsyncDisposable
             }
             catch (OperationCanceledException)
             {
-                // Erwartet beim Herunterfahren.
+                // Expected during shutdown.
             }
         }
 

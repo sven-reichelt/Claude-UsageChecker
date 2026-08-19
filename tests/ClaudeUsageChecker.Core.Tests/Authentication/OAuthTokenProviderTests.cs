@@ -7,30 +7,30 @@ using Microsoft.Extensions.Time.Testing;
 namespace ClaudeUsageChecker.Core.Tests.Authentication;
 
 /// <summary>
-/// Prueft die selbsttaetige Erneuerung der eigenen Anmeldung.
+/// Checks the automatic refresh of the application's own sign-in.
 /// </summary>
 public class OAuthTokenProviderTests
 {
     private static readonly DateTimeOffset Jetzt = new(2026, 8, 19, 12, 0, 0, TimeSpan.Zero);
 
     [Fact]
-    public async Task OhneAnmeldungWirdNichtsGeliefert()
+    public async Task WithoutASignInNothingIsSupplied()
     {
-        using var provider = CreateProvider(new OAuthFlowTests.StubHandler(), gespeichert: null, out _);
+        using var provider = CreateProvider(new OAuthFlowTests.StubHandler(), saved: null, out _);
 
         Assert.Null(await provider.TryGetTokenAsync());
     }
 
     [Fact]
-    public async Task EinGueltigesTokenWirdUnveraendertGeliefert()
+    public async Task AValidTokenIsSuppliedUnchanged()
     {
-        var gespeichert = new OAuthTokens
+        var saved = new OAuthTokens
         {
             AccessToken = "a1",
             RefreshToken = "r1",
             ExpiresAt = Jetzt.AddHours(1)
         };
-        using var provider = CreateProvider(new OAuthFlowTests.StubHandler(), gespeichert, out _);
+        using var provider = CreateProvider(new OAuthFlowTests.StubHandler(), saved, out _);
 
         var token = await provider.TryGetTokenAsync();
 
@@ -39,18 +39,18 @@ public class OAuthTokenProviderTests
     }
 
     [Fact]
-    public async Task EinAblaufendesTokenWirdErneuert()
+    public async Task AnExpiringTokenIsRefreshed()
     {
         var handler = new OAuthFlowTests.StubHandler((HttpStatusCode.OK,
             """{"access_token":"a2","refresh_token":"r2","expires_in":3600}"""));
-        var gespeichert = new OAuthTokens
+        var saved = new OAuthTokens
         {
             AccessToken = "a1",
             RefreshToken = "r1",
-            // Laeuft in zwei Minuten ab, die Vorlaufzeit betraegt fuenf.
+            // Expires in two minutes, while the lead time is five.
             ExpiresAt = Jetzt.AddMinutes(2)
         };
-        using var provider = CreateProvider(handler, gespeichert, out var store);
+        using var provider = CreateProvider(handler, saved, out var store);
 
         var token = await provider.TryGetTokenAsync();
 
@@ -60,18 +60,18 @@ public class OAuthTokenProviderTests
     }
 
     [Fact]
-    public async Task OhneNeuenRefreshTokenBleibtDerBisherigeGueltig()
+    public async Task WithoutANewRefreshTokenThePreviousOneStaysValid()
     {
-        // Nicht jeder Server liefert beim Erneuern einen neuen Refresh-Token mit.
+        // Not every server sends a new refresh token when refreshing.
         var handler = new OAuthFlowTests.StubHandler((HttpStatusCode.OK,
             """{"access_token":"a2","expires_in":3600}"""));
-        var gespeichert = new OAuthTokens
+        var saved = new OAuthTokens
         {
             AccessToken = "a1",
             RefreshToken = "r1",
             ExpiresAt = Jetzt.AddMinutes(2)
         };
-        using var provider = CreateProvider(handler, gespeichert, out var store);
+        using var provider = CreateProvider(handler, saved, out var store);
 
         await provider.TryGetTokenAsync();
 
@@ -80,42 +80,42 @@ public class OAuthTokenProviderTests
     }
 
     [Fact]
-    public async Task EineGescheiterteErneuerungLiefertNichtsUndReisstNichtsMit()
+    public async Task AFailedRefreshSuppliesNothingAndBreaksNothing()
     {
         var handler = new OAuthFlowTests.StubHandler((HttpStatusCode.BadRequest,
             """{"error":"invalid_grant"}"""));
-        var gespeichert = new OAuthTokens
+        var saved = new OAuthTokens
         {
             AccessToken = "a1",
             RefreshToken = "r1",
             ExpiresAt = Jetzt.AddMinutes(2)
         };
-        using var provider = CreateProvider(handler, gespeichert, out _);
+        using var provider = CreateProvider(handler, saved, out _);
 
-        // Null statt Ausnahme: So kommt die naechste Tokenquelle zum Zuge.
+        // Null rather than an exception: that way the next token source gets its turn.
         Assert.Null(await provider.TryGetTokenAsync());
     }
 
     [Fact]
-    public async Task AbgelaufenUndNichtErneuerbarLiefertNichts()
+    public async Task ExpiredAndNotRefreshableSuppliesNothing()
     {
-        var gespeichert = new OAuthTokens
+        var saved = new OAuthTokens
         {
             AccessToken = "a1",
             RefreshToken = null,
             ExpiresAt = Jetzt.AddMinutes(-1)
         };
-        using var provider = CreateProvider(new OAuthFlowTests.StubHandler(), gespeichert, out _);
+        using var provider = CreateProvider(new OAuthFlowTests.StubHandler(), saved, out _);
 
         Assert.Null(await provider.TryGetTokenAsync());
     }
 
     [Fact]
-    public async Task OhneBekanntenAblaufWirdNichtVorsorglichErneuert()
+    public async Task WithoutAKnownExpiryNothingIsRefreshedPreemptively()
     {
-        var gespeichert = new OAuthTokens { AccessToken = "a1", RefreshToken = "r1", ExpiresAt = null };
+        var saved = new OAuthTokens { AccessToken = "a1", RefreshToken = "r1", ExpiresAt = null };
         var handler = new OAuthFlowTests.StubHandler();
-        using var provider = CreateProvider(handler, gespeichert, out _);
+        using var provider = CreateProvider(handler, saved, out _);
 
         var token = await provider.TryGetTokenAsync();
 
@@ -124,7 +124,7 @@ public class OAuthTokenProviderTests
     }
 
     [Fact]
-    public void EinBeschaedigterEintragZaehltWieKeiner()
+    public void ACorruptedEntryCountsAsNone()
     {
         var secretStore = new FakeSecretStore();
         secretStore.Write(OAuthTokenStore.DefaultKey, "kein json");
@@ -133,7 +133,7 @@ public class OAuthTokenProviderTests
     }
 
     [Fact]
-    public void GespeicherteAnmeldedatenUeberstehenEinenRundlauf()
+    public void StoredCredentialsSurviveARoundTrip()
     {
         var store = new OAuthTokenStore(new FakeSecretStore());
         var tokens = new OAuthTokens
@@ -154,7 +154,7 @@ public class OAuthTokenProviderTests
     }
 
     [Fact]
-    public void DieDarstellungGibtKeinGeheimnisPreis()
+    public void TheRepresentationGivesAwayNoSecret()
     {
         var text = new OAuthTokens { AccessToken = "streng-geheim", RefreshToken = "auch-geheim" }.ToString();
 
@@ -163,13 +163,13 @@ public class OAuthTokenProviderTests
     }
 
     private static OAuthTokenProvider CreateProvider(
-        OAuthFlowTests.StubHandler handler, OAuthTokens? gespeichert, out OAuthTokenStore store)
+        OAuthFlowTests.StubHandler handler, OAuthTokens? saved, out OAuthTokenStore store)
     {
         var secretStore = new FakeSecretStore();
         store = new OAuthTokenStore(secretStore);
-        if (gespeichert is not null)
+        if (saved is not null)
         {
-            store.Write(gespeichert);
+            store.Write(saved);
         }
 
         var zeit = new FakeTimeProvider(Jetzt);

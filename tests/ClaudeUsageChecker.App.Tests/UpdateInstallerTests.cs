@@ -4,11 +4,11 @@ using ClaudeUsageChecker.App.Services;
 namespace ClaudeUsageChecker.App.Tests;
 
 /// <summary>
-/// Prueft die Absicherungen des Selbstaustauschs.
+/// Checks the safeguards of the self-update.
 /// </summary>
 /// <remarks>
-/// Die Anwendung laedt hier Fremdcode herunter und fuehrt ihn aus. Die einzige
-/// Absicherung dagegen ist die veroeffentlichte Pruefsumme - entsprechend genau
+/// The application downloads foreign code here and executes it. The only
+/// safeguard against that is the published checksum - which is accordingly
 /// muss ihre Auswertung sein. Eine zu grosszuegige Erkennung waere schlimmer
 /// als gar keine, weil sie Sicherheit vortaeuscht.
 /// </remarks>
@@ -17,7 +17,7 @@ public class UpdateInstallerTests
     private const string GueltigeSumme = "d07e71e78e774176e768f4c5308d90c66f4e0aafcc495189a4b1115a0e896857";
 
     [Fact]
-    public void PruefsummeWirdAusDerUeblichenSchreibweiseGelesen()
+    public void TheChecksumIsReadFromTheUsualNotation()
     {
         var inhalt = $"{GueltigeSumme}  ClaudeUsageChecker-0.2.0-win-x64.exe";
 
@@ -25,28 +25,28 @@ public class UpdateInstallerTests
     }
 
     [Fact]
-    public void PruefsummeVertraegtUmbruecheUndLeerraum() =>
-        Assert.Equal(GueltigeSumme, UpdateInstaller.LiesPruefsumme($"\n  {GueltigeSumme}   datei.exe \n"));
+    public void TheChecksumToleratesLineBreaksAndWhitespace() =>
+        Assert.Equal(GueltigeSumme, UpdateInstaller.LiesPruefsumme($"\n  {GueltigeSumme}   file.exe \n"));
 
     [Fact]
-    public void PruefsummeInGrossschreibungWirdVereinheitlicht() =>
+    public void AnUppercaseChecksumIsNormalised() =>
         Assert.Equal(GueltigeSumme, UpdateInstaller.LiesPruefsumme(GueltigeSumme.ToUpperInvariant() + "  x.exe"));
 
     [Theory]
     [InlineData("")]
     [InlineData("   ")]
     [InlineData("keine summe hier")]
-    // Zu kurz - eine SHA-256-Summe hat genau 64 Stellen.
+    // Too short - a SHA-256 sum has exactly 64 digits.
     [InlineData("d07e71e7")]
     // Zu lang.
     [InlineData("d07e71e78e774176e768f4c5308d90c66f4e0aafcc495189a4b1115a0e8968571")]
     // Richtige Laenge, aber keine Hexadezimalziffern.
     [InlineData("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz")]
-    public void UnbrauchbarePruefsummenWerdenAbgelehnt(string inhalt) =>
+    public void UnusableChecksumsAreRejected(string inhalt) =>
         Assert.Null(UpdateInstaller.LiesPruefsumme(inhalt));
 
     [Fact]
-    public void OhneDateiUndPruefsummeWirdNichtsAngeboten()
+    public void WithoutFileAndChecksumNothingIsOffered()
     {
         var ohneAlles = new UpdateCheckResult { Status = UpdateCheckStatus.UpdateAvailable };
         var nurDatei = new UpdateCheckResult
@@ -79,7 +79,7 @@ public class UpdateInstallerTests
     }
 
     [Fact]
-    public void OhneVerfuegbareAktualisierungWirdNichtsAngeboten()
+    public void WithoutAnAvailableUpdateNothingIsOffered()
     {
         var aktuell = UpdateCheckResult.UpToDate(new Version(1, 0, 0)) with
         {
@@ -91,7 +91,7 @@ public class UpdateInstallerTests
     }
 
     [Fact]
-    public void DateienWerdenAusDerAntwortVonGitHubGelesen()
+    public void FilesAreReadFromGitHubsResponse()
     {
         using var doc = JsonDocument.Parse("""
             {
@@ -113,9 +113,9 @@ public class UpdateInstallerTests
     }
 
     [Fact]
-    public void EineAdresseOhneHttpsWirdVerworfen()
+    public void AnAddressWithoutHttpsIsDiscarded()
     {
-        // Sonst liesse sich der Download auf eine ungesicherte Verbindung lenken.
+        // Otherwise the download could be steered onto an unsecured connection.
         using var doc = JsonDocument.Parse("""
             {"assets":[{"name":"app.exe","browser_download_url":"http://example.invalid/app.exe"}]}
             """);
@@ -124,7 +124,7 @@ public class UpdateInstallerTests
     }
 
     [Fact]
-    public void OhneAngehaengteDateienWirdNichtsGefunden()
+    public void WithoutAttachedFilesNothingIsFound()
     {
         using var doc = JsonDocument.Parse("""{"tag_name":"v0.3.0"}""");
 
@@ -134,8 +134,8 @@ public class UpdateInstallerTests
     [Theory]
     [InlineData(1234, "--nach-update", "1234")]
     [InlineData(42, "irgendwas", "--nach-update", "42")]
-    public void DieKennungDerVorgaengerinstanzWirdGelesen(int erwartet, params string[] args) =>
-        Assert.Equal(erwartet, StartupArguments.TryReadPredecessorId(args));
+    public void DieKennungDerVorgaengerinstanzWirdGelesen(int expected, params string[] args) =>
+        Assert.Equal(expected, StartupArguments.TryReadPredecessorId(args));
 
     [Theory]
     [InlineData]
@@ -144,6 +144,6 @@ public class UpdateInstallerTests
     [InlineData("--nach-update", "0")]
     [InlineData("--nach-update", "-5")]
     [InlineData("--anderer-schalter", "1234")]
-    public void UnbrauchbareAngabenWerdenIgnoriert(params string[] args) =>
+    public void UnusableValuesAreIgnored(params string[] args) =>
         Assert.Null(StartupArguments.TryReadPredecessorId(args));
 }

@@ -1,32 +1,33 @@
 using System;
 
+using ClaudeUsageChecker.Core.Localization;
+
 namespace ClaudeUsageChecker.App.Services;
 
-/// <summary>Ergebnis einer Aktualisierungspruefung.</summary>
+/// <summary>Result of an update check.</summary>
 public sealed record UpdateCheckResult
 {
     public required UpdateCheckStatus Status { get; init; }
 
-    /// <summary>Version der gefundenen Aktualisierung.</summary>
+    /// <summary>Version of the update that was found.</summary>
     public Version? AvailableVersion { get; init; }
 
-    /// <summary>Seite der Veroeffentlichung zum manuellen Herunterladen.</summary>
+    /// <summary>Release page for downloading by hand.</summary>
     public Uri? ReleasePage { get; init; }
 
-    /// <summary>Die ausfuehrbare Datei der neuen Fassung.</summary>
+    /// <summary>The executable of the new version.</summary>
     public Uri? DownloadUrl { get; init; }
 
     /// <summary>
-    /// Die zugehoerige Pruefsummendatei. Ohne sie wird nichts eingespielt -
-    /// heruntergeladener Code, dessen Echtheit niemand belegt, wird nicht
-    /// ausgefuehrt.
+    /// The matching checksum file. Without it nothing is installed - downloaded
+    /// code whose authenticity nobody vouches for is not executed.
     /// </summary>
     public Uri? ChecksumUrl { get; init; }
 
-    /// <summary>Erlaeuternder Text fuer die Oberflaeche.</summary>
+    /// <summary>Explanatory text for the interface.</summary>
     public string? Message { get; init; }
 
-    /// <summary>Ob genug vorliegt, um die neue Fassung selbst einzuspielen.</summary>
+    /// <summary>Whether there is enough to install the new version ourselves.</summary>
     public bool CanInstall =>
         Status == UpdateCheckStatus.UpdateAvailable && DownloadUrl is not null && ChecksumUrl is not null;
 
@@ -34,20 +35,20 @@ public sealed record UpdateCheckResult
     {
         Status = UpdateCheckStatus.UpToDate,
         AvailableVersion = current,
-        Message = $"Version {Anzeigen(current)} ist aktuell."
+        Message = T.UpdateUpToDate(Display(current))
     };
 
     /// <summary>
-    /// Kuerzt auf drei Stellen. Assembly-Versionen haben immer vier, deren
-    /// letzte hier nichts aussagt - "0.2.0.0" verwirrt nur.
+    /// Cuts down to three parts. Assembly versions always have four, and the
+    /// last says nothing here - "0.2.0.0" is merely confusing.
     /// </summary>
-    internal static string Anzeigen(Version version)
+    internal static string Display(Version version)
     {
         ArgumentNullException.ThrowIfNull(version);
         return version.Build >= 0 ? version.ToString(3) : version.ToString();
     }
 
-    /// <summary>Es gibt (noch) keine Veroeffentlichung, gegen die geprueft werden koennte.</summary>
+    /// <summary>There is no release (yet) to check against.</summary>
     public static UpdateCheckResult Unavailable(string reason) => new()
     {
         Status = UpdateCheckStatus.Unavailable,

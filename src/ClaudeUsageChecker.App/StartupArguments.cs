@@ -7,22 +7,22 @@ using ClaudeUsageChecker.App.Services;
 namespace ClaudeUsageChecker.App;
 
 /// <summary>
-/// Wertet die Befehlszeile aus. Der einzige Schalter dient dem Neustart nach
-/// einer Aktualisierung.
+/// Interprets the command line. The only switch serves the restart after an
+/// update.
 /// </summary>
 internal static class StartupArguments
 {
     /// <summary>
-    /// So lange wird auf das Ende der Vorgaengerinstanz gewartet. Laenger zu
-    /// warten hilft nicht - dann stimmt etwas anderes nicht, und die Sperre auf
-    /// eine Instanz greift ohnehin als letzte Absicherung.
+    /// How long the predecessor is waited for. Waiting longer does not help - by
+    /// then something else is wrong, and the single-instance lock catches it as a
+    /// last resort anyway.
     /// </summary>
     private static readonly TimeSpan MaxWait = TimeSpan.FromSeconds(30);
 
     /// <summary>
-    /// Wartet nach einer Aktualisierung darauf, dass die ersetzte Fassung sich
-    /// beendet - sonst scheitert diese Instanz an der Einzelinstanz-Sperre und
-    /// der Nutzer stuende nach dem Update ohne laufende Anwendung da.
+    /// After an update, waits for the replaced version to end - otherwise this
+    /// instance fails on the single-instance lock and the user would be left
+    /// without a running application after updating.
     /// </summary>
     public static void WaitForPredecessor(string[] args)
     {
@@ -38,19 +38,19 @@ internal static class StartupArguments
         }
         catch (ArgumentException)
         {
-            // Schon beendet - genau das war das Ziel.
+            // Already gone - which was exactly the aim.
         }
         catch (InvalidOperationException)
         {
-            // Ebenso.
+            // Likewise.
         }
 
-        // Der Riegel wird erst beim Beenden freigegeben; ein kurzer Nachlauf
-        // erspart ein Wettrennen darum.
+        // The lock is only released on exit; a brief grace period avoids a race
+        // for it.
         Thread.Sleep(TimeSpan.FromMilliseconds(500));
     }
 
-    /// <summary>Liest die Kennung der Vorgaengerinstanz aus der Befehlszeile.</summary>
+    /// <summary>Reads the id of the predecessor instance from the command line.</summary>
     internal static int? TryReadPredecessorId(string[] args)
     {
         ArgumentNullException.ThrowIfNull(args);

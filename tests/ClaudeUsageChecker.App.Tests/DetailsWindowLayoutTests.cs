@@ -10,45 +10,45 @@ using ClaudeUsageChecker.Core.Services;
 namespace ClaudeUsageChecker.App.Tests;
 
 /// <summary>
-/// Prueft, dass der Inhalt in das Fenster passt.
+/// Checks that the content fits the window.
 /// </summary>
 /// <remarks>
-/// Anlass war ein Ueberlauf: Zwei Schaltflaechen nebeneinander brauchten mehr
-/// Platz, als das 380 Pixel breite Fenster hergibt - die zweite ragte hinaus
-/// und war nur halb lesbar. So etwas faellt in keinem Funktionstest auf, weil
-/// alle Steuerelemente vorhanden und bedienbar sind. Nur die Vermessung zeigt es.
+/// The occasion was an overflow: two buttons side by side needed more room
+/// than the 380 pixel window offers - the second extended past it and was only
+/// half readable. Nothing like that shows in a functional test, because every
+/// control is present and operable. Only measuring reveals it.
 /// </remarks>
 public class DetailsWindowLayoutTests
 {
     [AvaloniaFact]
-    public void DerUpdateHinweisPasstInsFenster()
+    public void TheUpdateNoticeFitsTheWindow()
     {
         var window = new DetailsWindow();
         window.Render(ReadyState());
         window.SetUpdateNotice(
-            "Version 0.9.9 ist verfügbar (installiert: 0.3.0).",
+            "Version 0.9.9 is available (installed: 0.3.0).",
             new Uri("https://example.invalid/release"),
             canInstall: true);
 
-        Assert.True(PasstInDieBreite(window, out var breite),
-            $"Der Inhalt braucht {breite:0} Pixel, das Fenster ist {window.Width:0} breit.");
+        Assert.True(LayoutProbe.FitsTheWidth(window, out var width),
+            $"The content needs {width:0} pixels, the window is {window.Width:0} wide.");
     }
 
     [AvaloniaFact]
-    public void AuchDerHinweisAufEineAbgelaufeneAnmeldungPasst()
+    public void TheExpiredSignInNoticeFitsToo()
     {
         var window = new DetailsWindow();
         window.Render(ReadyState());
         window.SetSignInNotice(
-            "Die eigene Anmeldung ist abgelaufen und wurde entfernt. "
-            + "Bitte in den Einstellungen neu anmelden.");
+            "Your own sign-in has expired and was removed. "
+            + "Please sign in again under Settings.");
 
-        Assert.True(PasstInDieBreite(window, out var breite),
-            $"Der Inhalt braucht {breite:0} Pixel, das Fenster ist {window.Width:0} breit.");
+        Assert.True(LayoutProbe.FitsTheWidth(window, out var width),
+            $"The content needs {width:0} pixels, the window is {window.Width:0} wide.");
     }
 
     [AvaloniaFact]
-    public void AlleVierNutzungsfensterPassen()
+    public void AllFourUsageWindowsFit()
     {
         var window = new DetailsWindow();
         var now = DateTimeOffset.UtcNow;
@@ -60,23 +60,26 @@ public class DetailsWindowLayoutTests
             {
                 Session = new UsageWindow(100, now.AddHours(1)),
                 Weekly = new UsageWindow(100, now.AddDays(3)),
-                WeeklyOpus = new UsageWindow(100, now.AddDays(3)),
-                WeeklySonnet = new UsageWindow(100, now.AddDays(3)),
+                ScopedWeekly =
+                [
+                    new ScopedUsageWindow("Opus", new UsageWindow(100, now.AddDays(3))),
+                    new ScopedUsageWindow("Fable", new UsageWindow(100, now.AddDays(3)))
+                ],
                 ExtraUsage = new ExtraUsage(true, 999.99m, 888.88m, 99.9),
                 RetrievedAt = now
             }
         });
 
-        Assert.True(PasstInDieBreite(window, out var breite),
-            $"Der Inhalt braucht {breite:0} Pixel, das Fenster ist {window.Width:0} breit.");
+        Assert.True(LayoutProbe.FitsTheWidth(window, out var width),
+            $"The content needs {width:0} pixels, the window is {window.Width:0} wide.");
     }
 
     /// <summary>
-    /// Ein nicht aufloesbares DynamicResource bleibt stillschweigend leer - der
-    /// Rahmen waere dann unsichtbar, ohne dass irgendetwas fehlschlaegt.
+    /// An unresolvable DynamicResource stays empty in silence - the border would
+    /// then be invisible without anything failing.
     /// </summary>
     [AvaloniaFact]
-    public void DerRahmenTraegtDieFarbeDesSymbols()
+    public void TheBorderCarriesTheColourOfTheIcon()
     {
         var window = new DetailsWindow();
         window.Show();
@@ -89,57 +92,6 @@ public class DetailsWindowLayoutTests
 
         window.Hide();
     }
-
-    /// <summary>
-    /// Vermisst den Inhalt mit der tatsaechlichen Fensterbreite und sucht dann
-    /// nach Elementen, die trotz dieser Vorgabe mehr Platz beanspruchen.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// Nicht das Fenster vermessen: Dessen Breite steht fest, es meldet also
-    /// stets 380 zurueck, egal wie viel darin ueberlaeuft.
-    /// </para>
-    /// <para>
-    /// Und nicht ohne Beschraenkung messen: Umbrechende Textbloecke melden dann
-    /// ihre volle Zeilenlaenge, was jeden laengeren Satz faelschlich als
-    /// Ueberlauf ausweisen wuerde. Mit Vorgabe fuegen sie sich, waehrend eine
-    /// Reihe nebeneinanderliegender Schaltflaechen ihren Bedarf unveraendert
-    /// meldet - genau das soll auffallen.
-    /// </para>
-    /// </remarks>
-    private static bool PasstInDieBreite(Window window, out double breite)
-    {
-        window.Show();
-
-        breite = 0;
-        var passt = true;
-
-        foreach (var kind in window.GetLogicalDescendants().OfType<Control>())
-        {
-            if (!kind.IsVisible || kind.Bounds.Width <= 0)
-            {
-                continue;
-            }
-
-            // Der rechte Rand des Elements, umgerechnet in Fensterkoordinaten.
-            if (kind.TranslatePoint(new Point(kind.Bounds.Width, 0), window) is not { } rechts)
-            {
-                continue;
-            }
-
-            breite = Math.Max(breite, rechts.X);
-            if (rechts.X > window.Width + Toleranz)
-            {
-                passt = false;
-            }
-        }
-
-        window.Hide();
-        return passt;
-    }
-
-    /// <summary>Rundungsspielraum des Layouts, in Pixeln.</summary>
-    private const double Toleranz = 0.5;
 
     private static UsageState ReadyState() => new()
     {

@@ -1,10 +1,11 @@
 namespace ClaudeUsageChecker.Core.Authentication;
 
 /// <summary>
-/// Ein OAuth-Access-Token samt Herkunft und - sofern bekannt - Ablaufzeitpunkt.
+/// An OAuth access token with its origin and - where known - its expiry.
 /// </summary>
 /// <remarks>
-/// Der Tokenwert wird bewusst NIE geloggt oder in <see cref="ToString"/> ausgegeben.
+/// The token value is deliberately NEVER logged or exposed through
+/// <see cref="ToString"/>.
 /// </remarks>
 public sealed class AccessToken
 {
@@ -16,38 +17,38 @@ public sealed class AccessToken
         ExpiresAt = expiresAt;
     }
 
-    /// <summary>Der rohe Tokenwert. Nur an den Authorization-Header weiterreichen.</summary>
+    /// <summary>The raw token value. Only ever pass it to the Authorization header.</summary>
     public string Value { get; }
 
-    /// <summary>Woher das Token stammt - fuer Diagnose und UI-Hinweise.</summary>
+    /// <summary>Where the token came from - for diagnostics and interface hints.</summary>
     public TokenSource Source { get; }
 
-    /// <summary>Ablaufzeitpunkt, falls die Quelle ihn mitliefert.</summary>
+    /// <summary>Expiry, if the source supplies one.</summary>
     public DateTimeOffset? ExpiresAt { get; }
 
     /// <summary>
-    /// Prueft, ob das Token abgelaufen ist. Ohne bekannten Ablauf wird es als gueltig behandelt -
-    /// die endgueltige Entscheidung trifft ohnehin der Server per 401.
+    /// Whether the token has expired. Without a known expiry it counts as valid -
+    /// the final say belongs to the server through a 401 anyway.
     /// </summary>
     public bool IsExpired(DateTimeOffset now, TimeSpan skew) =>
         ExpiresAt is { } expiry && expiry - skew <= now;
 
-    /// <summary>Maskierte Darstellung fuer Logs. Enthaelt nie das Geheimnis.</summary>
+    /// <summary>Masked representation for logs. Never contains the secret.</summary>
     public override string ToString() => $"AccessToken(source={Source}, expiresAt={ExpiresAt:o})";
 }
 
-/// <summary>Herkunft eines Tokens.</summary>
+/// <summary>Where a token came from.</summary>
 public enum TokenSource
 {
-    /// <summary>Umgebungsvariable CLAUDE_CODE_OAUTH_TOKEN.</summary>
+    /// <summary>The CLAUDE_CODE_OAUTH_TOKEN environment variable.</summary>
     Environment,
 
-    /// <summary>Eigene Anmeldung dieser Anwendung ueber OAuth mit PKCE.</summary>
+    /// <summary>This application's own sign-in through OAuth with PKCE.</summary>
     OAuth,
 
-    /// <summary>Vom Nutzer hinterlegtes Langzeit-Token aus dem Secret-Store des Betriebssystems.</summary>
+    /// <summary>A long-lived token the user stored in the operating system's secret store.</summary>
     SecretStore,
 
-    /// <summary>Mitgelesen aus den Anmeldedaten der Claude-Code-CLI.</summary>
+    /// <summary>Read from the credentials of the Claude Code CLI.</summary>
     ClaudeCli
 }

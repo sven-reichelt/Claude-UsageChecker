@@ -4,24 +4,24 @@ using ClaudeUsageChecker.Core.Authentication.OAuth;
 namespace ClaudeUsageChecker.Core.Tests.Authentication;
 
 /// <summary>
-/// Haelt die Eigenheiten des Tokenendpunkts fest, die sich nur durch Messung
-/// gegen den echten Server zeigen.
+/// Records the peculiarities of the token endpoint that only show up when
+/// measured against the real server.
 /// </summary>
 public class OAuthEndpointTests
 {
     [Fact]
-    public void DerTokenendpunktZeigtAufPlatformClaudeCom()
+    public void TheTokenEndpointPointsAtPlatformClaudeCom()
     {
-        // console.anthropic.com antwortet auf diesem Pfad mit HTTP 404.
+        // console.anthropic.com answers HTTP 404 on this path.
         Assert.Equal(
             new Uri("https://platform.claude.com/v1/oauth/token"),
             new OAuthOptions().TokenEndpoint);
     }
 
     [Fact]
-    public async Task DerTauschSchicktImmerEinenStateMit()
+    public async Task TheExchangeAlwaysSendsAState()
     {
-        // Ohne state weist der Server den Rumpf mit "Invalid request format" ab.
+        // Without state the server rejects the body with "Invalid request format".
         var handler = new OAuthFlowTests.StubHandler((HttpStatusCode.OK,
             """{"access_token":"a1","expires_in":3600}"""));
         var client = new AnthropicOAuthClient(new HttpClient(handler), new OAuthOptions());

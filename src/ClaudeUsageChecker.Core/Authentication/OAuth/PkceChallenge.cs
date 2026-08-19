@@ -4,13 +4,13 @@ using System.Text;
 namespace ClaudeUsageChecker.Core.Authentication.OAuth;
 
 /// <summary>
-/// Ein Paar aus Verifier und Challenge nach RFC 7636 (PKCE, Verfahren S256).
+/// A verifier and challenge pair per RFC 7636 (PKCE, method S256).
 /// </summary>
 /// <remarks>
-/// PKCE bindet den spaeteren Tausch des Autorisierungscodes an genau den
-/// Vorgang, der ihn angefordert hat. Ohne das koennte ein abgefangener Code von
-/// einem Dritten eingeloest werden - bei einer Anwendung ohne Client-Geheimnis
-/// die entscheidende Absicherung.
+/// PKCE ties the later exchange of the authorization code to exactly the flow
+/// that requested it. Without it, an intercepted code could be redeemed by a
+/// third party - the decisive safeguard for an application without a client
+/// secret.
 /// </remarks>
 public sealed class PkceChallenge
 {
@@ -20,15 +20,15 @@ public sealed class PkceChallenge
         Challenge = challenge;
     }
 
-    /// <summary>Das Geheimnis, das erst beim Tausch mitgeschickt wird.</summary>
+    /// <summary>The secret that is sent only when the code is exchanged.</summary>
     public string Verifier { get; }
 
-    /// <summary>Der oeffentliche Abdruck des Verifiers, base64url-kodiert.</summary>
+    /// <summary>The public digest of the verifier, base64url encoded.</summary>
     public string Challenge { get; }
 
     public const string Method = "S256";
 
-    /// <summary>Erzeugt ein frisches Paar mit 32 Byte Zufall.</summary>
+    /// <summary>Creates a fresh pair from 32 random bytes.</summary>
     public static PkceChallenge Create()
     {
         var verifier = Base64Url(RandomNumberGenerator.GetBytes(32));
@@ -36,11 +36,11 @@ public sealed class PkceChallenge
         return new PkceChallenge(verifier, challenge);
     }
 
-    /// <summary>Baut ein Paar aus einem bekannten Verifier - nur fuer Tests.</summary>
+    /// <summary>Builds a pair from a known verifier - for tests only.</summary>
     internal static PkceChallenge FromVerifier(string verifier) =>
         new(verifier, Base64Url(SHA256.HashData(Encoding.ASCII.GetBytes(verifier))));
 
-    /// <summary>base64url ohne Auffuellzeichen, wie von RFC 7636 verlangt.</summary>
+    /// <summary>base64url without padding, as RFC 7636 demands.</summary>
     private static string Base64Url(byte[] bytes) =>
         Convert.ToBase64String(bytes).TrimEnd('=').Replace('+', '-').Replace('/', '_');
 }
