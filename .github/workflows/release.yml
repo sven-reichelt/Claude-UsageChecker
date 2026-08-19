@@ -73,13 +73,16 @@ jobs:
             exit 1
           }
 
-      - name: Ergebnis benennen und Prüfsumme bilden
+      # Bewusst ohne Versionsnummer im Dateinamen. Der Selbstaustausch schreibt
+      # die neue Fassung an den Pfad der laufenden Datei; ein versionierter Name
+      # wuerde danach eine falsche Version behaupten. Wichtiger noch: Windows
+      # merkt sich die Anheftung im Infobereich pro Pfad - bliebe der Name nicht
+      # gleich, landete das Symbol nach jedem Update wieder im Ueberlaufbereich.
+      - name: Prüfsumme bilden
         id: package
         shell: pwsh
         run: |
-          $version = "${{ steps.version.outputs.version }}"
-          $name = "ClaudeUsageChecker-$version-win-x64.exe"
-          Move-Item publish/ClaudeUsageChecker.exe "publish/$name"
+          $name = "ClaudeUsageChecker.exe"
 
           $hash = (Get-FileHash "publish/$name" -Algorithm SHA256).Hash.ToLower()
           "$hash  $name" | Out-File -FilePath "publish/$name.sha256" -Encoding ascii

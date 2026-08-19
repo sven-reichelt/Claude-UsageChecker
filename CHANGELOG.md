@@ -5,6 +5,17 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unveröffentlicht]
 
+## [0.3.3] – 2026-08-19
+
+### Geändert
+- Die veröffentlichte Datei heißt in jeder Version gleich:
+  `ClaudeUsageChecker.exe` statt `ClaudeUsageChecker-0.3.2-win-x64.exe`.
+  Der Selbstaustausch schreibt die neue Fassung an den Pfad der laufenden
+  Datei – ein versionierter Name behauptete danach eine falsche Version. Und
+  Windows merkt sich die Anheftung im Infobereich pro Pfad: Bliebe der Name
+  nicht gleich, landete das Symbol nach jedem Update wieder im
+  Überlaufbereich.
+
 ## [0.3.2] – 2026-08-19
 
 ### Behoben

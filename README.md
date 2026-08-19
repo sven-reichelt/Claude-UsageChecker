@@ -251,6 +251,13 @@ Der Selbstaustausch setzt die veröffentlichte Einzeldatei voraus. Im
 Entwicklungsstand liegen Dutzende Dateien nebeneinander – dort wird die
 Schaltfläche gar nicht erst angeboten.
 
+**Die Datei heißt in jeder Veröffentlichung gleich: `ClaudeUsageChecker.exe`.**
+Das hat zwei Gründe. Der Selbstaustausch schreibt die neue Fassung an den Pfad
+der laufenden Datei – ein versionierter Name behauptete danach eine falsche
+Version. Und Windows merkt sich die Anheftung im Infobereich pro Pfad: Bliebe
+der Name nicht gleich, landete das Symbol nach jedem Update wieder im
+Überlaufbereich.
+
 Solange es keine Veröffentlichung gibt, meldet die Prüfung das offen, statt zu
 schweigen.
 
