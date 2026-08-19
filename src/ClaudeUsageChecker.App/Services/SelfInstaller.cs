@@ -25,9 +25,18 @@ namespace ClaudeUsageChecker.App.Services;
 /// </remarks>
 public static class SelfInstaller
 {
-    /// <summary>Verzeichnis, in dem die Anwendung dauerhaft liegen soll.</summary>
+    /// <summary>
+    /// Verzeichnis, in dem die Anwendung dauerhaft liegen soll.
+    /// </summary>
+    /// <remarks>
+    /// <c>%LOCALAPPDATA%\Programs</c> ist der von Windows vorgesehene Ort fuer
+    /// Anwendungen, die ohne Administratorrechte auskommen - dort liegen etwa
+    /// auch VS Code und Signal. Das haelt die Wurzel des Benutzerprofils frei,
+    /// wo neben Dokumenten und Downloads niemand Programme erwartet.
+    /// </remarks>
     public static string TargetDirectory { get; } = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "Programs",
         "ClaudeUsageChecker");
 
     /// <summary>Vollstaendiger Zielpfad der ausfuehrbaren Datei.</summary>

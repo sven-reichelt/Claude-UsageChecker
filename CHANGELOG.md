@@ -5,6 +5,21 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unveröffentlicht]
 
+## [0.5.0] – 2026-08-19
+
+### Geändert
+- Der Zielort der Einrichtung ist jetzt
+  `%LOCALAPPDATA%\Programs\ClaudeUsageChecker` statt
+  `%USERPROFILE%\ClaudeUsageChecker`. Das ist der von Windows vorgesehene Ort
+  für Anwendungen ohne Administratorrechte – dort liegen etwa auch VS Code und
+  Signal. Die Wurzel des Benutzerprofils bleibt damit frei, wo neben Dokumenten
+  und Downloads niemand Programme erwartet.
+
+  **Bereits eingerichtete Fassungen ziehen nicht von selbst um.** Sie laufen
+  weiter vom alten Ort. Zum Umziehen genügt: Einstellungen öffnen und speichern
+  – bei gesetztem Autostart-Haken wird dabei an den neuen Ort kopiert. Das alte
+  Verzeichnis kann danach von Hand gelöscht werden.
+
 ## [0.4.2] – 2026-08-19
 
 ### Behoben
@@ -22,7 +37,7 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 - Die Entpackungsordner früherer Fassungen blieben im Temporärverzeichnis
   liegen. Eine komprimierte Einzeldatei kann ihre nativen Bibliotheken nicht
   aus dem Bündel laden – die .NET-Laufzeit packt sie nach
-  `%TEMP%.netClaudeUsageChecker<Kennung>` aus, und da die Kennung am Inhalt
+  `%TEMP%\.net\ClaudeUsageChecker\<Kennung>` aus, und da die Kennung am Inhalt
   hängt, bekam jede Version einen eigenen Ordner. Rund 16 MB je Update, die
   sich unbegrenzt sammelten. Die Anwendung räumt sie jetzt selbst weg.
 
@@ -35,7 +50,7 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 ### Hinzugefügt
 - **Dauerhafte Einrichtung.** Läuft die Anwendung außerhalb ihres Zielorts,
   bietet sie beim ersten Start einmalig an, sich nach
-  `%USERPROFILE%ClaudeUsageChecker` zu kopieren, den Autostart einzurichten
+  `%USERPROFILE%\ClaudeUsageChecker` zu kopieren, den Autostart einzurichten
   und von dort neu zu starten. Grund ist nicht Ordnungsliebe: Autostart,
   Anheftung im Infobereich und Selbstaustausch hängen alle am Pfad der
   ausführbaren Datei – liegt sie im Download-Ordner, bricht alles drei, sobald

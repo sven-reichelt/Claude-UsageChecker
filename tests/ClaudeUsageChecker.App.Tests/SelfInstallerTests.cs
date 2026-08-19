@@ -12,12 +12,27 @@ namespace ClaudeUsageChecker.App.Tests;
 public class SelfInstallerTests
 {
     [Fact]
-    public void DerZielortLiegtImBenutzerprofil()
+    public void DerZielortLiegtUnterProgramsImLokalenProfil()
     {
-        var profil = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        // %LOCALAPPDATA%\Programs ist der von Windows vorgesehene Ort fuer
+        // Anwendungen ohne Administratorrechte. Die Wurzel des Benutzerprofils
+        // bleibt damit frei.
+        var erwartet = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "Programs",
+            "ClaudeUsageChecker");
 
-        Assert.StartsWith(profil, SelfInstaller.TargetDirectory, StringComparison.OrdinalIgnoreCase);
-        Assert.EndsWith("ClaudeUsageChecker", SelfInstaller.TargetDirectory, StringComparison.Ordinal);
+        Assert.Equal(erwartet, SelfInstaller.TargetDirectory);
+    }
+
+    [Fact]
+    public void DerZielortLiegtNichtInDerWurzelDesBenutzerprofils()
+    {
+        var wurzel = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+            "ClaudeUsageChecker");
+
+        Assert.NotEqual(wurzel, SelfInstaller.TargetDirectory);
     }
 
     [Fact]

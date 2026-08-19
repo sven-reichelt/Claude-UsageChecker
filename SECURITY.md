@@ -46,7 +46,7 @@ ausschließlich Verhaltenseinstellungen und niemals Geheimnisse.
 | Anmeldeinformationsverwaltung, `ClaudeUsageChecker:OAuthToken` | von Hand hinterlegtes Einzeltoken | ja |
 | `%LOCALAPPDATA%\ClaudeUsageChecker\settings.json` | Verhaltenseinstellungen, keine Geheimnisse | ja |
 | `%LOCALAPPDATA%\ClaudeUsageChecker\crash.log` | lokale Fehlerberichte | ja |
-| `%USERPROFILE%\ClaudeUsageChecker\` | die Anwendung selbst, nach Einrichtung | ja |
+| `%LOCALAPPDATA%\Programs\ClaudeUsageChecker\` | die Anwendung selbst, nach Einrichtung | ja |
 | `HKCU\…\CurrentVersion\Run`, Wert `ClaudeUsageChecker` | Autostart-Eintrag | ja |
 | `%TEMP%\.net\ClaudeUsageChecker\<Kennung>\` | von der .NET-Laufzeit ausgepackte Bibliotheken | wird beim Start aufgeräumt |
 | `%TEMP%\ClaudeUsageChecker-<Kennung>.exe` | Zwischenablage beim Aktualisieren | wird sofort gelöscht |
