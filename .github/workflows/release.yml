@@ -116,9 +116,13 @@ jobs:
           # That way nothing goes out unchecked.
           draft: true
           generate_release_notes: true
+          # LICENSE travels with the binary: the GPL wants its text to accompany
+          # the program, and whoever downloads only the exe would otherwise never
+          # see it.
           files: |
             publish/${{ steps.package.outputs.name }}
             publish/${{ steps.package.outputs.name }}.sha256
+            LICENSE
           body: |
             ## Claude UsageChecker ${{ steps.version.outputs.version }}
 
@@ -139,3 +143,10 @@ jobs:
             ```
             ${{ steps.package.outputs.sha256 }}
             ```
+
+            ### License
+
+            Free software under the [GNU General Public License
+            v3](https://www.gnu.org/licenses/gpl-3.0.html) or later - the text
+            is attached as `LICENSE`. The corresponding source is this
+            repository, at the tag of this release. No warranty of any kind.

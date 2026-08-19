@@ -357,4 +357,8 @@ zurechtzurücken.
 
 ## Lizenz
 
-[GNU General Public License v3.0 oder neuer](../../LICENSE)
+[GNU General Public License v3.0 oder neuer](../../LICENSE).
+
+Freie Software: benutzen, verstehen, weitergeben, verändern. Wer eine veränderte
+Fassung weitergibt, muss deren Quelltext unter denselben Bedingungen mitgeben –
+genau darum ging es bei der Wahl.

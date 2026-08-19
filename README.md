@@ -354,4 +354,8 @@ rather than what.
 
 ## License
 
-[GNU General Public License v3.0 or later](LICENSE)
+[GNU General Public License v3.0 or later](LICENSE).
+
+Free software: use it, study it, pass it on, change it. Whoever passes on a
+changed version has to pass on its source under the same terms - that is the
+whole point of the choice.
