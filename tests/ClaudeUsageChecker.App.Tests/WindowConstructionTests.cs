@@ -83,7 +83,8 @@ public class WindowConstructionTests
     {
         using var settingsFile = new TemporaryFile();
         var store = new FakeSecretStore();
-        store.Write("ClaudeUsageChecker:OAuthToken", "sk-ant-oat01-beispiel");
+        // Bewusst ohne echte Tokenform - der Geheimnis-Scanner der CI schlaegt sonst an.
+        store.Write("ClaudeUsageChecker:OAuthToken", "platzhalter-fuer-test");
 
         var window = new SettingsWindow(store, new SettingsStore(settingsFile.Path), new AppSettings());
 
