@@ -18,6 +18,10 @@ local.settings.json
 *.snk
 *.key
 *.pem
+# Persoenliche Arbeitsnotizen - gehoeren nicht in die Versionsverwaltung
+Fortsetzungspromt.md
+Fortsetzungsprompt.md
+
 # Lokale Laufzeit-/Nutzerkonfiguration der App (kann Kontodaten enthalten)
 config.local.json
 usage-cache.json
