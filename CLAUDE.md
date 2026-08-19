@@ -65,12 +65,12 @@ Builds into `artifacts/` (centrally through `ArtifactsPath` in
 
 ## Status
 
-Version 0.6.0, the repository is public and written in English. Finished among
-other things: the application's own sign-in through OAuth with PKCE including
-refresh, update at the push of a button with checksum verification, permanent
-setup with autostart, configurable thresholds, the summary of changes after an
-update, the about window, model-specific weekly limits read from the `limits`
-list, and nine languages.
+Version 0.6.0 released, the repository is public and written in English.
+Finished among other things: the application's own sign-in through OAuth with
+PKCE including refresh, update at the push of a button with checksum
+verification, permanent setup with autostart, configurable thresholds, the
+summary of changes after an update, the about window, model-specific weekly
+limits read from the `limits` list, and nine languages.
 
 Open: **the macOS menu bar** - the only larger item. The core is platform
 independent and `MacOsKeychainCredentialReader` exists; what is missing is the
@@ -126,6 +126,16 @@ know the same versions - a missing entry under *Unreleased* escapes it, though.
 running version out of date - the summary of changes would come back on every
 start. Use `ReleaseHistory.ThreePart` before every comparison;
 `ReleaseHistoryTests` pins it down.
+
+**The CI runs in English, this machine in German.** Anything a test compares
+against a formatted date, time or number therefore behaves differently in the
+two places. `ToTooltip_ContainsTheResetTime` built its expectation with the
+invariant culture while the code formats with the current one - "07:14" in both
+on a German machine, "7:14 AM" on the runner. Green here, red on the first
+push. Since a language change now sets the culture of the process, this kind of
+fault has become easy to write: never compare against a formatted literal
+without fixing the culture, and derive times rather than writing them out - the
+time zone differs between the two as well.
 
 **Restoring a file from a backup does not trigger a rebuild.** `Copy-Item` and
 `cp` carry the source's timestamp along, so a restored file looks older than the
