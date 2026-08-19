@@ -7,22 +7,22 @@
     <RootNamespace>ClaudeUsageChecker.App</RootNamespace>
     <ApplicationIcon>../../assets/icons/app.ico</ApplicationIcon>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-    <!-- COM-Interop verhindert Trimming und wird hier nicht gebraucht: Die
-         Anwendung nutzt weder Ziehen-und-Ablegen noch Shell-Einbindung. -->
+    <!-- COM interop prevents trimming and is not needed here: the application
+         uses neither drag and drop nor shell integration. -->
     <BuiltInComInteropSupport>false</BuiltInComInteropSupport>
   </PropertyGroup>
 
   <!--
-    Einstellungen der Veroeffentlichung. Gemessen am 19.08.2026 gegen die
-    unveraenderte Fassung (93 MB):
+    Publishing settings. Measured on 2026-08-19 against the untouched build
+    (93 MB):
 
-      nur komprimiert         45 MB, Start 7,2 s, 136 MB Arbeitsspeicher
-      getrimmt + komprimiert  21 MB, Start 2,3 s,  87 MB Arbeitsspeicher
+      compressed only        45 MB, start 7.2 s, 136 MB memory
+      trimmed + compressed   21 MB, start 2.3 s,  87 MB memory
 
-    Trimming gewinnt auf allen drei Achsen - entfernter Code muss auch nicht
-    geladen und uebersetzt werden. Alle Fenster, das Kontextmenue und die
-    Anmeldung wurden in der getrimmten Fassung von Hand nachgeprueft; die
-    Warnungen der Trimm-Analyse betreffen Pfade, die diese Anwendung nicht geht.
+    Trimming wins on all three counts - code that has been removed does not have
+    to be loaded and compiled either. Every window, the context menu and the
+    sign-in were checked by hand in the trimmed build; the warnings from the trim
+    analysis concern paths this application does not take.
   -->
   <PropertyGroup Condition="'$(PublishSingleFile)' == 'true'">
     <PublishTrimmed>true</PublishTrimmed>
@@ -52,12 +52,12 @@
   <ItemGroup>
     <AvaloniaResource Include="../../assets/icons/*.png" Link="Assets/%(Filename)%(Extension)" />
     <AvaloniaResource Include="../../assets/icons/*.ico" Link="Assets/%(Filename)%(Extension)" />
-    <!-- Der Aenderungsverlauf reist mit: Die Uebersicht nach einer
-         Aktualisierung soll ohne Netzzugriff auskommen und genau das zeigen,
-         was zur laufenden Fassung gehoert. Gut zehn Kilobyte Text. -->
+    <!-- The changelog travels along: the summary shown after an update has to
+         manage without network access and show exactly what belongs to the
+         running version. A good ten kilobytes of text. -->
     <AvaloniaResource Include="../../CHANGELOG.md" Link="Assets/CHANGELOG.md" />
-    <!-- Die Uebersetzungen des Verlaufs. Deutsch ist die Quelle und bleibt in
-         der Wurzel; das Repository fuehrt den Verlauf weiterhin auf Deutsch. -->
+    <!-- Its translations. English is the source and stays in the root; the
+         translations, German among them, live under docs/changelog/. -->
     <AvaloniaResource Include="../../docs/changelog/*.md" Link="Assets/changelog/%(Filename)%(Extension)" />
   </ItemGroup>
 

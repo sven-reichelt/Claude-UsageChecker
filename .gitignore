@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------
-# SICHERHEIT: Nichts hiervon darf jemals in das Repository gelangen.
+# SECURITY: none of this may ever reach the repository.
 # ---------------------------------------------------------------------------
 *.credentials.json
 .credentials.json
@@ -18,17 +18,17 @@ local.settings.json
 *.snk
 *.key
 *.pem
-# Persoenliche Arbeitsnotizen - gehoeren nicht in die Versionsverwaltung
+# Personal working notes - not for version control
 Fortsetzungspromt.md
 Fortsetzungsprompt.md
 
-# Lokale Laufzeit-/Nutzerkonfiguration der App (kann Kontodaten enthalten)
+# Local runtime and user configuration of the app (may hold account data)
 config.local.json
 usage-cache.json
 *.log
 
 # ---------------------------------------------------------------------------
-# .NET Build-Artefakte
+# .NET build artefacts
 # ---------------------------------------------------------------------------
 [Bb]in/
 [Oo]bj/

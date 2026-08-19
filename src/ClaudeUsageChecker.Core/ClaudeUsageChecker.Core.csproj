@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <!-- Fuer das gezielte Ueberschreiben des Tokenspeichers vor der Freigabe. -->
+    <!-- For overwriting the token buffer deliberately before releasing it. -->
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
@@ -18,10 +18,10 @@
   </ItemGroup>
 
   <!--
-    Die Sprachdateien reisen als eingebettete Ressourcen mit - bewusst nicht als
-    Satelliten-Assemblies aus .resx. Die Veroeffentlichung ist eine getrimmte
-    Einzeldatei; dort sind Satelliten der Weg mit den meisten Fallstricken,
-    waehrend eingebettete Dateien jeden Trimmvorgang unveraendert ueberstehen.
+    The language files travel along as embedded resources - deliberately not as
+    satellite assemblies from .resx. The release is a trimmed single file, and
+    satellites are the route with the most traps there, while embedded files
+    survive every trimming pass unchanged.
   -->
   <ItemGroup>
     <EmbeddedResource Include="Localization/Texts/*.json" />
