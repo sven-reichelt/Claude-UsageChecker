@@ -141,11 +141,13 @@ public partial class DetailsWindow : Window
     }
 
     /// <summary>Sprechender Name der Tokenquelle fuer die Fusszeile.</summary>
-    private static string QuellenName(TokenSource source) => source switch
+    internal static string QuellenName(TokenSource source) => source switch
     {
+        TokenSource.OAuth => "eigene Anmeldung",
         TokenSource.SecretStore => "hinterlegtes Token",
         TokenSource.Environment => "Umgebungsvariable",
-        _ => "Claude Code"
+        TokenSource.ClaudeCli => "Claude Code",
+        _ => "unbekannt"
     };
 
     private void RenderMessage(UsageState state)

@@ -80,7 +80,7 @@ offenbar allein Inferenz-Rechte an. Das Token der interaktiven Anmeldung
 **Folgen für den Entwurf:**
 
 1. Das Projektziel „unabhängig von Claude Code" ist auf diesem Weg nicht
-   erreichbar. Die Anwendung braucht eine bestehende Claude-Code-Anmeldung.
+   erreichbar – wohl aber über einen eigenen OAuth-Fluss, siehe unten.
 2. Ein hinterlegtes `setup-token` legte die Anwendung anfangs vollständig lahm,
    weil die Tokenkette nur bei einer *leeren* Quelle weiterrückte, nicht bei
    einer *abgelehnten*. Der Abruf probiert nun bei HTTP 401/403 die nächste
@@ -88,15 +88,55 @@ offenbar allein Inferenz-Rechte an. Das Token der interaktiven Anmeldung
 3. Die Einstellungen prüfen ein eingegebenes Token vor dem Speichern gegen den
    Endpunkt und lehnen es mit der Begründung ab, statt es still abzulegen.
 
-Ein wirklich unabhängiger Weg bliebe ein eigener OAuth-Flow mit PKCE, der
-`user:profile` ausdrücklich anfordert. Noch nicht geprüft.
+## Gewählt: eigener OAuth-Fluss mit PKCE
 
-## Verworfen: Token selbst erneuern
+Der Weg zur Unabhängigkeit. Am 19.08.2026 vollständig durchgespielt und
+bestätigt.
 
-Technisch möglich über
-`POST https://console.anthropic.com/v1/oauth/token` mit
-`grant_type=refresh_token` und der Claude-Code-Client-ID. Aus drei Gründen
-verworfen:
+```
+1. GET  https://claude.ai/oauth/authorize
+        ?code=true&client_id=…&response_type=code
+        &redirect_uri=https://console.anthropic.com/oauth/code/callback
+        &scope=user:profile
+        &code_challenge=…&code_challenge_method=S256&state=…
+
+2. Nutzer erteilt die Freigabe, die Seite zeigt CODE#STATE an
+
+3. POST https://platform.claude.com/v1/oauth/token
+        {"grant_type":"authorization_code","code":…,"state":…,
+         "client_id":…,"redirect_uri":…,"code_verifier":…}
+     → {"access_token":…,"refresh_token":…,"expires_in":28800,"scope":"user:profile"}
+```
+
+**`user:profile` allein genügt.** Weder `user:inference` noch
+`org:create_api_key` sind nötig – die Freigabeseite akzeptiert den einzelnen
+Geltungsbereich und der Nutzungsendpunkt nimmt das Token an.
+
+### Gemessene Eigenheiten
+
+| Beobachtung | Konsequenz |
+| --- | --- |
+| `console.anthropic.com/v1/oauth/token` antwortet mit **HTTP 404** | Der Tausch läuft über `platform.claude.com`. Festgehalten in `OAuthEndpointTests` |
+| Ohne `state` im Rumpf: `Invalid request format` | `state` wird immer mitgeschickt, auch beim Tausch |
+| Access-Token gilt rund **8 Stunden** | Erneuerung fünf Minuten vor Ablauf |
+| Beim Erneuern kommt ein **neuer** Refresh-Token zurück | Er rotiert; die Anwendung speichert ihn sofort |
+
+Die Erneuerung wurde gegen den echten Server geprüft und liefert ein frisches
+Tokenpaar mit unverändertem Geltungsbereich.
+
+### Restrisiko
+
+Der Fluss nutzt die öffentlich bekannte Client-ID von Claude Code, weil
+Anthropic keine Registrierung eigener Anwendungen anbietet. Gegenüber dem
+Autorisierungsserver gibt sich die Anwendung damit als Claude Code aus. Kein
+offiziell unterstützter Weg; Endpunkte und Verhalten können sich ändern – der
+404 auf dem alten Tokenendpunkt ist genau dafür ein Beleg.
+
+## Verworfen: **fremde** Tokens selbst erneuern
+
+Gemeint ist der Refresh-Token aus `.credentials.json`, also der von Claude Code.
+Das eigene Token aus dem Fluss oben wird sehr wohl erneuert – der Unterschied
+ist, wem die Anmeldedaten gehören. Aus drei Gründen verworfen:
 
 1. **Rotierende Refresh-Tokens.** Erneuert diese Anwendung ein Token und
    schreibt das Ergebnis nicht zurück, verliert Claude Code seine Anmeldung.
@@ -133,5 +173,10 @@ Pro-/Max-Abonnements. Falsche Datenquelle für dieses Vorhaben.
 
 * Der `User-Agent` trägt derzeit eine fest verdrahtete Version. Falls Anthropic
   gegen veraltete Versionen filtert, muss sie nachgeführt werden.
-* Ein eigener OAuth-Flow mit PKCE, der `user:profile` anfordert, wäre der
-  einzige bekannte Weg zu echter Unabhängigkeit von Claude Code. Ungeprüft.
+* Wie lange der Refresh-Token gilt, ist unbekannt. Solange die Anwendung
+  regelmäßig läuft, erneuert sie rechtzeitig. Nach sehr langer Pause könnte er
+  verfallen sein – dann ist einmal neu anzumelden.
+* Rotierende Refresh-Tokens bergen ein schmales Zeitfenster: Schlägt das
+  Speichern zwischen erfolgreicher Erneuerung und Ablage fehl, ist der alte
+  Token verbraucht und der neue verloren. Folge wäre eine erneute Anmeldung,
+  kein Datenverlust.

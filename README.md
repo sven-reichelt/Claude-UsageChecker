@@ -23,6 +23,7 @@ ist vorbereitet, aber noch nicht umgesetzt – siehe [Roadmap](#roadmap).
 | Autostart mit Windows | ✅ |
 | Nur eine Instanz je Anmeldesitzung | ✅ |
 | Eigene Anmeldung per OAuth mit PKCE – unabhängig von Claude Code | ✅ |
+| Selbsttätige Erneuerung des eigenen Tokens | ✅ |
 | Aktualisierungsprüfung über GitHub-Releases | ✅ |
 | macOS-Menüleiste | 🚧 geplant |
 
@@ -111,6 +112,12 @@ selbsttätig weiter; ein erneutes Anmelden ist nicht nötig.
 Bewusst ohne lokalen Webserver: Der Code wird von Hand eingefügt, statt über
 eine Rückleitung auf `localhost` entgegengenommen zu werden. So öffnet die
 Anwendung keinen Port.
+
+Das Zugriffstoken gilt rund acht Stunden. Die Anwendung erneuert es fünf Minuten
+vor Ablauf selbst über den Refresh-Token, der dabei rotiert – ein erneutes
+Anmelden ist im laufenden Betrieb nicht nötig. Läuft die Anwendung sehr lange
+gar nicht, kann der Refresh-Token seinerseits verfallen; dann ist einmal
+neu anzumelden.
 
 ### Ohne Anmeldung
 

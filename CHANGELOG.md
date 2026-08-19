@@ -107,3 +107,13 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 ### Geändert
 - Reihenfolge der Tokenquellen: eigene Anmeldung, hinterlegtes Token,
   Umgebungsvariable, Claude Code.
+
+### Behoben
+- Der Tokenendpunkt zeigte auf `console.anthropic.com`, wo der Pfad nicht mehr
+  liegt – der Tausch scheiterte mit HTTP 404. Er läuft nun über
+  `platform.claude.com`. Gemessen am 19.08.2026, festgehalten in
+  `OAuthEndpointTests`.
+- Die Fußzeile der Detailansicht wies die eigene Anmeldung fälschlich als
+  „Claude Code" aus: Der neue Quellentyp fiel in den Sammelfall der
+  Beschriftung. Jede Quelle hat jetzt ihre eigene, und ein Test verlangt, dass
+  keine zwei sich eine teilen.

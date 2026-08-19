@@ -83,7 +83,7 @@ Es werden genau zwei Gegenstellen kontaktiert:
 | --- | --- | --- |
 | `api.anthropic.com/api/oauth/usage` | Nutzungsstand abrufen | nur das Bearer-Token |
 | `claude.ai/oauth/authorize` | Anmeldeseite, nur im Browser des Nutzers | – |
-| `console.anthropic.com/v1/oauth/token` | Code tauschen, Token erneuern | Code, PKCE-Verifier bzw. Refresh-Token |
+| `platform.claude.com/v1/oauth/token` | Code tauschen, Token erneuern | Code, PKCE-Verifier bzw. Refresh-Token |
 | `api.github.com` (optional) | Versionsprüfung | keine, nur ein GET |
 
 Es gibt keine Telemetrie, keine Absturzberichte an Dritte und keine Analytik.
