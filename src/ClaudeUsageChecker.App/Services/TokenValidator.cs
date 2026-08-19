@@ -35,7 +35,7 @@ public sealed class TokenValidator(HttpClient httpClient, UsageApiOptions? optio
     {
         if (string.IsNullOrWhiteSpace(token))
         {
-            return TokenValidationResult.Unusable("Bitte zuerst ein Token einfuegen.");
+            return TokenValidationResult.Unusable("Bitte zuerst ein Token einfügen.");
         }
 
         var provider = new StaticTokenProvider(token.Trim());
@@ -44,7 +44,7 @@ public sealed class TokenValidator(HttpClient httpClient, UsageApiOptions? optio
         try
         {
             await client.GetUsageAsync(cancellationToken).ConfigureAwait(false);
-            return TokenValidationResult.Usable("Token geprueft und angenommen.");
+            return TokenValidationResult.Usable("Token geprüft und angenommen.");
         }
         catch (UsageApiException ex) when (ex.Failure == UsageApiFailure.Unauthorized)
         {
@@ -54,7 +54,7 @@ public sealed class TokenValidator(HttpClient httpClient, UsageApiOptions? optio
         {
             // Netzwerkprobleme sagen nichts ueber das Token aus - nicht ablehnen.
             return TokenValidationResult.Usable(
-                $"Token gespeichert, aber nicht pruefbar: {ex.Message}");
+                $"Token gespeichert, aber nicht prüfbar: {ex.Message}");
         }
     }
 

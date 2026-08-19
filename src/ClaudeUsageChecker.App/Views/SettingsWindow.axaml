@@ -43,7 +43,7 @@
       </Grid>
 
       <CheckBox x:Name="LaunchAtLoginBox" Content="Mit Windows starten" />
-      <CheckBox x:Name="CheckUpdatesBox" Content="Beim Start auf Aktualisierungen pruefen" />
+      <CheckBox x:Name="CheckUpdatesBox" Content="Beim Start auf Aktualisierungen prüfen" />
     </StackPanel>
 
     <Separator />

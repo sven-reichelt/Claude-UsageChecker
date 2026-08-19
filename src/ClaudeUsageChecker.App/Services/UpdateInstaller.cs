@@ -87,7 +87,7 @@ public sealed class UpdateInstaller(HttpClient httpClient)
         if (update is not { DownloadUrl: { } downloadUrl, ChecksumUrl: { } checksumUrl })
         {
             return InstallResult.Failed(
-                "Zur neuen Version fehlt die Datei oder die Pruefsumme. "
+                "Zur neuen Version fehlt die Datei oder die Prüfsumme. "
                 + "Ohne beides wird nichts eingespielt.");
         }
 
@@ -101,15 +101,15 @@ public sealed class UpdateInstaller(HttpClient httpClient)
             var erwartet = await LadePruefsummeAsync(checksumUrl, cancellationToken).ConfigureAwait(false);
             if (erwartet is null)
             {
-                return InstallResult.Failed("Die Pruefsumme war nicht lesbar. Es wird nichts eingespielt.");
+                return InstallResult.Failed("Die Prüfsumme war nicht lesbar. Es wird nichts eingespielt.");
             }
 
             var tatsaechlich = await BerechnePruefsummeAsync(temp, cancellationToken).ConfigureAwait(false);
             if (!string.Equals(erwartet, tatsaechlich, StringComparison.OrdinalIgnoreCase))
             {
                 return InstallResult.Failed(
-                    "Die Pruefsumme der heruntergeladenen Datei stimmt nicht. "
-                    + "Sie wird verworfen und nicht ausgefuehrt.");
+                    "Die Prüfsumme der heruntergeladenen Datei stimmt nicht. "
+                    + "Sie wird verworfen und nicht ausgeführt.");
             }
 
             return Tausche(eigenerPfad, temp);
@@ -200,7 +200,7 @@ public sealed class UpdateInstaller(HttpClient httpClient)
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             File.Move(beiseite, eigenerPfad);
-            return InstallResult.Failed("Die neue Fassung liess sich nicht einsetzen: " + ex.Message);
+            return InstallResult.Failed("Die neue Fassung ließ sich nicht einsetzen: " + ex.Message);
         }
 
         var start = new ProcessStartInfo(eigenerPfad) { UseShellExecute = false };

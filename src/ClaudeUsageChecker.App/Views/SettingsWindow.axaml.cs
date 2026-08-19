@@ -81,7 +81,7 @@ public partial class SettingsWindow : Window
             ? "Nicht angemeldet. Ohne eigene Anmeldung wird das Token einer laufenden "
               + "Claude-Code-Installation mitgelesen."
             : $"Angemeldet. Rechte: {tokens.Scope ?? "unbekannt"}. "
-              + $"Token gueltig bis {tokens.ExpiresAt?.ToLocalTime():g} und wird selbsttaetig erneuert.";
+              + $"Token gültig bis {tokens.ExpiresAt?.ToLocalTime():g} und wird selbsttätig erneuert.";
 
         SignOutButton.IsEnabled = tokens is not null;
     }
@@ -131,7 +131,7 @@ public partial class SettingsWindow : Window
         var value = TokenBox.Text?.Trim();
         if (string.IsNullOrEmpty(value))
         {
-            TokenStatus.Text = "Bitte zuerst ein Token einfuegen.";
+            TokenStatus.Text = "Bitte zuerst ein Token einfügen.";
             return;
         }
 
@@ -140,7 +140,7 @@ public partial class SettingsWindow : Window
         if (_validateToken is not null)
         {
             SaveTokenButton.IsEnabled = false;
-            TokenStatus.Text = "Token wird geprueft ...";
+            TokenStatus.Text = "Token wird geprüft ...";
             try
             {
                 var result = await _validateToken(value).ConfigureAwait(true);

@@ -100,7 +100,7 @@ public partial class App : Application, IDisposable
         // darin darf die Anwendung nicht kommentarlos beenden.
         _tray = new TrayIconController(_monitor, () => _settings);
         _tray.ShowDetails += (_, _) => ErrorGuard.Run("Details anzeigen", ShowDetails);
-        _tray.ShowSettings += (_, _) => ErrorGuard.Run("Einstellungen oeffnen", ShowSettings);
+        _tray.ShowSettings += (_, _) => ErrorGuard.Run("Einstellungen öffnen", ShowSettings);
         _tray.RefreshRequested += (_, _) => ErrorGuard.Forget("Abruf anstossen", RefreshAsync);
         _tray.CheckForUpdatesRequested += (_, _) => ErrorGuard.Forget(
             "Aktualisierungspruefung", () => CheckForUpdatesAsync(announceUpToDate: true));
@@ -160,7 +160,7 @@ public partial class App : Application, IDisposable
         var window = new DetailsWindow();
         window.RefreshRequested += (_, _) => ErrorGuard.Forget("Abruf anstossen", RefreshAsync);
         window.ReleasePageRequested += (_, page) =>
-            ErrorGuard.Run("Release-Seite oeffnen", () => OpenReleasePage(page));
+            ErrorGuard.Run("Release-Seite öffnen", () => OpenReleasePage(page));
         window.InstallRequested += (_, _) =>
             ErrorGuard.Forget("Aktualisierung einspielen", InstallUpdateAsync);
         window.Closing += (_, e) =>
@@ -187,7 +187,7 @@ public partial class App : Application, IDisposable
             _settings = settings;
             ErrorGuard.Forget("Abruf nach Einstellungsaenderung", RefreshAsync);
         };
-        window.SignInRequested += (_, _) => ErrorGuard.Run("Anmeldung oeffnen", () => ShowSignIn(window));
+        window.SignInRequested += (_, _) => ErrorGuard.Run("Anmeldung öffnen", () => ShowSignIn(window));
 
         window.Show();
         window.Activate();
@@ -293,7 +293,7 @@ public partial class App : Application, IDisposable
             return;
         }
 
-        _detailsWindow.SetInstallProgress("Die neue Fassung wird geladen und geprueft ...", busy: true);
+        _detailsWindow.SetInstallProgress("Die neue Fassung wird geladen und geprüft ...", busy: true);
 
         var installer = new UpdateInstaller(_updateHttpClient);
         var ergebnis = await installer.InstallAsync(update).ConfigureAwait(true);

@@ -108,7 +108,7 @@ public sealed class TrayIconController : IDisposable
         settings.Click += (_, _) => ShowSettings?.Invoke(this, EventArgs.Empty);
         menu.Add(settings);
 
-        var update = new NativeMenuItem("Auf Aktualisierungen pruefen ...");
+        var update = new NativeMenuItem("Auf Aktualisierungen prüfen ...");
         update.Click += (_, _) => CheckForUpdatesRequested?.Invoke(this, EventArgs.Empty);
         menu.Add(update);
 

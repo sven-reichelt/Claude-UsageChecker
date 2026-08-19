@@ -5,6 +5,21 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unveröffentlicht]
 
+## [0.3.1] – 2026-08-19
+
+### Geändert
+- Die Oberfläche schreibt Umlaute als Umlaute. Bisher stand dort „Auf
+  Aktualisierungen pruefen", „Gueltig bis" oder „Der Browser liess sich nicht
+  oeffnen" – die Umschreibungen stammten aus der Entwicklung und hatten in der
+  Anzeige nichts verloren. 36 Zeichenketten betroffen.
+- Die Meldung bei fehlendem Zugriffsrecht verweist auch dort auf die
+  Einstellungen, wo sie bisher ein Token zum Hinterlegen verlangte.
+
+### Hinzugefügt
+- Ein Test prüft die Zeichenkodierung von der Quelldatei bis in die
+  Oberfläche. Ein Kodierungsfehler fällt damit im Testlauf auf statt beim
+  Nutzer.
+
 ## [0.3.0] – 2026-08-19
 
 Die erste Fassung, die sich selbst aktualisieren kann. Ab hier genügt ein Klick

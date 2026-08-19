@@ -64,7 +64,7 @@ public sealed class AnthropicOAuthClient(HttpClient httpClient, OAuthOptions? op
         if (state is not null && !string.Equals(state, request.State, StringComparison.Ordinal))
         {
             throw new OAuthException(
-                "Der eingefuegte Code gehoert zu einem anderen Anmeldevorgang. "
+                "Der eingefügte Code gehört zu einem anderen Anmeldevorgang. "
                 + "Bitte die Anmeldung erneut starten.");
         }
 
@@ -78,7 +78,7 @@ public sealed class AnthropicOAuthClient(HttpClient httpClient, OAuthOptions? op
             CodeVerifier = request.CodeVerifier
         };
 
-        return await PostAsync(payload, "Der Code konnte nicht eingeloest werden", cancellationToken)
+        return await PostAsync(payload, "Der Code konnte nicht eingelöst werden", cancellationToken)
             .ConfigureAwait(false);
     }
 

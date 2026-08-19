@@ -38,7 +38,7 @@ public sealed class GitHubReleaseUpdateService(
             if (response.StatusCode == HttpStatusCode.NotFound)
             {
                 return UpdateCheckResult.Unavailable(
-                    "Es gibt noch keine veroeffentlichte Version zum Vergleichen.");
+                    "Es gibt noch keine veröffentlichte Version zum Vergleichen.");
             }
 
             if (!response.IsSuccessStatusCode)
@@ -53,7 +53,7 @@ public sealed class GitHubReleaseUpdateService(
 
             if (!root.TryGetProperty("tag_name", out var tagElement))
             {
-                return UpdateCheckResult.Failed("Die Antwort von GitHub war unvollstaendig.");
+                return UpdateCheckResult.Failed("Die Antwort von GitHub war unvollständig.");
             }
 
             var tag = tagElement.GetString();
@@ -79,13 +79,13 @@ public sealed class GitHubReleaseUpdateService(
                 ReleasePage = page,
                 DownloadUrl = FindAsset(root, ".exe"),
                 ChecksumUrl = FindAsset(root, ".exe.sha256"),
-                Message = $"Version {UpdateCheckResult.Anzeigen(latest)} ist verfuegbar "
+                Message = $"Version {UpdateCheckResult.Anzeigen(latest)} ist verfügbar "
                           + $"(installiert: {UpdateCheckResult.Anzeigen(currentVersion)})."
             };
         }
         catch (Exception ex) when (ex is HttpRequestException or JsonException or TaskCanceledException)
         {
-            return UpdateCheckResult.Failed("Die Aktualisierungspruefung ist fehlgeschlagen.");
+            return UpdateCheckResult.Failed("Die Aktualisierungsprüfung ist fehlgeschlagen.");
         }
     }
 

@@ -48,21 +48,21 @@ public partial class SignInWindow : Window
         var vorhanden = _tokenStore?.Read();
         SignedInText.Text = vorhanden is null
             ? "Noch nicht angemeldet."
-            : $"Angemeldet. Gueltig bis {vorhanden.ExpiresAt?.ToLocalTime():g}, Rechte: {vorhanden.Scope ?? "unbekannt"}.";
+            : $"Angemeldet. Gültig bis {vorhanden.ExpiresAt?.ToLocalTime():g}, Rechte: {vorhanden.Scope ?? "unbekannt"}.";
     }
 
     private void StartSignIn()
     {
         if (_oauthClient is null)
         {
-            StatusText.Text = "Die Anmeldung ist in dieser Ansicht nicht verfuegbar.";
+            StatusText.Text = "Die Anmeldung ist in dieser Ansicht nicht verfügbar.";
             return;
         }
 
         _pendingRequest = _oauthClient.CreateAuthorizationRequest();
         UrlBox.Text = _pendingRequest.Url.ToString();
         CompleteButton.IsEnabled = true;
-        StatusText.Text = "Bitte im Browser die Freigabe erteilen und den angezeigten Code hier einfuegen.";
+        StatusText.Text = "Bitte im Browser die Freigabe erteilen und den angezeigten Code hier einfügen.";
 
         try
         {
@@ -70,7 +70,7 @@ public partial class SignInWindow : Window
         }
         catch (Exception ex) when (ex is System.ComponentModel.Win32Exception or InvalidOperationException)
         {
-            StatusText.Text = "Der Browser liess sich nicht oeffnen. Bitte die Adresse oben kopieren.";
+            StatusText.Text = "Der Browser ließ sich nicht öffnen. Bitte die Adresse oben kopieren.";
         }
     }
 
@@ -83,19 +83,19 @@ public partial class SignInWindow : Window
 
         if (_pendingRequest is null)
         {
-            StatusText.Text = "Bitte zuerst die Anmeldeseite oeffnen.";
+            StatusText.Text = "Bitte zuerst die Anmeldeseite öffnen.";
             return;
         }
 
         var code = CodeBox.Text?.Trim();
         if (string.IsNullOrEmpty(code))
         {
-            StatusText.Text = "Bitte den Code von der Anthropic-Seite einfuegen.";
+            StatusText.Text = "Bitte den Code von der Anthropic-Seite einfügen.";
             return;
         }
 
         CompleteButton.IsEnabled = false;
-        StatusText.Text = "Code wird eingeloest ...";
+        StatusText.Text = "Code wird eingelöst ...";
 
         try
         {

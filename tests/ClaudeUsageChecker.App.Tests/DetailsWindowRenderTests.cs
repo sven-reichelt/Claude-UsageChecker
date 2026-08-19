@@ -113,6 +113,25 @@ public class DetailsWindowRenderTests
         Assert.Equal(4, window.FindControl<StackPanel>("WindowsPanel")!.Children.Count);
     }
 
+    /// <summary>
+    /// Prueft die Zeichenkodierung durchgehend: Quelltext, Uebersetzung,
+    /// Laufzeit, Oberflaeche. Ein Kodierungsfehler wuerde hier als Zeichensalat
+    /// auffallen statt erst beim Nutzer.
+    /// </summary>
+    [AvaloniaFact]
+    public void UmlauteErreichenDieOberflaecheUnbeschadet()
+    {
+        var window = new DetailsWindow();
+
+        window.Render(new UsageState { Kind = UsageStateKind.NotConfigured });
+
+        var text = window.FindControl<TextBlock>("MessageText")!.Text!;
+        Assert.Contains("Einstellungen → Anmelden", text, StringComparison.Ordinal);
+        Assert.Contains("Zugriffsrecht", text, StringComparison.Ordinal);
+        // Der klassische Fehlerfall: UTF-8 als Latin-1 gelesen.
+        Assert.DoesNotContain("Ã", text, StringComparison.Ordinal);
+    }
+
     private static UsageState StateWith(ExtraUsage? extraUsage) => new()
     {
         Kind = UsageStateKind.Ready,

@@ -66,7 +66,7 @@ public sealed class AnthropicUsageApiClient(
         throw rejection ?? new UsageApiException(
             sawToken
                 ? "Kein verwendbares Token gefunden."
-                : "Kein OAuth-Token gefunden. Bitte in den Einstellungen ein Token hinterlegen.",
+                : "Kein Zugriffsrecht vorhanden. Bitte in den Einstellungen anmelden.",
             UsageApiFailure.NoToken);
     }
 
@@ -79,7 +79,7 @@ public sealed class AnthropicUsageApiClient(
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            logger?.LogWarning(ex, "Tokenquelle {Source} nicht verfuegbar.", provider.Name);
+            logger?.LogWarning(ex, "Tokenquelle {Source} nicht verfügbar.", provider.Name);
             return null;
         }
     }
@@ -98,7 +98,7 @@ public sealed class AnthropicUsageApiClient(
         catch (TaskCanceledException ex) when (!cancellationToken.IsCancellationRequested)
         {
             throw new UsageApiException(
-                "Zeitueberschreitung beim Abruf des Nutzungsstands.",
+                "Zeitüberschreitung beim Abruf des Nutzungsstands.",
                 UsageApiFailure.Network, innerException: ex);
         }
         catch (HttpRequestException ex)
@@ -208,10 +208,10 @@ public sealed class AnthropicUsageApiClient(
         if (body.Contains("user:profile", StringComparison.OrdinalIgnoreCase))
         {
             return "Dem Token fehlt der Geltungsbereich \"user:profile\". "
-                   + "Tokens aus \"claude setup-token\" taugen nur fuer Inferenz, nicht fuer den Nutzungsstand.";
+                   + "Tokens aus \"claude setup-token\" taugen nur für Inferenz, nicht für den Nutzungsstand.";
         }
 
-        return "Das Token wurde abgelehnt. Es ist abgelaufen oder ungueltig.";
+        return "Das Token wurde abgelehnt. Es ist abgelaufen oder ungültig.";
     }
 
     internal static UsageSnapshot MapToSnapshot(

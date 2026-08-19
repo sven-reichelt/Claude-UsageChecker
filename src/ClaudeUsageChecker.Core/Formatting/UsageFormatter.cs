@@ -180,7 +180,7 @@ public static class UsageFormatter
 
         if (window is null)
         {
-            return string.Format(culture, "{0}: nicht verfuegbar", label);
+            return string.Format(culture, "{0}: nicht verfügbar", label);
         }
 
         return string.Format(
