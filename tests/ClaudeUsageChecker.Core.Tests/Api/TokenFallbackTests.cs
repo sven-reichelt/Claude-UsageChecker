@@ -12,8 +12,8 @@ namespace ClaudeUsageChecker.Core.Tests.Api;
 /// <remarks>
 /// The occasion is concrete: a token from <c>claude setup-token</c> is valid but
 /// does not carry the <c>user:profile</c> scope and is turned away by the usage
-/// endpoint with HTTP 403. If the application does not pass on to the
-/// naechste Quelle weiter, legt ein solches Token sie vollstaendig lahm.
+/// endpoint with HTTP 403. If the application does not move on to the next
+/// source, such a token paralyses it completely.
 /// </remarks>
 public class TokenFallbackTests
 {
@@ -31,8 +31,8 @@ public class TokenFallbackTests
             (HttpStatusCode.OK, UsageJson));
 
         var snapshot = await CreateClient(handler,
-            Quelle("secret-store", TokenSource.SecretStore),
-            Quelle("claude-cli", TokenSource.ClaudeCli)).GetUsageAsync();
+            Source("secret-store", TokenSource.SecretStore),
+            Source("claude-cli", TokenSource.ClaudeCli)).GetUsageAsync();
 
         Assert.Equal(19.0, snapshot.Session!.Utilization);
         Assert.Equal(TokenSource.ClaudeCli, snapshot.TokenSource);
@@ -45,8 +45,8 @@ public class TokenFallbackTests
         var handler = new StubHandler((HttpStatusCode.OK, UsageJson));
 
         var snapshot = await CreateClient(handler,
-            Quelle("secret-store", TokenSource.SecretStore),
-            Quelle("claude-cli", TokenSource.ClaudeCli)).GetUsageAsync();
+            Source("secret-store", TokenSource.SecretStore),
+            Source("claude-cli", TokenSource.ClaudeCli)).GetUsageAsync();
 
         Assert.Equal(TokenSource.SecretStore, snapshot.TokenSource);
         Assert.Equal(1, handler.RequestCount);
@@ -59,7 +59,7 @@ public class TokenFallbackTests
 
         var snapshot = await CreateClient(handler,
             Leer("secret-store"),
-            Quelle("claude-cli", TokenSource.ClaudeCli)).GetUsageAsync();
+            Source("claude-cli", TokenSource.ClaudeCli)).GetUsageAsync();
 
         Assert.Equal(TokenSource.ClaudeCli, snapshot.TokenSource);
         Assert.Equal(1, handler.RequestCount);
@@ -73,8 +73,8 @@ public class TokenFallbackTests
             (HttpStatusCode.Unauthorized, "{}"));
 
         var client = CreateClient(handler,
-            Quelle("secret-store", TokenSource.SecretStore),
-            Quelle("claude-cli", TokenSource.ClaudeCli));
+            Source("secret-store", TokenSource.SecretStore),
+            Source("claude-cli", TokenSource.ClaudeCli));
 
         var ex = await Assert.ThrowsAsync<UsageApiException>(() => client.GetUsageAsync());
 
@@ -87,7 +87,7 @@ public class TokenFallbackTests
     {
         var handler = new StubHandler((HttpStatusCode.Forbidden, ScopeError));
 
-        var client = CreateClient(handler, Quelle("secret-store", TokenSource.SecretStore));
+        var client = CreateClient(handler, Source("secret-store", TokenSource.SecretStore));
 
         var ex = await Assert.ThrowsAsync<UsageApiException>(() => client.GetUsageAsync());
 
@@ -115,7 +115,7 @@ public class TokenFallbackTests
 
         var snapshot = await CreateClient(handler,
             new ThrowingProvider(),
-            Quelle("claude-cli", TokenSource.ClaudeCli)).GetUsageAsync();
+            Source("claude-cli", TokenSource.ClaudeCli)).GetUsageAsync();
 
         Assert.Equal(TokenSource.ClaudeCli, snapshot.TokenSource);
     }
@@ -128,8 +128,8 @@ public class TokenFallbackTests
         var handler = new StubHandler((HttpStatusCode.ServiceUnavailable, "{}"));
 
         var client = CreateClient(handler,
-            Quelle("secret-store", TokenSource.SecretStore),
-            Quelle("claude-cli", TokenSource.ClaudeCli));
+            Source("secret-store", TokenSource.SecretStore),
+            Source("claude-cli", TokenSource.ClaudeCli));
 
         var ex = await Assert.ThrowsAsync<UsageApiException>(() => client.GetUsageAsync());
 
@@ -142,7 +142,7 @@ public class TokenFallbackTests
             providers,
             new UsageApiOptions());
 
-    private static ITokenProvider Quelle(string name, TokenSource source) =>
+    private static ITokenProvider Source(string name, TokenSource source) =>
         new StubProvider(name, new AccessToken($"token-{name}", source));
 
     private static ITokenProvider Leer(string name) => new StubProvider(name, null);
@@ -160,7 +160,7 @@ public class TokenFallbackTests
         public string Name => "kaputt";
 
         public ValueTask<AccessToken?> TryGetTokenAsync(CancellationToken cancellationToken = default) =>
-            throw new IOException("Quelle nicht lesbar");
+            throw new IOException("Source nicht lesbar");
     }
 
     /// <summary>Returns the prepared responses in order.</summary>

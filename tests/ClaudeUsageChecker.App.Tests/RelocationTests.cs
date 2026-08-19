@@ -21,7 +21,7 @@ public class RelocationTests
     public void WithoutTheTickNoNoticeAboutMoving()
     {
         using var file = new TemporaryFile();
-        var window = Erzeuge(file, new AppSettings { LaunchAtLogin = false }, out _);
+        var window = Create(file, new AppSettings { LaunchAtLogin = false }, out _);
 
         Assert.False(window.FindControl<TextBlock>("RelocationHint")!.IsVisible);
     }
@@ -30,21 +30,21 @@ public class RelocationTests
     public void UntickingDoesNotEntailMoving()
     {
         using var file = new TemporaryFile();
-        var window = Erzeuge(file, new AppSettings { LaunchAtLogin = true }, out var aufrufe);
+        var window = Create(file, new AppSettings { LaunchAtLogin = true }, out var calls);
 
         window.FindControl<CheckBox>("LaunchAtLoginBox")!.IsChecked = false;
         Klicke(window, "SaveButton");
 
         // An application once installed stays where it is - only the autostart
         // entry is removed.
-        Assert.Equal(0, aufrufe.Anzahl);
+        Assert.Equal(0, calls.Count);
     }
 
     [AvaloniaFact]
     public void TheNoticeNamesTheTargetPath()
     {
         using var file = new TemporaryFile();
-        var window = Erzeuge(file, new AppSettings { LaunchAtLogin = false }, out _);
+        var window = Create(file, new AppSettings { LaunchAtLogin = false }, out _);
 
         window.FindControl<CheckBox>("LaunchAtLoginBox")!.IsChecked = true;
 
@@ -69,10 +69,10 @@ public class RelocationTests
         knopf.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
     }
 
-    private static SettingsWindow Erzeuge(TemporaryFile file, AppSettings settings, out Zaehler aufrufe)
+    private static SettingsWindow Create(TemporaryFile file, AppSettings settings, out Counter calls)
     {
-        var zaehler = new Zaehler();
-        aufrufe = zaehler;
+        var counter = new Counter();
+        calls = counter;
 
         return new SettingsWindow(
             new SettingsStore(file.Path),
@@ -80,14 +80,14 @@ public class RelocationTests
             oauthTokenStore: null,
             relocate: () =>
             {
-                zaehler.Anzahl++;
+                counter.Count++;
                 return new InstallResult(true, "erledigt");
             });
     }
 
-    private sealed class Zaehler
+    private sealed class Counter
     {
-        public int Anzahl { get; set; }
+        public int Count { get; set; }
     }
 
     private sealed class TemporaryFile : IDisposable

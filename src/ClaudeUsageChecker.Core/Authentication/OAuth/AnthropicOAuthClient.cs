@@ -191,9 +191,9 @@ public sealed class AnthropicOAuthClient(HttpClient httpClient, OAuthOptions? op
         try
         {
             using var doc = JsonDocument.Parse(body);
-            if (doc.RootElement.TryGetProperty("error_description", out var beschreibung))
+            if (doc.RootElement.TryGetProperty("error_description", out var description))
             {
-                return beschreibung.GetString() ?? string.Empty;
+                return description.GetString() ?? string.Empty;
             }
 
             if (doc.RootElement.TryGetProperty("error", out var fehler))

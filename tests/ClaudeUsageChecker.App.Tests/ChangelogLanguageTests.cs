@@ -15,11 +15,11 @@ namespace ClaudeUsageChecker.App.Tests;
 /// </remarks>
 public class ChangelogLanguageTests : IDisposable
 {
-    private readonly Language _vorher = Localizer.Current.Language;
+    private readonly Language _before = Localizer.Current.Language;
 
     public void Dispose()
     {
-        Localizer.Use(_vorher);
+        Localizer.Use(_before);
         GC.SuppressFinalize(this);
     }
 

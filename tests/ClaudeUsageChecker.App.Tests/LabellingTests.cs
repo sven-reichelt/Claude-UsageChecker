@@ -21,11 +21,11 @@ namespace ClaudeUsageChecker.App.Tests;
 /// </remarks>
 public class LabellingTests : IDisposable
 {
-    private readonly Language _vorher = Localizer.Current.Language;
+    private readonly Language _before = Localizer.Current.Language;
 
     public void Dispose()
     {
-        Localizer.Use(_vorher);
+        Localizer.Use(_before);
         GC.SuppressFinalize(this);
     }
 
@@ -182,7 +182,7 @@ public class LabellingTests : IDisposable
         window.Hide();
 
         Assert.True(empty.Count == 0,
-            $"In {window.GetType().Name} ({code}) sind Beschriftungen empty: {string.Join(", ", empty)}");
+            $"In {window.GetType().Name} ({code}) these labels are empty: {string.Join(", ", empty)}");
     }
 
     /// <summary>

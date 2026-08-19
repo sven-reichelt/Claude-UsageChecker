@@ -6,19 +6,18 @@ using Microsoft.Extensions.Time.Testing;
 namespace ClaudeUsageChecker.Core.Tests.Authentication;
 
 /// <summary>
-/// Distinguishes credentials discarded for good from temporary
-/// Stoerungen.
+/// Distinguishes credentials discarded for good from a temporary disturbance.
 /// </summary>
 /// <remarks>
 /// The difference matters: if a merely disturbed connection counts as a
 /// rejection, the application deletes an intact sign-in and the user has to sign
 /// in again for no reason. The other way round, on a real rejection the display
-/// would carry on silently through Claude Code - and the
-/// Unabhaengigkeit waere unbemerkt verloren.
+/// would carry on silently through Claude Code - and the independence would be
+/// lost without anyone noticing.
 /// </remarks>
 public class SignInExpiryTests
 {
-    private static readonly DateTimeOffset Jetzt = new(2026, 8, 19, 12, 0, 0, TimeSpan.Zero);
+    private static readonly DateTimeOffset Now = new(2026, 8, 19, 12, 0, 0, TimeSpan.Zero);
 
     [Theory]
     [InlineData(HttpStatusCode.BadRequest)]
@@ -26,7 +25,7 @@ public class SignInExpiryTests
     public async Task ARejectionRemovesTheSignInAndReportsIt(HttpStatusCode status)
     {
         var handler = new OAuthFlowTests.StubHandler((status, """{"error":"invalid_grant"}"""));
-        using var provider = CreateProvider(handler, AblaufendeAnmeldung(), out var store);
+        using var provider = CreateProvider(handler, ExpiringSignIn(), out var store);
 
         string? reported = null;
         provider.SignInExpired += (_, grund) => reported = grund;
@@ -46,7 +45,7 @@ public class SignInExpiryTests
     public async Task ADisturbanceLeavesTheSignInUntouched(HttpStatusCode status)
     {
         var handler = new OAuthFlowTests.StubHandler((status, """{"error":"nicht erreichbar"}"""));
-        using var provider = CreateProvider(handler, AblaufendeAnmeldung(), out var store);
+        using var provider = CreateProvider(handler, ExpiringSignIn(), out var store);
 
         var reported = false;
         provider.SignInExpired += (_, _) => reported = true;
@@ -63,7 +62,7 @@ public class SignInExpiryTests
     public async Task ANetworkOutageLeavesTheSignInUntouched()
     {
         var handler = new ThrowingHandler();
-        using var provider = CreateProvider(handler, AblaufendeAnmeldung(), out var store);
+        using var provider = CreateProvider(handler, ExpiringSignIn(), out var store);
 
         var reported = false;
         provider.SignInExpired += (_, _) => reported = true;
@@ -78,7 +77,7 @@ public class SignInExpiryTests
     {
         var handler = new OAuthFlowTests.StubHandler((HttpStatusCode.OK,
             """{"access_token":"a2","refresh_token":"r2","expires_in":28800,"refresh_token_expires_in":2592000}"""));
-        using var provider = CreateProvider(handler, AblaufendeAnmeldung(), out var store);
+        using var provider = CreateProvider(handler, ExpiringSignIn(), out var store);
 
         await provider.TryGetTokenAsync();
 
@@ -90,18 +89,18 @@ public class SignInExpiryTests
     {
         var handler = new OAuthFlowTests.StubHandler((HttpStatusCode.OK,
             """{"access_token":"a2","refresh_token":"r2","expires_in":28800}"""));
-        using var provider = CreateProvider(handler, AblaufendeAnmeldung(), out var store);
+        using var provider = CreateProvider(handler, ExpiringSignIn(), out var store);
 
         await provider.TryGetTokenAsync();
 
         Assert.Null(store.Read()!.RefreshTokenExpiresAt);
     }
 
-    private static OAuthTokens AblaufendeAnmeldung() => new()
+    private static OAuthTokens ExpiringSignIn() => new()
     {
         AccessToken = "a1",
         RefreshToken = "r1",
-        ExpiresAt = Jetzt.AddMinutes(2)
+        ExpiresAt = Now.AddMinutes(2)
     };
 
     private static OAuthTokenProvider CreateProvider(
@@ -114,7 +113,7 @@ public class SignInExpiryTests
             store,
             new AnthropicOAuthClient(new HttpClient(handler), new OAuthOptions()),
             new OAuthOptions(),
-            new FakeTimeProvider(Jetzt));
+            new FakeTimeProvider(Now));
     }
 
     private sealed class ThrowingHandler : HttpMessageHandler

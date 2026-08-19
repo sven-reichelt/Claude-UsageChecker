@@ -35,76 +35,76 @@ public static class TempCleanup
     /// <summary>Cleans up and reports how many folders were removed.</summary>
     public static int RemoveStaleExtractions()
     {
-        var basis = Path.Combine(Path.GetTempPath(), ".net");
-        if (!Directory.Exists(basis))
+        var root = Path.Combine(Path.GetTempPath(), ".net");
+        if (!Directory.Exists(root))
         {
             return 0;
         }
 
-        var eigene = FindeEigeneEntpackungen(basis);
-        if (eigene.Count == 0)
+        var own = FindOwnExtractions(root);
+        if (own.Count == 0)
         {
             // Without knowing our own folder, better to touch nothing.
             return 0;
         }
 
-        var entfernt = 0;
+        var removed = 0;
 
-        foreach (var anwendungsordner in VerzeichnisseSicher(basis))
+        foreach (var appFolder in DirectoriesOrEmpty(root))
         {
-            if (!Path.GetFileName(anwendungsordner).StartsWith(AppFolderPrefix, StringComparison.OrdinalIgnoreCase))
+            if (!Path.GetFileName(appFolder).StartsWith(AppFolderPrefix, StringComparison.OrdinalIgnoreCase))
             {
                 continue;
             }
 
-            foreach (var entpackung in VerzeichnisseSicher(anwendungsordner))
+            foreach (var extraction in DirectoriesOrEmpty(appFolder))
             {
-                if (eigene.Contains(Normalisiere(entpackung)))
+                if (own.Contains(Normalise(extraction)))
                 {
                     continue;
                 }
 
-                if (LoescheSicher(entpackung))
+                if (DeleteQuietly(extraction))
                 {
-                    entfernt++;
+                    removed++;
                 }
             }
 
-            if (VerzeichnisseSicher(anwendungsordner).Length == 0
-                && DateienSicher(anwendungsordner).Length == 0)
+            if (DirectoriesOrEmpty(appFolder).Length == 0
+                && FilesOrEmpty(appFolder).Length == 0)
             {
-                LoescheSicher(anwendungsordner);
+                DeleteQuietly(appFolder);
             }
         }
 
-        return entfernt;
+        return removed;
     }
 
     /// <summary>
     /// The extraction folders this process has actually loaded libraries from.
     /// That is the reliable answer to what is in use.
     /// </summary>
-    private static HashSet<string> FindeEigeneEntpackungen(string basis)
+    private static HashSet<string> FindOwnExtractions(string root)
     {
-        var gefunden = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var basisNormalisiert = Normalisiere(basis);
+        var found = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var normalisedRoot = Normalise(root);
 
         try
         {
-            foreach (ProcessModule modul in Process.GetCurrentProcess().Modules)
+            foreach (ProcessModule module in Process.GetCurrentProcess().Modules)
             {
-                if (modul.FileName is not { Length: > 0 } datei)
+                if (module.FileName is not { Length: > 0 } file)
                 {
                     continue;
                 }
 
-                var ordner = Path.GetDirectoryName(datei);
-                if (ordner is null || !Normalisiere(ordner).StartsWith(basisNormalisiert, StringComparison.OrdinalIgnoreCase))
+                var folder = Path.GetDirectoryName(file);
+                if (folder is null || !Normalise(folder).StartsWith(normalisedRoot, StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
 
-                gefunden.Add(Normalisiere(ordner));
+                found.Add(Normalise(folder));
             }
         }
         catch (Exception ex) when (ex is InvalidOperationException or NotSupportedException)
@@ -112,17 +112,17 @@ public static class TempCleanup
             // No module list, no answer - then nothing is cleaned up.
         }
 
-        return gefunden;
+        return found;
     }
 
-    private static string Normalisiere(string pfad) =>
-        Path.TrimEndingDirectorySeparator(Path.GetFullPath(pfad));
+    private static string Normalise(string path) =>
+        Path.TrimEndingDirectorySeparator(Path.GetFullPath(path));
 
-    private static string[] VerzeichnisseSicher(string pfad)
+    private static string[] DirectoriesOrEmpty(string path)
     {
         try
         {
-            return Directory.GetDirectories(pfad);
+            return Directory.GetDirectories(path);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
@@ -130,11 +130,11 @@ public static class TempCleanup
         }
     }
 
-    private static string[] DateienSicher(string pfad)
+    private static string[] FilesOrEmpty(string path)
     {
         try
         {
-            return Directory.GetFiles(pfad);
+            return Directory.GetFiles(path);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
@@ -142,11 +142,11 @@ public static class TempCleanup
         }
     }
 
-    private static bool LoescheSicher(string pfad)
+    private static bool DeleteQuietly(string path)
     {
         try
         {
-            Directory.Delete(pfad, recursive: true);
+            Directory.Delete(path, recursive: true);
             return true;
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)

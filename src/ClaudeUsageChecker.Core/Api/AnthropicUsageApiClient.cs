@@ -218,7 +218,7 @@ public sealed class AnthropicUsageApiClient(
     {
         // The individual fields still supply session and weekly limit reliably;
         // only the model-specific limits are missing there. They therefore stay
-        // the basis, and the list adds to or overrides what it knows.
+        // the base, and the list adds to or overrides what it knows.
         Session = MapFromLimits(dto, "session") ?? MapWindow(dto.FiveHour),
         Weekly = MapFromLimits(dto, "weekly_all") ?? MapWindow(dto.SevenDay),
         ScopedWeekly = MapScopedWeekly(dto),

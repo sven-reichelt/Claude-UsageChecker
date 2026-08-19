@@ -57,12 +57,12 @@ public sealed class UpdateInstaller(HttpClient httpClient)
     {
         get
         {
-            if (!OperatingSystem.IsWindows() || Environment.ProcessPath is not { Length: > 0 } pfad)
+            if (!OperatingSystem.IsWindows() || Environment.ProcessPath is not { Length: > 0 } path)
             {
                 return false;
             }
 
-            return !File.Exists(Path.ChangeExtension(pfad, ".dll"));
+            return !File.Exists(Path.ChangeExtension(path, ".dll"));
         }
     }
 
@@ -88,27 +88,27 @@ public sealed class UpdateInstaller(HttpClient httpClient)
                 T.UpdaterMissingFileOrChecksum);
         }
 
-        var eigenerPfad = Environment.ProcessPath!;
+        var ownPath = Environment.ProcessPath!;
         var temp = Path.Combine(Path.GetTempPath(), $"ClaudeUsageChecker-{Guid.NewGuid():N}.exe");
 
         try
         {
-            await LadeAsync(downloadUrl, temp, cancellationToken).ConfigureAwait(false);
+            await DownloadAsync(downloadUrl, temp, cancellationToken).ConfigureAwait(false);
 
-            var erwartet = await LadePruefsummeAsync(checksumUrl, cancellationToken).ConfigureAwait(false);
-            if (erwartet is null)
+            var expected = await LoadChecksumAsync(checksumUrl, cancellationToken).ConfigureAwait(false);
+            if (expected is null)
             {
                 return InstallResult.Failed(T.UpdaterChecksumUnreadable);
             }
 
-            var tatsaechlich = await BerechnePruefsummeAsync(temp, cancellationToken).ConfigureAwait(false);
-            if (!string.Equals(erwartet, tatsaechlich, StringComparison.OrdinalIgnoreCase))
+            var actual = await ComputeChecksumAsync(temp, cancellationToken).ConfigureAwait(false);
+            if (!string.Equals(expected, actual, StringComparison.OrdinalIgnoreCase))
             {
                 return InstallResult.Failed(
                     T.UpdaterChecksumMismatch);
             }
 
-            return Tausche(eigenerPfad, temp);
+            return PutInPlace(ownPath, temp);
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
@@ -120,46 +120,46 @@ public sealed class UpdateInstaller(HttpClient httpClient)
         }
         finally
         {
-            Loesche(temp);
+            DeleteQuietly(temp);
         }
     }
 
-    private async Task LadeAsync(Uri url, string ziel, CancellationToken cancellationToken)
+    private async Task DownloadAsync(Uri url, string target, CancellationToken cancellationToken)
     {
         using var response = await httpClient
             .GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
 
-        await using var quelle = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
-        await using var datei = File.Create(ziel);
-        await quelle.CopyToAsync(datei, cancellationToken).ConfigureAwait(false);
+        await using var source = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+        await using var file = File.Create(target);
+        await source.CopyToAsync(file, cancellationToken).ConfigureAwait(false);
     }
 
-    private async Task<string?> LadePruefsummeAsync(Uri url, CancellationToken cancellationToken)
+    private async Task<string?> LoadChecksumAsync(Uri url, CancellationToken cancellationToken)
     {
-        var inhalt = await httpClient.GetStringAsync(url, cancellationToken).ConfigureAwait(false);
-        return LiesPruefsumme(inhalt);
+        var content = await httpClient.GetStringAsync(url, cancellationToken).ConfigureAwait(false);
+        return ReadChecksum(content);
     }
 
     /// <summary>
     /// Extracts the sum from a file of the form "&lt;hash&gt;  &lt;filename&gt;".
     /// </summary>
-    internal static string? LiesPruefsumme(string inhalt)
+    internal static string? ReadChecksum(string content)
     {
-        if (string.IsNullOrWhiteSpace(inhalt))
+        if (string.IsNullOrWhiteSpace(content))
         {
             return null;
         }
 
-        var erstesWort = inhalt.Trim().Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries)[0];
+        var firstWord = content.Trim().Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries)[0];
 
-        // Eine SHA-256-Summe hat 64 Stellen in Hexadezimalschreibweise.
-        return erstesWort.Length == 64 && IsHex(erstesWort) ? erstesWort.ToLowerInvariant() : null;
+        // A SHA-256 sum has 64 digits in hexadecimal.
+        return firstWord.Length == 64 && IsHex(firstWord) ? firstWord.ToLowerInvariant() : null;
     }
 
-    private static bool IsHex(string wert)
+    private static bool IsHex(string value)
     {
-        foreach (var c in wert)
+        foreach (var c in value)
         {
             if (!Uri.IsHexDigit(c))
             {
@@ -170,36 +170,36 @@ public sealed class UpdateInstaller(HttpClient httpClient)
         return true;
     }
 
-    private static async Task<string> BerechnePruefsummeAsync(string pfad, CancellationToken cancellationToken)
+    private static async Task<string> ComputeChecksumAsync(string path, CancellationToken cancellationToken)
     {
-        await using var datei = File.OpenRead(pfad);
-        var hash = await SHA256.HashDataAsync(datei, cancellationToken).ConfigureAwait(false);
+        await using var file = File.OpenRead(path);
+        var hash = await SHA256.HashDataAsync(file, cancellationToken).ConfigureAwait(false);
         return Convert.ToHexString(hash).ToLowerInvariant();
     }
 
     /// <summary>
-    /// Legt die laufende Datei beiseite, setzt die neue an ihren Platz und
-    /// startet sie. Scheitert der zweite Schritt, wird der erste
-    /// zurueckgenommen - sonst bliebe kein lauffaehiges Programm zurueck.
+    /// Sets the running file aside, puts the new one in its place and starts
+    /// it. If the second step fails, the first is undone - otherwise no
+    /// runnable program would be left behind.
     /// </summary>
-    private static InstallResult Tausche(string eigenerPfad, string neueDatei)
+    private static InstallResult PutInPlace(string ownPath, string newFile)
     {
-        var beiseite = eigenerPfad + BackupSuffix;
-        Loesche(beiseite);
+        var setAside = ownPath + BackupSuffix;
+        DeleteQuietly(setAside);
 
-        File.Move(eigenerPfad, beiseite);
+        File.Move(ownPath, setAside);
 
         try
         {
-            File.Move(neueDatei, eigenerPfad);
+            File.Move(newFile, ownPath);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
-            File.Move(beiseite, eigenerPfad);
+            File.Move(setAside, ownPath);
             return InstallResult.Failed(T.UpdaterReplaceFailed(ex.Message));
         }
 
-        var start = new ProcessStartInfo(eigenerPfad) { UseShellExecute = false };
+        var start = new ProcessStartInfo(ownPath) { UseShellExecute = false };
         start.ArgumentList.Add(WaitArgument);
         start.ArgumentList.Add(Environment.ProcessId.ToString(System.Globalization.CultureInfo.InvariantCulture));
         Process.Start(start);
@@ -208,29 +208,29 @@ public sealed class UpdateInstaller(HttpClient httpClient)
     }
 
     /// <summary>
-    /// Entfernt eine beiseitegelegte Altfassung. Wird beim Start aufgerufen,
-    /// denn erst dann laeuft sie nicht mehr.
+    /// Removes a set-aside earlier version. Called at startup, because only
+    /// then is it no longer running.
     /// </summary>
     public static void RemovePreviousVersion()
     {
-        if (Environment.ProcessPath is { } pfad)
+        if (Environment.ProcessPath is { } path)
         {
-            Loesche(pfad + BackupSuffix);
+            DeleteQuietly(path + BackupSuffix);
         }
     }
 
-    private static void Loesche(string pfad)
+    private static void DeleteQuietly(string path)
     {
         try
         {
-            if (File.Exists(pfad))
+            if (File.Exists(path))
             {
-                File.Delete(pfad);
+                File.Delete(path);
             }
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
-            // Beim naechsten Start noch einmal - kein Grund, hier zu scheitern.
+            // Again on the next start - no reason to fail here.
         }
     }
 }

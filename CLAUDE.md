@@ -19,7 +19,7 @@ it would change every hash, and the releases and their tags hang off those.
 
 ```powershell
 dotnet build                                      # the whole solution
-dotnet test                                       # 399 tests (Core.Tests + App.Tests)
+dotnet test                                       # 400 tests (Core.Tests + App.Tests)
 dotnet run --project src/ClaudeUsageChecker.App   # run the application
 node build/generate-icons.mjs                     # regenerate the icons
 ```

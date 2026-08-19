@@ -4,8 +4,7 @@ namespace ClaudeUsageChecker.App.Tests;
 
 /// <summary>
 /// Checks the version comparison of the update check. A fault here would either
-/// conceal an available version or permanently announce one that
-/// vermeintlich neue melden.
+/// conceal an available version or keep announcing one that does not exist.
 /// </summary>
 public class UpdateVersionTests
 {
@@ -39,13 +38,14 @@ public class UpdateVersionTests
     [InlineData("v0.1.1", "v0.1.0", true)]
     [InlineData("v1.0.0", "v0.9.9", true)]
     public void VersionComparison_ReportsOnlyRealUpdates(
-        string veroeffentlicht, string installiert, bool istNeuer)
+        string published, string installed, bool isNewer)
     {
-        Assert.True(GitHubReleaseUpdateService.TryParseTag(veroeffentlicht, out var latest));
-        Assert.True(GitHubReleaseUpdateService.TryParseTag(installiert, out var current));
+        Assert.True(GitHubReleaseUpdateService.TryParseTag(published, out var latest));
+        Assert.True(GitHubReleaseUpdateService.TryParseTag(installed, out var current));
 
-        // Genau diese Bedingung entscheidet im Dienst ueber "Update available".
-        Assert.Equal(istNeuer, latest > current);
+        // This is the very comparison the service uses to decide "update
+        // available".
+        Assert.Equal(isNewer, latest > current);
     }
 
     [Theory]

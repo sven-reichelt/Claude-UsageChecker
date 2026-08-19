@@ -47,8 +47,8 @@ public class SelfInstallerTests
     [Fact]
     public void NothingIsOfferedInADevelopmentBuild()
     {
-        // Dozens of files sit side by side there - copying a single one
-        // ergaebe nichts Lauffaehiges.
+        // Dozens of files sit side by side there - copying a single one would
+        // not yield anything runnable.
         Assert.False(UpdateInstaller.IsSupported);
         Assert.False(SelfInstaller.ShouldOffer);
     }

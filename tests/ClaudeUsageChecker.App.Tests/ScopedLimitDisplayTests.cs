@@ -33,13 +33,13 @@ public class ScopedLimitDisplayTests
     [Fact]
     public void ThereAreEnoughSlotsForEveryReportedLimit()
     {
-        var zustand = State("Fable", "Opus", "Sonnet", "Ein viertes Modell", "Ein fuenftes Modell");
+        var state = State("Fable", "Opus", "Sonnet", "A fourth model", "A fifth model");
 
-        var lines = TrayIconController.BuildStatusLines(zustand, Now);
+        var lines = TrayIconController.BuildStatusLines(state, Now);
 
         Assert.True(lines.Count <= TrayIconController.StatusSlotCount,
-            $"Das Menue haelt {TrayIconController.StatusSlotCount} Plaetze bereit, "
-            + $"gebraucht werden {lines.Count}.");
+            $"The menu holds {TrayIconController.StatusSlotCount} slots, "
+            + $"and {lines.Count} are needed.");
     }
 
     [AvaloniaFact]
@@ -58,7 +58,7 @@ public class ScopedLimitDisplayTests
     {
         // Were it not included here, the icon would stay green although a limit
         // is nearly exhausted.
-        var zustand = new UsageState
+        var state = new UsageState
         {
             Kind = UsageStateKind.Ready,
             Snapshot = new UsageSnapshot
@@ -70,7 +70,7 @@ public class ScopedLimitDisplayTests
             }
         };
 
-        Assert.Equal(TrayIconSeverity.Critical, TrayIconSeverityResolver.Resolve(zustand, 75, 90));
+        Assert.Equal(TrayIconSeverity.Critical, TrayIconSeverityResolver.Resolve(state, 75, 90));
     }
 
     private static readonly DateTimeOffset Now = new(2026, 8, 19, 21, 0, 0, TimeSpan.Zero);

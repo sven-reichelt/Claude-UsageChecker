@@ -38,9 +38,9 @@ public class ThresholdSettingsTests
     [InlineData(0, 90)]
     [InlineData(75, 101)]
     [InlineData(-5, 90)]
-    public void ValidateThresholds_ValuesOutsideTheRangeAreRejected(double warnung, double kritisch)
+    public void ValidateThresholds_ValuesOutsideTheRangeAreRejected(double warning, double critical)
     {
-        Assert.NotNull(AppSettings.ValidateThresholds(warnung, kritisch));
+        Assert.NotNull(AppSettings.ValidateThresholds(warning, critical));
     }
 
     [AvaloniaFact]
@@ -106,7 +106,7 @@ public class ThresholdSettingsTests
     [Fact]
     public void TheThresholdsDecideTheIconColour()
     {
-        var zustand = new UsageState
+        var state = new UsageState
         {
             Kind = UsageStateKind.Ready,
             Snapshot = new UsageSnapshot
@@ -117,9 +117,9 @@ public class ThresholdSettingsTests
             }
         };
 
-        Assert.Equal(TrayIconSeverity.Normal, TrayIconSeverityResolver.Resolve(zustand, 75, 90));
-        Assert.Equal(TrayIconSeverity.Warning, TrayIconSeverityResolver.Resolve(zustand, 50, 90));
-        Assert.Equal(TrayIconSeverity.Critical, TrayIconSeverityResolver.Resolve(zustand, 30, 50));
+        Assert.Equal(TrayIconSeverity.Normal, TrayIconSeverityResolver.Resolve(state, 75, 90));
+        Assert.Equal(TrayIconSeverity.Warning, TrayIconSeverityResolver.Resolve(state, 50, 90));
+        Assert.Equal(TrayIconSeverity.Critical, TrayIconSeverityResolver.Resolve(state, 30, 50));
     }
 
     private static void Save(Window window)

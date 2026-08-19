@@ -46,8 +46,8 @@ public static class SelfInstaller
 
     /// <summary>Whether the running version already sits at the target location.</summary>
     public static bool IsInstalled =>
-        Environment.ProcessPath is { } pfad
-        && string.Equals(Path.GetFullPath(pfad), TargetPath, StringComparison.OrdinalIgnoreCase);
+        Environment.ProcessPath is { } path
+        && string.Equals(Path.GetFullPath(path), TargetPath, StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
     /// Whether offering the setup makes sense at all: only for a published
@@ -62,7 +62,7 @@ public static class SelfInstaller
     /// </summary>
     public static InstallResult Install()
     {
-        if (Environment.ProcessPath is not { Length: > 0 } quelle)
+        if (Environment.ProcessPath is not { Length: > 0 } source)
         {
             return InstallResult.Failed(T.InstallerLocationUnknown);
         }
@@ -75,7 +75,7 @@ public static class SelfInstaller
         try
         {
             Directory.CreateDirectory(TargetDirectory);
-            File.Copy(quelle, TargetPath, overwrite: true);
+            File.Copy(source, TargetPath, overwrite: true);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {

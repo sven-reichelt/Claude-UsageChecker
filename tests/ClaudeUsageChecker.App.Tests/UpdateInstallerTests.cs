@@ -8,29 +8,29 @@ namespace ClaudeUsageChecker.App.Tests;
 /// </summary>
 /// <remarks>
 /// The application downloads foreign code here and executes it. The only
-/// safeguard against that is the published checksum - which is accordingly
-/// muss ihre Auswertung sein. Eine zu grosszuegige Erkennung waere schlimmer
-/// als gar keine, weil sie Sicherheit vortaeuscht.
+/// safeguard against that is the published checksum - so its evaluation has to
+/// be correspondingly strict. A recognition that is too generous would be worse
+/// than none at all, because it feigns safety.
 /// </remarks>
 public class UpdateInstallerTests
 {
-    private const string GueltigeSumme = "d07e71e78e774176e768f4c5308d90c66f4e0aafcc495189a4b1115a0e896857";
+    private const string ValidChecksum = "d07e71e78e774176e768f4c5308d90c66f4e0aafcc495189a4b1115a0e896857";
 
     [Fact]
     public void TheChecksumIsReadFromTheUsualNotation()
     {
-        var inhalt = $"{GueltigeSumme}  ClaudeUsageChecker-0.2.0-win-x64.exe";
+        var content = $"{ValidChecksum}  ClaudeUsageChecker-0.2.0-win-x64.exe";
 
-        Assert.Equal(GueltigeSumme, UpdateInstaller.LiesPruefsumme(inhalt));
+        Assert.Equal(ValidChecksum, UpdateInstaller.ReadChecksum(content));
     }
 
     [Fact]
     public void TheChecksumToleratesLineBreaksAndWhitespace() =>
-        Assert.Equal(GueltigeSumme, UpdateInstaller.LiesPruefsumme($"\n  {GueltigeSumme}   file.exe \n"));
+        Assert.Equal(ValidChecksum, UpdateInstaller.ReadChecksum($"\n  {ValidChecksum}   file.exe \n"));
 
     [Fact]
     public void AnUppercaseChecksumIsNormalised() =>
-        Assert.Equal(GueltigeSumme, UpdateInstaller.LiesPruefsumme(GueltigeSumme.ToUpperInvariant() + "  x.exe"));
+        Assert.Equal(ValidChecksum, UpdateInstaller.ReadChecksum(ValidChecksum.ToUpperInvariant() + "  x.exe"));
 
     [Theory]
     [InlineData("")]
@@ -38,12 +38,12 @@ public class UpdateInstallerTests
     [InlineData("keine summe hier")]
     // Too short - a SHA-256 sum has exactly 64 digits.
     [InlineData("d07e71e7")]
-    // Zu lang.
+    // Too long.
     [InlineData("d07e71e78e774176e768f4c5308d90c66f4e0aafcc495189a4b1115a0e8968571")]
-    // Richtige Laenge, aber keine Hexadezimalziffern.
+    // Right length, but not hexadecimal digits.
     [InlineData("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz")]
-    public void UnusableChecksumsAreRejected(string inhalt) =>
-        Assert.Null(UpdateInstaller.LiesPruefsumme(inhalt));
+    public void UnusableChecksumsAreRejected(string content) =>
+        Assert.Null(UpdateInstaller.ReadChecksum(content));
 
     [Fact]
     public void WithoutFileAndChecksumNothingIsOffered()

@@ -65,8 +65,8 @@ public class ScopedLimitMappingTests
     [Fact]
     public void MapToSnapshot_TakesUpEveryReportedModel()
     {
-        // Kuenftige models sollen ohne Codeaenderung erscheinen - genau daran
-        // is exactly where the previous solution failed.
+        // Future models should appear without a code change - which is exactly
+        // where the previous solution failed.
         const string json = """
             {
                 "limits": [

@@ -96,16 +96,16 @@ public partial class InstallPromptWindow : Window
         StatusText.Text = T.InstallRunning;
         StatusText.IsVisible = true;
 
-        var ergebnis = SelfInstaller.Install();
+        var result = SelfInstaller.Install();
 
-        if (!ergebnis.Succeeded)
+        if (!result.Succeeded)
         {
-            StatusText.Text = ergebnis.Message;
+            StatusText.Text = result.Message;
             InstallButton.IsEnabled = true;
             return;
         }
 
-        StatusText.Text = ergebnis.Message;
+        StatusText.Text = result.Message;
         Installed?.Invoke(this, EventArgs.Empty);
     }
 }

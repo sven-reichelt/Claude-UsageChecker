@@ -15,21 +15,21 @@ public class TempCleanupTests
     [Fact]
     public void WithoutARecognisableOwnFolderNothingIsDeleted()
     {
-        // Im Entwicklungsstand liegt keine Entpackung vor, es laedt also kein
-        // module from there. That removes any basis for deciding which folder is
-        // in use - and then nothing is touched, on purpose.
+        // A development build has no extraction folder, so it loads no module
+        // from one. That removes any basis for deciding which folder is in
+        // use - and then nothing is touched, on purpose.
         Assert.Equal(0, TempCleanup.RemoveStaleExtractions());
     }
 
     [Fact]
     public void TheCleanupLeavesTheTempDirectoryUntouched()
     {
-        var basis = Path.Combine(Path.GetTempPath(), ".net");
-        var vorher = Directory.Exists(basis) ? Directory.GetDirectories(basis).Length : -1;
+        var root = Path.Combine(Path.GetTempPath(), ".net");
+        var before = Directory.Exists(root) ? Directory.GetDirectories(root).Length : -1;
 
         TempCleanup.RemoveStaleExtractions();
 
-        var nachher = Directory.Exists(basis) ? Directory.GetDirectories(basis).Length : -1;
-        Assert.Equal(vorher, nachher);
+        var after = Directory.Exists(root) ? Directory.GetDirectories(root).Length : -1;
+        Assert.Equal(before, after);
     }
 }

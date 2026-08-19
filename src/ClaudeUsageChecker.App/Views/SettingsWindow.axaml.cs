@@ -189,31 +189,31 @@ public partial class SettingsWindow : Window
 
     private void SaveAndClose()
     {
-        var warnung = (double)(WarningThresholdBox.Value ?? 75m);
-        var kritisch = (double)(CriticalThresholdBox.Value ?? 90m);
+        var warning = (double)(WarningThresholdBox.Value ?? 75m);
+        var critical = (double)(CriticalThresholdBox.Value ?? 90m);
 
         // A warning threshold above the critical one would never take effect.
         // Rather than quietly correcting it, the window stays open and says what
         // is wrong - otherwise something else would end up there than was typed.
-        if (AppSettings.ValidateThresholds(warnung, kritisch) is { } fehler)
+        if (AppSettings.ValidateThresholds(warning, critical) is { } problem)
         {
-            ThresholdHint.Text = fehler;
+            ThresholdHint.Text = problem;
             ThresholdHint.IsVisible = true;
             return;
         }
 
         ThresholdHint.IsVisible = false;
 
-        var sprache = SelectedLanguage;
+        var language = SelectedLanguage;
 
         _settings = new AppSettings
         {
             PollIntervalSeconds = (int)(IntervalBox.Value ?? 300),
             LaunchAtLogin = LaunchAtLoginBox.IsChecked ?? false,
             CheckForUpdates = CheckUpdatesBox.IsChecked ?? true,
-            WarningThreshold = warnung,
-            CriticalThreshold = kritisch,
-            Language = sprache.Code,
+            WarningThreshold = warning,
+            CriticalThreshold = critical,
+            Language = language.Code,
             InstallPromptShown = _settings.InstallPromptShown,
             LastRunVersion = _settings.LastRunVersion
         };
@@ -222,9 +222,9 @@ public partial class SettingsWindow : Window
 
         // Switch before reporting: whoever reacts to the change - the context
         // menu, say - should already find the new texts in place.
-        if (sprache.Code != Localizer.Current.Language.Code)
+        if (language.Code != Localizer.Current.Language.Code)
         {
-            Localizer.Use(sprache);
+            Localizer.Use(language);
         }
 
         // Autostart needs a permanent location. Unticking, by contrast, only
@@ -235,15 +235,15 @@ public partial class SettingsWindow : Window
             RelocationHint.IsVisible = true;
             RelocationHint.Text = T.SettingsRelocating;
 
-            var ergebnis = _relocate();
-            if (!ergebnis.Succeeded)
+            var result = _relocate();
+            if (!result.Succeeded)
             {
-                RelocationHint.Text = ergebnis.Message;
+                RelocationHint.Text = result.Message;
                 SaveButton.IsEnabled = true;
                 return;
             }
 
-            RelocationHint.Text = ergebnis.Message;
+            RelocationHint.Text = result.Message;
             SettingsChanged?.Invoke(this, _settings);
             Close();
             return;

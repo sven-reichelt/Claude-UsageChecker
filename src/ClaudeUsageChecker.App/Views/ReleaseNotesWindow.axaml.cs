@@ -71,20 +71,20 @@ public partial class ReleaseNotesWindow : Window
 
         foreach (var release in releases)
         {
-            NotesPanel.Children.Add(BuildRelease(release, mitUeberschrift: releases.Count > 1));
+            NotesPanel.Children.Add(BuildRelease(release, withHeading: releases.Count > 1));
         }
     }
 
     /// <summary>Builds the block of one version.</summary>
-    /// <param name="mitUeberschrift">
+    /// <param name="withHeading">
     /// With a single version the number is already in the window heading - a
     /// second one next to it would be duplication.
     /// </param>
-    private static Control BuildRelease(ReleaseNotes release, bool mitUeberschrift)
+    private static Control BuildRelease(ReleaseNotes release, bool withHeading)
     {
         var panel = new StackPanel { Spacing = 10 };
 
-        if (mitUeberschrift)
+        if (withHeading)
         {
             panel.Children.Add(new TextBlock
             {
