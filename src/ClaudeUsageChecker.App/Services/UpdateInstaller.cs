@@ -2,7 +2,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
-using System.Reflection;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
@@ -48,10 +47,25 @@ public sealed class UpdateInstaller(HttpClient httpClient)
     /// Veroeffentlichung als Einzeldatei voraus - im Entwicklungsstand liegen
     /// Dutzende Dateien nebeneinander, die einzeln zu tauschen waeren.
     /// </summary>
-    public static bool IsSupported =>
-        OperatingSystem.IsWindows()
-        && string.IsNullOrEmpty(Assembly.GetEntryAssembly()?.Location)
-        && !string.IsNullOrEmpty(Environment.ProcessPath);
+    /// <remarks>
+    /// Erkannt wird das am Fehlen der gleichnamigen Bibliothek neben der
+    /// ausfuehrbaren Datei. Das trifft genau die Frage, auf die es ankommt:
+    /// Genuegt es, diese eine Datei zu tauschen? Ueber
+    /// <c>Assembly.Location</c> waere es zwar auch zu ermitteln, doch dessen
+    /// Verhalten in Einzeldateien gilt zu Recht als Stolperstein.
+    /// </remarks>
+    public static bool IsSupported
+    {
+        get
+        {
+            if (!OperatingSystem.IsWindows() || Environment.ProcessPath is not { Length: > 0 } pfad)
+            {
+                return false;
+            }
+
+            return !File.Exists(Path.ChangeExtension(pfad, ".dll"));
+        }
+    }
 
     /// <summary>
     /// Laedt die neue Fassung, prueft sie und legt sie an die Stelle der alten.
