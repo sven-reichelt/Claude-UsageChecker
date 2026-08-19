@@ -127,3 +127,10 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
   Ablehnung entfernt die Anmeldedaten; eine Störung lässt sie unangetastet.
 - `refresh_token_expires_in` wird ausgewertet, falls der Server es liefert.
   Bislang tut er das nicht, sodass die Haltbarkeit der Anmeldung offen bleibt.
+
+### Hinzugefügt
+- Release-Ablauf für GitHub Actions: Eine Marke `v*` löst Test, Build einer
+  eigenständigen Einzeldatei für Windows x64, einen Startversuch und die
+  SHA-256-Summe aus. Das Ergebnis landet als **Entwurf** einer
+  Veröffentlichung – erst das Freigeben von Hand macht es für die
+  Aktualisierungsprüfung sichtbar.

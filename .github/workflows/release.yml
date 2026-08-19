@@ -1,0 +1,130 @@
+name: Release
+
+# Eine Veroeffentlichung entsteht durch das Setzen einer Marke, etwa "v0.2.0".
+# Der Ablauf baut, testet und haengt das Ergebnis samt Pruefsumme an die
+# GitHub-Release - genau die Quelle, aus der die Anwendung ihre
+# Aktualisierungspruefung speist.
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version ohne fuehrendes v, z. B. 0.2.0'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Bauen und veröffentlichen
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: .NET einrichten
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Version aus der Marke ableiten
+        id: version
+        shell: bash
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION="${GITHUB_REF_NAME#v}"
+          fi
+          # Vierstellig ist fuer AssemblyVersion Pflicht, dreistellig fuer die Anzeige.
+          if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::Unbrauchbare Version '$VERSION'. Erwartet wird x.y.z."
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Version: $VERSION"
+
+      - name: Testen
+        run: dotnet test --configuration Release --verbosity normal
+
+      - name: Veröffentlichen
+        run: >
+          dotnet publish src/ClaudeUsageChecker.App
+          --configuration Release
+          --runtime win-x64
+          --self-contained true
+          -p:PublishSingleFile=true
+          -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:Version=${{ steps.version.outputs.version }}
+          -p:DebugType=none
+          --output publish
+
+      - name: Ergebnis benennen und Prüfsumme bilden
+        id: package
+        shell: pwsh
+        run: |
+          $version = "${{ steps.version.outputs.version }}"
+          $name = "ClaudeUsageChecker-$version-win-x64.exe"
+          Move-Item publish/ClaudeUsageChecker.exe "publish/$name"
+
+          $hash = (Get-FileHash "publish/$name" -Algorithm SHA256).Hash.ToLower()
+          "$hash  $name" | Out-File -FilePath "publish/$name.sha256" -Encoding ascii
+
+          $size = [math]::Round((Get-Item "publish/$name").Length / 1MB, 1)
+          "name=$name" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "sha256=$hash" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "size=$size" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+      - name: Startet die gebaute Fassung überhaupt?
+        shell: pwsh
+        run: |
+          # Ein Paket, das nicht startet, darf niemanden erreichen. Die Anwendung
+          # lebt im Infobereich, laesst sich hier aber wenigstens auf einen
+          # Sofortabsturz pruefen.
+          $exe = "publish/${{ steps.package.outputs.name }}"
+          $p = Start-Process -FilePath $exe -PassThru
+          Start-Sleep -Seconds 20
+          if ($p.HasExited) {
+            Write-Error "Die Anwendung hat sich sofort beendet (Exit-Code $($p.ExitCode))."
+            exit 1
+          }
+          Stop-Process -Id $p.Id -Force
+          Write-Host "Start erfolgreich."
+
+      - name: Veröffentlichung anlegen
+        uses: softprops/action-gh-release@v2
+        with:
+          name: v${{ steps.version.outputs.version }}
+          # Nicht github.ref_name: Bei manuellem Start waere das ein Zweigname.
+          tag_name: v${{ steps.version.outputs.version }}
+          # Entwurf: Die Aktualisierungspruefung sieht ihn erst, wenn er von Hand
+          # veroeffentlicht wird. So geht nichts ungeprueft hinaus.
+          draft: true
+          generate_release_notes: true
+          files: |
+            publish/${{ steps.package.outputs.name }}
+            publish/${{ steps.package.outputs.name }}.sha256
+          body: |
+            ## Claude UsageChecker ${{ steps.version.outputs.version }}
+
+            Eigenständige Anwendung für Windows (x64) – eine Datei, keine
+            .NET-Runtime nötig, ${{ steps.package.outputs.size }} MB.
+
+            ### Installation
+
+            Datei herunterladen und starten. Beim ersten Start meldet Windows
+            SmartScreen einen unbekannten Herausgeber, weil das Paket nicht
+            signiert ist – über **Weitere Informationen → Trotzdem ausführen**
+            bestätigen.
+
+            Danach in den Einstellungen anmelden, damit die Anwendung ihr
+            eigenes Zugriffsrecht erhält.
+
+            ### Prüfsumme (SHA-256)
+
+            ```
+            ${{ steps.package.outputs.sha256 }}
+            ```

@@ -194,6 +194,24 @@ Symbole werden aus Code erzeugt statt binär eingecheckt:
 node build/generate-icons.mjs
 ```
 
+## Veröffentlichen
+
+Eine Marke setzen genügt:
+
+```powershell
+git tag v0.2.0
+git push origin v0.2.0
+```
+
+Der Ablauf `.github/workflows/release.yml` testet, baut eine eigenständige
+Einzeldatei für Windows x64, prüft ob sie startet, bildet die SHA-256-Summe und
+legt einen **Entwurf** der Veröffentlichung an. Erst das Freigeben von Hand macht
+sie für die Aktualisierungsprüfung sichtbar – so geht nichts ungeprüft hinaus.
+
+Das Paket ist nicht signiert. Windows SmartScreen meldet deshalb beim ersten
+Start einen unbekannten Herausgeber. Ein Zertifikat würde das beheben, kostet
+aber Geld und ist für den Eigengebrauch verzichtbar.
+
 ## Aktualisierungen
 
 Die Prüfung läuft gegen die GitHub-Releases dieses Repositorys
