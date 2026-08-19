@@ -4,7 +4,7 @@ using System.Text.Json;
 
 namespace ClaudeUsageChecker.App.Settings;
 
-/// <summary>Laedt und speichert die Benutzereinstellungen als JSON im lokalen Profil.</summary>
+/// <summary>Loads and saves the user settings as JSON inside the local profile.</summary>
 public sealed class SettingsStore(string? path = null)
 {
     private readonly string _path = path ?? AppPaths.SettingsFile;
@@ -23,7 +23,7 @@ public sealed class SettingsStore(string? path = null)
         }
         catch (Exception ex) when (ex is IOException or JsonException or UnauthorizedAccessException)
         {
-            // Beschaedigte Einstellungen duerfen den Start nicht verhindern.
+            // Corrupted settings must not prevent the start.
             return new AppSettings();
         }
     }
