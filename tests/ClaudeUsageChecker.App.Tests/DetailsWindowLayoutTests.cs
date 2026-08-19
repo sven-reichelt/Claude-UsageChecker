@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.LogicalTree;
+using Avalonia.Media;
 using ClaudeUsageChecker.App.Views;
 using ClaudeUsageChecker.Core.Models;
 using ClaudeUsageChecker.Core.Services;
@@ -68,6 +69,25 @@ public class DetailsWindowLayoutTests
 
         Assert.True(PasstInDieBreite(window, out var breite),
             $"Der Inhalt braucht {breite:0} Pixel, das Fenster ist {window.Width:0} breit.");
+    }
+
+    /// <summary>
+    /// Ein nicht aufloesbares DynamicResource bleibt stillschweigend leer - der
+    /// Rahmen waere dann unsichtbar, ohne dass irgendetwas fehlschlaegt.
+    /// </summary>
+    [AvaloniaFact]
+    public void DerRahmenTraegtDieFarbeDesSymbols()
+    {
+        var window = new DetailsWindow();
+        window.Show();
+
+        var rahmen = window.GetLogicalDescendants().OfType<Border>().First();
+
+        Assert.NotNull(rahmen.BorderBrush);
+        Assert.Equal(Color.FromRgb(0xD9, 0x77, 0x57), ((ISolidColorBrush)rahmen.BorderBrush!).Color);
+        Assert.True(rahmen.BorderThickness.Top > 0);
+
+        window.Hide();
     }
 
     /// <summary>

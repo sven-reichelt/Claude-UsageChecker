@@ -15,18 +15,23 @@ internal static class AutostartManager
     private const string RunKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
     private const string ValueName = "ClaudeUsageChecker";
 
-    public static void Apply(bool enabled)
+    /// <param name="path">
+    /// Der einzutragende Pfad. Ohne Angabe der aktuelle - beim Installieren muss
+    /// aber der Zielpfad eingetragen werden, nicht der, von dem gerade
+    /// gestartet wurde.
+    /// </param>
+    public static void Apply(bool enabled, string? path = null)
     {
         if (!OperatingSystem.IsWindows())
         {
             return;
         }
 
-        ApplyWindows(enabled);
+        ApplyWindows(enabled, path);
     }
 
     [SupportedOSPlatform("windows")]
-    private static void ApplyWindows(bool enabled)
+    private static void ApplyWindows(bool enabled, string? path)
     {
         try
         {
@@ -38,10 +43,10 @@ internal static class AutostartManager
 
             if (enabled)
             {
-                var path = Environment.ProcessPath ?? Process.GetCurrentProcess().MainModule?.FileName;
-                if (!string.IsNullOrEmpty(path))
+                var ziel = path ?? Environment.ProcessPath;
+                if (!string.IsNullOrEmpty(ziel))
                 {
-                    key.SetValue(ValueName, $"\"{path}\"");
+                    key.SetValue(ValueName, $"\"{ziel}\"");
                 }
             }
             else

@@ -21,7 +21,7 @@ noch nicht umgesetzt – siehe [Roadmap](#roadmap).
 | Zusatzkontingent, sofern im Abo aktiviert | ✅ |
 | Alle Limits im Kontextmenü | ✅ |
 | Token verschlüsselt in der Windows-Anmeldeinformationsverwaltung | ✅ |
-| Autostart mit Windows | ✅ |
+| Dauerhafte Einrichtung samt Autostart, auf Nachfrage | ✅ |
 | Nur eine Instanz je Anmeldesitzung | ✅ |
 | Eigene Anmeldung per OAuth mit PKCE – unabhängig von Claude Code | ✅ |
 | Selbsttätige Erneuerung des eigenen Tokens | ✅ |

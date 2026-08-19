@@ -17,6 +17,14 @@ public sealed class AppSettings
     [JsonPropertyName("launchAtLogin")]
     public bool LaunchAtLogin { get; set; }
 
+    /// <summary>
+    /// Ob nach der dauerhaften Einrichtung schon einmal gefragt wurde. Die
+    /// Frage soll genau einmal kommen - wer ablehnt, will nicht bei jedem Start
+    /// erneut gefragt werden.
+    /// </summary>
+    [JsonPropertyName("installPromptShown")]
+    public bool InstallPromptShown { get; set; }
+
     /// <summary>Beim Start automatisch auf Aktualisierungen pruefen.</summary>
     [JsonPropertyName("checkForUpdates")]
     public bool CheckForUpdates { get; set; } = true;

@@ -13,7 +13,7 @@
 
   <!-- Versionierung: wird von der CI ueber -p:Version=x.y.z ueberschrieben. -->
   <PropertyGroup>
-    <VersionPrefix>0.3.3</VersionPrefix>
+    <VersionPrefix>0.4.0</VersionPrefix>
     <Product>Claude UsageChecker</Product>
     <Company>Sven Reichelt</Company>
     <Authors>Sven Reichelt</Authors>

@@ -5,6 +5,27 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unveröffentlicht]
 
+## [0.4.0] – 2026-08-19
+
+### Hinzugefügt
+- **Dauerhafte Einrichtung.** Läuft die Anwendung außerhalb ihres Zielorts,
+  bietet sie beim ersten Start einmalig an, sich nach
+  `%USERPROFILE%ClaudeUsageChecker` zu kopieren, den Autostart einzurichten
+  und von dort neu zu starten. Grund ist nicht Ordnungsliebe: Autostart,
+  Anheftung im Infobereich und Selbstaustausch hängen alle am Pfad der
+  ausführbaren Datei – liegt sie im Download-Ordner, bricht alles drei, sobald
+  dort aufgeräumt wird.
+- Der Autostart wird zusammen mit der Einrichtung aktiviert und zeigt auf den
+  Zielpfad, nicht auf den Startort. Abschaltbar in den Einstellungen.
+
+### Geändert
+- Das Detailfenster erscheint mittig auf dem Bildschirm und trägt einen
+  schmalen Rahmen in der Farbe des Symbols statt des Systemrahmens.
+
+### Hinzugefügt
+- Ein Test prüft, dass der Rahmen seine Farbe tatsächlich bekommt. Ein nicht
+  auflösbares `DynamicResource` bliebe sonst stillschweigend leer.
+
 ## [0.3.3] – 2026-08-19
 
 ### Geändert

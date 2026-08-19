@@ -116,6 +116,42 @@ public partial class App : Application, IDisposable
             ErrorGuard.Forget(
                 "Aktualisierungspruefung beim Start", () => CheckForUpdatesAsync(announceUpToDate: false));
         }
+
+        if (SelfInstaller.ShouldOffer && !_settings.InstallPromptShown)
+        {
+            ErrorGuard.Run("Einrichtung anbieten", ShowInstallPrompt);
+        }
+    }
+
+    /// <summary>
+    /// Bietet einmalig an, die Anwendung dauerhaft einzurichten. Die Antwort
+    /// wird festgehalten, damit die Frage nicht bei jedem Start wiederkehrt.
+    /// </summary>
+    private void ShowInstallPrompt()
+    {
+        var window = new InstallPromptWindow();
+
+        window.Declined += (_, _) => ErrorGuard.Run("Antwort merken", () => MerkeAntwort(installiert: false));
+        window.Installed += (_, _) => ErrorGuard.Run("Einrichtung abschliessen", () =>
+        {
+            MerkeAntwort(installiert: true);
+            // Die eingerichtete Fassung wartet bereits auf das Ende dieser.
+            RequestShutdown();
+        });
+
+        window.Show();
+        window.Activate();
+    }
+
+    private void MerkeAntwort(bool installiert)
+    {
+        _settings.InstallPromptShown = true;
+        if (installiert)
+        {
+            _settings.LaunchAtLogin = true;
+        }
+
+        _settingsStore.Save(_settings);
     }
 
     /// <summary>

@@ -5,13 +5,22 @@
         Width="380" SizeToContent="Height"
         CanResize="False"
         ShowInTaskbar="False"
-        WindowStartupLocation="Manual"
-        SystemDecorations="BorderOnly">
+        WindowStartupLocation="CenterScreen"
+        SystemDecorations="None"
+        Background="Transparent">
 
-  <Border Padding="18" Background="{DynamicResource SystemControlBackgroundAltHighBrush}">
+  <!-- Ohne Fensterrahmen des Systems, dafuer ein eigener in der Farbe des
+       Symbols. Das bindet das Fenster sichtbar an die Anwendung, statt es wie
+       einen beliebigen Dialog aussehen zu lassen. -->
+  <Border Padding="18"
+          Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+          BorderBrush="{DynamicResource AccentBrush}"
+          BorderThickness="1"
+          CornerRadius="6">
     <StackPanel Spacing="14">
 
-      <TextBlock Text="Claude UsageChecker" FontWeight="SemiBold" FontSize="15" />
+      <TextBlock Text="Claude UsageChecker" FontWeight="SemiBold" FontSize="15"
+                 Foreground="{DynamicResource AccentBrush}" />
 
       <StackPanel x:Name="WindowsPanel" Spacing="12" />
 

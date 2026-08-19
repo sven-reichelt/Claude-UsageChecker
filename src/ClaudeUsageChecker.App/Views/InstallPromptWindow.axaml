@@ -1,0 +1,47 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="ClaudeUsageChecker.App.Views.InstallPromptWindow"
+        Title="Claude UsageChecker einrichten"
+        Width="460" SizeToContent="Height"
+        CanResize="False"
+        WindowStartupLocation="CenterScreen"
+        SystemDecorations="None"
+        Background="Transparent">
+
+  <Border Padding="20"
+          Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+          BorderBrush="{DynamicResource AccentBrush}"
+          BorderThickness="1"
+          CornerRadius="6">
+    <StackPanel Spacing="14">
+
+      <TextBlock Text="Dauerhaft einrichten?" FontWeight="SemiBold" FontSize="15"
+                 Foreground="{DynamicResource AccentBrush}" />
+
+      <TextBlock TextWrapping="Wrap" FontSize="12"
+                 Text="Die Anwendung läuft gerade von dort, wo du sie heruntergeladen hast. Autostart und die Anheftung im Infobereich hängen aber am Speicherort – wird dort aufgeräumt, ist beides hinüber." />
+
+      <TextBlock TextWrapping="Wrap" FontSize="12" Text="Wenn du zustimmst, wird sie:" />
+
+      <StackPanel Spacing="4" Margin="8,0,0,0">
+        <TextBlock FontSize="12" Text="• an einen festen Platz kopiert:" />
+        <TextBlock x:Name="TargetText" FontSize="11" Opacity="0.75" Margin="10,0,0,0" TextWrapping="Wrap" />
+        <TextBlock FontSize="12" Text="• von dort mit Windows gestartet" />
+        <TextBlock FontSize="12" Text="• von dort neu gestartet" />
+      </StackPanel>
+
+      <TextBlock TextWrapping="Wrap" FontSize="11" Opacity="0.7"
+                 Text="Die heruntergeladene Datei bleibt liegen und kann gelöscht werden. Beides lässt sich in den Einstellungen jederzeit ändern." />
+
+      <TextBlock x:Name="StatusText" TextWrapping="Wrap" FontSize="12" IsVisible="False" />
+
+      <StackPanel Spacing="6">
+        <Button x:Name="InstallButton" Content="Einrichten und neu starten"
+                HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+        <Button x:Name="LaterButton" Content="Nicht einrichten"
+                HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+      </StackPanel>
+
+    </StackPanel>
+  </Border>
+</Window>
