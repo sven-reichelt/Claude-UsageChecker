@@ -188,12 +188,24 @@ public partial class App : Application, IDisposable
         }
     }
 
+    /// <summary>Shows the summary of changes after an update.</summary>
+    /// <remarks>
+    /// <c>Activate</c> alone does not bring the window forward. After an update
+    /// the application restarts itself, and Windows refuses the foreground to a
+    /// process that did not have it - the window then opens behind whatever the
+    /// user happens to be doing, and the summary goes unread. Briefly declaring
+    /// it topmost puts it in front; the flag is dropped again at once, so that
+    /// the window does not sit above everything else afterwards.
+    /// </remarks>
     private static void ShowReleaseNotes(IReadOnlyList<ReleaseNotes> releases, Version? previous)
     {
         var window = new ReleaseNotesWindow();
         window.Render(releases, previous, ChangelogResource.IsTranslated);
+
+        window.Topmost = true;
         window.Show();
         window.Activate();
+        window.Topmost = false;
     }
 
     /// <summary>
