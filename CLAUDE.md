@@ -7,7 +7,7 @@ Claude-Abonnements im Infobereich anzeigt.
 
 ```powershell
 dotnet build                                      # gesamte Solution
-dotnet test                                       # 32 Tests in Core.Tests
+dotnet test                                       # 39 Tests (Core.Tests + App.Tests)
 dotnet run --project src/ClaudeUsageChecker.App   # Anwendung starten
 node build/generate-icons.mjs                     # Symbole neu erzeugen
 ```
@@ -50,3 +50,18 @@ nicht in projektlokale `bin/obj`-Ordner.
 Version 0.1 in Arbeit. Offen: Aktualisierungsprüfung aktivieren (hängt an der
 Entscheidung, ob das Repository öffentlich wird), Installationspaket,
 macOS-Menüleiste. Details in [CHANGELOG.md](CHANGELOG.md).
+
+## Fallstricke, die schon einmal zugeschlagen haben
+
+**Kein eigenes `InitializeComponent()` in Fenster-Code-Behind schreiben.**
+Avalonia erzeugt eine Fassung `InitializeComponent(bool loadXaml = true, …)`,
+die nach dem Laden die per `x:Name` benannten Steuerelemente in die Felder
+schreibt. Eine handgeschriebene parameterlose Variante gewinnt bei der
+Überladungsauflösung, lädt nur das XAML und lässt alle Felder null – der
+Konstruktor scheitert dann mit `NullReferenceException`. Das kompiliert
+fehlerfrei. `WindowConstructionTests` fängt es ab.
+
+**Fehler in Tray-Aktionen beenden sonst die Anwendung.** Ohne Fenster läuft eine
+Ausnahme bis in die Nachrichtenschleife und der Prozess verschwindet
+kommentarlos. Neue Handler deshalb immer über `ErrorGuard.Run` bzw.
+`ErrorGuard.Forget` führen.

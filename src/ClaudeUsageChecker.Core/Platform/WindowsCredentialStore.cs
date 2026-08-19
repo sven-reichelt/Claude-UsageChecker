@@ -59,7 +59,7 @@ public sealed class WindowsCredentialStore : ISecretStore
         }
     }
 
-    public void Write(string key, string secret)
+    public unsafe void Write(string key, string secret)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(key);
         ArgumentException.ThrowIfNullOrWhiteSpace(secret);
@@ -89,7 +89,12 @@ public sealed class WindowsCredentialStore : ISecretStore
         }
         finally
         {
-            Marshal.ZeroFreeGlobalAllocUnicode(blobHandle);
+            // Erst ueberschreiben, dann freigeben: Der Tokenwert soll nicht im
+            // freigegebenen Speicher zurueckbleiben. ZeroFreeGlobalAllocUnicode
+            // waere hier falsch - es erwartet einen Zeiger aus
+            // SecureStringToGlobalAllocUnicode und ermittelt die Laenge selbst.
+            NativeMemory.Clear((void*)blobHandle, (nuint)blob.Length);
+            Marshal.FreeHGlobal(blobHandle);
             Array.Clear(blob);
         }
     }

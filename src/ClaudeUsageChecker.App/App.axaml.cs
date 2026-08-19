@@ -78,21 +78,25 @@ public partial class App : Application, IDisposable
         _updateHttpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(15) };
         _updateService = CreateUpdateService(_updateHttpClient);
 
+        // Jede Aktion aus dem Infobereich laeuft durch den Wachposten: Ein Fehler
+        // darin darf die Anwendung nicht kommentarlos beenden.
         _tray = new TrayIconController(_monitor, () => _settings);
-        _tray.ShowDetails += (_, _) => ShowDetails();
-        _tray.ShowSettings += (_, _) => ShowSettings();
-        _tray.RefreshRequested += (_, _) => _ = RefreshAsync();
-        _tray.CheckForUpdatesRequested += (_, _) => _ = CheckForUpdatesAsync(announceUpToDate: true);
-        _tray.ExitRequested += (_, _) => RequestShutdown();
+        _tray.ShowDetails += (_, _) => ErrorGuard.Run("Details anzeigen", ShowDetails);
+        _tray.ShowSettings += (_, _) => ErrorGuard.Run("Einstellungen oeffnen", ShowSettings);
+        _tray.RefreshRequested += (_, _) => ErrorGuard.Forget("Abruf anstossen", RefreshAsync);
+        _tray.CheckForUpdatesRequested += (_, _) => ErrorGuard.Forget(
+            "Aktualisierungspruefung", () => CheckForUpdatesAsync(announceUpToDate: true));
+        _tray.ExitRequested += (_, _) => ErrorGuard.Run("Beenden", RequestShutdown);
 
-        _monitor.StateChanged += (_, state) =>
-            Dispatcher.UIThread.Post(() => _detailsWindow?.Render(state));
+        _monitor.StateChanged += (_, state) => Dispatcher.UIThread.Post(
+            () => ErrorGuard.Run("Detailansicht aktualisieren", () => _detailsWindow?.Render(state)));
 
         _monitor.Start();
 
         if (_settings.CheckForUpdates)
         {
-            _ = CheckForUpdatesAsync(announceUpToDate: false);
+            ErrorGuard.Forget(
+                "Aktualisierungspruefung beim Start", () => CheckForUpdatesAsync(announceUpToDate: false));
         }
     }
 
@@ -135,7 +139,7 @@ public partial class App : Application, IDisposable
     private DetailsWindow CreateDetailsWindow()
     {
         var window = new DetailsWindow();
-        window.RefreshRequested += (_, _) => _ = RefreshAsync();
+        window.RefreshRequested += (_, _) => ErrorGuard.Forget("Abruf anstossen", RefreshAsync);
         window.Closing += (_, e) =>
         {
             // Das Fenster wird nur versteckt - die Anwendung laeuft weiter.
@@ -151,7 +155,7 @@ public partial class App : Application, IDisposable
         window.SettingsChanged += (_, settings) =>
         {
             _settings = settings;
-            _ = RefreshAsync();
+            ErrorGuard.Forget("Abruf nach Einstellungsaenderung", RefreshAsync);
         };
         window.Show();
         window.Activate();
@@ -159,18 +163,9 @@ public partial class App : Application, IDisposable
 
     private async Task RefreshAsync()
     {
-        if (_monitor is null)
-        {
-            return;
-        }
-
-        try
+        if (_monitor is not null)
         {
             await _monitor.RefreshNowAsync().ConfigureAwait(false);
-        }
-        catch (OperationCanceledException)
-        {
-            // Beim Beenden erwartet.
         }
     }
 

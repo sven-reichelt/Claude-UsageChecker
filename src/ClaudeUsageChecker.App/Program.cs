@@ -10,6 +10,8 @@ internal static class Program
     [STAThread]
     public static int Main(string[] args)
     {
+        CrashReporter.InstallGlobalHandlers();
+
         try
         {
             BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
@@ -17,7 +19,7 @@ internal static class Program
         }
         catch (Exception ex)
         {
-            CrashReporter.Write(ex);
+            CrashReporter.Write(ex, "Program.Main");
             return 1;
         }
     }

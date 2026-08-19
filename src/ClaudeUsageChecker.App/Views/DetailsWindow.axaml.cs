@@ -4,7 +4,6 @@ using System.Globalization;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Layout;
-using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using ClaudeUsageChecker.Core.Formatting;
 using ClaudeUsageChecker.Core.Models;
@@ -43,8 +42,6 @@ public partial class DetailsWindow : Window
 
     /// <summary>Der Nutzer hat einen sofortigen Abruf angefordert.</summary>
     public event EventHandler? RefreshRequested;
-
-    private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
     /// <summary>Stellt den uebergebenen Zustand dar.</summary>
     public void Render(UsageState state)

@@ -1,7 +1,6 @@
 using System;
 using System.Reflection;
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
 using ClaudeUsageChecker.App.Settings;
 using ClaudeUsageChecker.Core.Authentication;
 using ClaudeUsageChecker.Core.Platform;
@@ -48,8 +47,6 @@ public partial class SettingsWindow : Window
 
     /// <summary>Wird ausgeloest, wenn Einstellungen oder Token geaendert wurden.</summary>
     public event EventHandler<AppSettings>? SettingsChanged;
-
-    private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
     private void UpdateTokenStatus()
     {

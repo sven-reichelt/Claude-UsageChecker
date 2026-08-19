@@ -16,3 +16,22 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 - Einstellungen inklusive Autostart mit Windows
 - Austauschbare Aktualisierungsprüfung (`IUpdateService`)
 - Symbolgenerator ohne externe Abhängigkeiten (`build/generate-icons.mjs`)
+
+### Behoben
+- Detail- und Einstellungsfenster ließen sich nicht öffnen: Eine selbst
+  geschriebene, parameterlose `InitializeComponent`-Methode verdeckte die von
+  Avalonia erzeugte Fassung. Das XAML wurde geladen, die Felder der benannten
+  Steuerelemente blieben aber null, und der Konstruktor scheiterte mit einer
+  `NullReferenceException`. Da die Anwendung kein Fenster besitzt, lief die
+  Ausnahme bis in die Nachrichtenschleife durch und beendete sie kommentarlos.
+- Fehler in Aktionen des Infobereichs beenden die Anwendung nicht mehr. Sie
+  werden mit Kontext nach `crash.log` protokolliert (`ErrorGuard`), zusätzlich
+  greifen globale Handler für unbehandelte und nicht abgewartete Ausnahmen.
+- `WindowsCredentialStore.Write` gab den Tokenpuffer mit
+  `ZeroFreeGlobalAllocUnicode` frei, obwohl er aus `AllocHGlobal` stammt. Jetzt
+  wird der Puffer gezielt überschrieben und mit `FreeHGlobal` freigegeben.
+
+### Hinzugefügt
+- Kopfloses UI-Testprojekt (`ClaudeUsageChecker.App.Tests`, 7 Tests), das die
+  Erzeugung beider Fenster und die Verknüpfung der benannten Steuerelemente
+  absichert – genau die Fehlerklasse, die zuvor unbemerkt blieb.
