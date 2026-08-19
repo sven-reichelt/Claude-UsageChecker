@@ -247,8 +247,8 @@ schweigen.
 
 | Version | Inhalt |
 | --- | --- |
-| 0.1 | Windows-Infobereich, Sitzungs- und Wochenlimit, Token-Verwaltung |
-| 0.2 | Signiertes Installationspaket, erste Veröffentlichung |
+| 0.1 | Windows-Infobereich, Sitzungs- und Wochenlimit, Token-Verwaltung ✅ |
+| 0.2 | Eigene OAuth-Anmeldung, erste Veröffentlichung als Einzeldatei ✅ |
 | 0.3 | macOS-Menüleiste (Schlüsselbund-Anbindung ist bereits vorhanden) |
 
 ## Lizenz

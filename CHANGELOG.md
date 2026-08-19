@@ -5,143 +5,72 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unveröffentlicht]
 
-### Hinzugefügt
-- Grundgerüst: Avalonia-Anwendung für den Windows-Infobereich
-- Abruf von `GET /api/oauth/usage` mit den erforderlichen Kopfzeilen
-- Anzeige von 5-Stunden-Sitzungslimit und Wochenlimits (gesamt, Opus, Sonnet)
-- Tokenkette: Windows-Anmeldeinformationsverwaltung → Umgebungsvariable →
-  Anmeldedaten der Claude-Code-CLI (ausschließlich lesend)
-- Farbcodiertes Infobereich-Symbol und Detailfenster mit Fortschrittsbalken
-- Abrufschleife mit Mindestintervall von 180 Sekunden und exponentiellem Backoff
-- Einstellungen inklusive Autostart mit Windows
-- Austauschbare Aktualisierungsprüfung (`IUpdateService`)
-- Symbolgenerator ohne externe Abhängigkeiten (`build/generate-icons.mjs`)
+## [0.2.0] – 2026-08-19
 
-### Behoben
-- Detail- und Einstellungsfenster ließen sich nicht öffnen: Eine selbst
-  geschriebene, parameterlose `InitializeComponent`-Methode verdeckte die von
-  Avalonia erzeugte Fassung. Das XAML wurde geladen, die Felder der benannten
-  Steuerelemente blieben aber null, und der Konstruktor scheiterte mit einer
-  `NullReferenceException`. Da die Anwendung kein Fenster besitzt, lief die
-  Ausnahme bis in die Nachrichtenschleife durch und beendete sie kommentarlos.
-- Fehler in Aktionen des Infobereichs beenden die Anwendung nicht mehr. Sie
-  werden mit Kontext nach `crash.log` protokolliert (`ErrorGuard`), zusätzlich
-  greifen globale Handler für unbehandelte und nicht abgewartete Ausnahmen.
-- `WindowsCredentialStore.Write` gab den Tokenpuffer mit
-  `ZeroFreeGlobalAllocUnicode` frei, obwohl er aus `AllocHGlobal` stammt. Jetzt
-  wird der Puffer gezielt überschrieben und mit `FreeHGlobal` freigegeben.
+Erste Veröffentlichung. Eigenständige Einzeldatei für Windows x64, 21 MB,
+kein .NET-Runtime nötig.
 
-### Hinzugefügt
-- Kopfloses UI-Testprojekt (`ClaudeUsageChecker.App.Tests`, 7 Tests), das die
-  Erzeugung beider Fenster und die Verknüpfung der benannten Steuerelemente
-  absichert – genau die Fehlerklasse, die zuvor unbemerkt blieb.
-- Die Anwendung läuft nur noch einmal je Anmeldesitzung. Ein zweiter Start legte
-  bislang ein zweites Symbol im Infobereich an und fragte die API doppelt ab, was
-  den drosselungsempfindlichen Endpunkt unnötig belastet.
+### Anzeige
 
-### Geändert
-- Der Tooltip nennt jetzt die Reset-**Uhrzeit** zusätzlich zur Restzeit, z. B.
-  „Sitzung 19 % - Reset 16:30 (2 Std 17 Min)". Bei einem Reset an einem anderen
-  Tag steht der Wochentag davor, ab einer Woche Abstand das Datum – eine bloße
-  Uhrzeit wäre für das Wochenlimit mehrdeutig.
-- Das Kontextmenü listet nun **alle** gemeldeten Limits statt nur der Sitzung,
-  jeweils mit Auslastung und Restzeit. Die Uhrzeit ist dafür in den Tooltip
-  gewandert.
-- Die Aktualisierungsprüfung läuft gegen die GitHub-Releases des nun
-  öffentlichen Repositorys. Ihr Ergebnis erscheint in der Detailansicht; bei
-  einer neueren Version führt eine Schaltfläche zur Release-Seite. Zuvor blieb
-  ein Klick auf „Auf Aktualisierungen prüfen" ohne jede Rückmeldung.
+- 5-Stunden-Sitzungslimit und Wochenlimits (gesamt, Opus, Sonnet) aus
+  `GET /api/oauth/usage` – autoritative Werte, keine Schätzung.
+- Tooltip mit Auslastung, Reset-Uhrzeit und Restzeit. Bei einem Reset an einem
+  anderen Tag steht der Wochentag davor, ab einer Woche Abstand das Datum –
+  eine bloße Uhrzeit wäre für das Wochenlimit mehrdeutig.
+- Kontextmenü mit **allen** gemeldeten Limits.
+- Detailfenster mit Fortschrittsbalken, Reset-Zeiten, Zusatzkontingent
+  (`extra_usage`) und der tatsächlich verwendeten Tokenquelle.
+- Farbcodiertes Infobereich-Symbol: normal, angespannt, kritisch.
 
-### Hinzugefügt
-- Das Zusatzkontingent (`extra_usage`) erscheint in der Detailansicht mit
-  Fortschrittsbalken und verbrauchten Credits, sofern das Abo es meldet. Die
-  Werte wurden bislang abgerufen, aber nirgends angezeigt.
+### Anmeldung
 
-### Behoben
-- Der Wochentag im Tooltip war mehrdeutig: `GetShortestDayName` liefert im
-  Deutschen einen einzelnen Buchstaben, sodass „S" für Samstag wie für Sonntag
-  stand. Jetzt wird die Abkürzung verwendet („So 02:59").
+- **Eigene Anmeldung per OAuth mit PKCE** (RFC 7636, S256) – macht die
+  Anwendung unabhängig von einer laufenden Claude-Code-Installation.
+  Angefordert wird ausschließlich `user:profile`; ausdrücklich **nicht**
+  `user:inference` und **nicht** `org:create_api_key`.
+- Ohne lokalen Webserver: Der Code wird von Hand eingefügt statt über eine
+  Rückleitung auf `localhost` entgegengenommen. Kein offener Port.
+- Das eigene Token wird selbsttätig erneuert. Beim mitgelesenen Token von
+  Claude Code unterbleibt das bewusst – ein rotierender Refresh-Token würde
+  dessen Anmeldung entwerten. Getrennte Einträge im Secret-Store.
+- Läuft die eigene Anmeldung ab, wird sie entfernt und gemeldet, statt still
+  auf Claude Code zurückzufallen. Eine bloße Störung (Netzwerk, 5xx,
+  Drosselung) lässt sie dagegen unangetastet.
+- Fallback-Kette: eigene Anmeldung → hinterlegtes Token → Umgebungsvariable →
+  Claude Code. Lehnt die API eine Quelle ab, rückt der Abruf zur nächsten vor.
 
-### Entfernt
-- `DisabledUpdateService` – der Platzhalter für das private Repository hat keinen
-  Aufrufer mehr.
+### Betrieb
 
-### Behoben
-- Ein hinterlegtes Token, das die API ablehnt, legte die Anwendung vollständig
-  lahm: Die Tokenkette rückte nur bei einer *leeren* Quelle weiter, nicht bei
-  einer *abgelehnten*. Der Abruf probiert bei HTTP 401/403 nun die nächste
-  Quelle. Konkreter Anlass: Tokens aus `claude setup-token` sind gültig, tragen
-  aber den Geltungsbereich `user:profile` nicht und werden vom Nutzungsendpunkt
-  mit HTTP 403 abgewiesen.
-- Die Fehlermeldung unterscheidet jetzt zwischen abgelaufenem Token und
-  fehlendem Geltungsbereich – für den Nutzer ein großer Unterschied, weil das
-  eine eine neue Anmeldung erfordert und das andere ein anderes Token.
+- Abrufintervall mindestens 180 Sekunden, exponentieller Backoff nach
+  Fehlschlägen, `Retry-After` des Servers hat Vorrang.
+- Nur eine Instanz je Anmeldesitzung.
+- Autostart mit Windows, abschaltbar.
+- Aktualisierungsprüfung über GitHub-Releases. Es wird nichts heruntergeladen
+  oder ausgeführt – nur gemeldet und auf Wunsch die Release-Seite geöffnet.
+- Fehler in Aktionen des Infobereichs beenden die Anwendung nicht mehr, sondern
+  landen mit Kontext in `crash.log`.
 
-### Hinzugefügt
-- Die Einstellungen prüfen ein eingegebenes Token gegen den Endpunkt, bevor sie
-  es speichern. Ein untaugliches Token gelangt gar nicht erst in den
-  Secret-Store.
-- Die Detailansicht nennt in der Fußzeile die verwendete Tokenquelle.
+### Erkenntnisse, die den Entwurf geprägt haben
 
-### Entfernt
-- `ChainedTokenProvider` – die Reihenfolge der Tokenquellen liegt jetzt beim
-  Abruf, weil nur dort auf eine Ablehnung durch die API reagiert werden kann.
+- **`claude setup-token` taugt für diesen Zweck nicht.** Solche Tokens sind
+  gültig und arbeiten gegen `/v1/messages`, tragen aber `user:profile` nicht.
+  Der Nutzungsendpunkt weist sie mit HTTP 403 ab. Das war die ursprüngliche
+  Annahme des Projekts und ist widerlegt.
+- **Der Tokenendpunkt liegt auf `platform.claude.com`**, nicht mehr auf
+  `console.anthropic.com` – dort antwortet er mit HTTP 404.
+- **Der `User-Agent` ist Pflicht.** Ohne einen Claude-Code-User-Agent drosselt
+  der Nutzungsendpunkt dauerhaft mit HTTP 429.
+- Getrimmt und komprimiert gebaut: 21 MB statt 93 MB, Start in 2,3 statt
+  7,2 Sekunden, 87 statt 136 MB Arbeitsspeicher. Trimming gewinnt auf allen
+  drei Achsen – entfernter Code muss auch nicht geladen und übersetzt werden.
 
-### Hinzugefügt
-- **Eigene Anmeldung per OAuth mit PKCE.** Die Anwendung kann sich ein eigenes
-  Zugriffsrecht holen und ist damit unabhängig von einer laufenden
-  Claude-Code-Installation – das ursprüngliche Projektziel, das über
-  `claude setup-token` nicht erreichbar war.
-  - Angefordert wird ausschließlich `user:profile`. Ausdrücklich nicht
-    `user:inference` und nicht `org:create_api_key`.
-  - PKCE nach RFC 7636 mit S256; Verifier und `state` je Vorgang neu erzeugt.
-    Ein Code aus einem fremden Vorgang wird erkannt und gar nicht abgeschickt.
-  - Ohne lokalen Webserver: Der Code wird von Hand eingefügt statt über eine
-    Rückleitung auf `localhost` entgegengenommen. Kein offener Port.
-  - Das eigene Token wird selbsttätig erneuert, bevor es abläuft. Anders als
-    beim mitgelesenen Token ist das hier zulässig – es entwertet keine fremde
-    Anmeldung. Getrennter Eintrag `ClaudeUsageChecker:OAuth` im Secret-Store.
-- Anmeldefenster mit Führung durch beide Schritte, Anmeldezustand und
-  Abmelden in den Einstellungen.
+### Bekannte Einschränkungen
 
-### Geändert
-- Reihenfolge der Tokenquellen: eigene Anmeldung, hinterlegtes Token,
-  Umgebungsvariable, Claude Code.
-
-### Behoben
-- Der Tokenendpunkt zeigte auf `console.anthropic.com`, wo der Pfad nicht mehr
-  liegt – der Tausch scheiterte mit HTTP 404. Er läuft nun über
-  `platform.claude.com`. Gemessen am 19.08.2026, festgehalten in
-  `OAuthEndpointTests`.
-- Die Fußzeile der Detailansicht wies die eigene Anmeldung fälschlich als
-  „Claude Code" aus: Der neue Quellentyp fiel in den Sammelfall der
-  Beschriftung. Jede Quelle hat jetzt ihre eigene, und ein Test verlangt, dass
-  keine zwei sich eine teilen.
-
-### Hinzugefügt
-- Eine abgelaufene eigene Anmeldung wird entfernt und in der Detailansicht
-  gemeldet, statt still auf das Token von Claude Code zurückzufallen. Sonst
-  ginge die Unabhängigkeit unbemerkt verloren.
-- Unterscheidung zwischen endgültiger Ablehnung (HTTP 400/401) und
-  vorübergehender Störung (404, 5xx, Drosselung, Netzwerkausfall). Nur die
-  Ablehnung entfernt die Anmeldedaten; eine Störung lässt sie unangetastet.
-- `refresh_token_expires_in` wird ausgewertet, falls der Server es liefert.
-  Bislang tut er das nicht, sodass die Haltbarkeit der Anmeldung offen bleibt.
-
-### Hinzugefügt
-- Release-Ablauf für GitHub Actions: Eine Marke `v*` löst Test, Build einer
-  eigenständigen Einzeldatei für Windows x64, einen Startversuch und die
-  SHA-256-Summe aus. Das Ergebnis landet als **Entwurf** einer
-  Veröffentlichung – erst das Freigeben von Hand macht es für die
-  Aktualisierungsprüfung sichtbar.
-
-### Geändert
-- Die Veröffentlichung wird getrimmt und komprimiert gebaut: **21 MB** statt
-  93 MB, Start in 2,3 statt 7,2 Sekunden, 87 statt 136 MB Arbeitsspeicher.
-  Trimming gewinnt auf allen drei Achsen – entfernter Code muss auch nicht
-  geladen und übersetzt werden. Alle Fenster, das Kontextmenü und die Anmeldung
-  wurden in der getrimmten Fassung von Hand nachgeprüft.
-- `BuiltInComInteropSupport` ist abgeschaltet; es verhindert Trimming und wird
-  nicht gebraucht (weder Ziehen-und-Ablegen noch Shell-Einbindung).
-- Der Release-Ablauf prüft die Paketgröße, damit ein ausgefallenes Trimming
-  auffällt statt unbemerkt ein Vielfaches auszuliefern.
+- Das Paket ist **nicht signiert**. Windows SmartScreen meldet beim ersten
+  Start einen unbekannten Herausgeber.
+- Wie lange die eigene Anmeldung eine längere Pause übersteht, ist unbekannt –
+  Anthropic dokumentiert die Lebensdauer des Refresh-Tokens nicht.
+- Der Anmeldevorgang nutzt die öffentlich bekannte OAuth-Client-ID von Claude
+  Code, da Anthropic keine Registrierung eigener Anwendungen anbietet. Kein
+  offiziell unterstützter Weg; er kann sich jederzeit ändern.
+- macOS ist vorbereitet, aber nicht umgesetzt.
