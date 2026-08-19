@@ -111,10 +111,20 @@ Abgesichert ist das durch drei Bedingungen. Fehlt eine, wird nichts eingespielt:
    Klick auf **Jetzt einspielen und neu starten**. Es gibt keine stille
    Aktualisierung im Hintergrund.
 
-Die Prüfsumme ersetzt keine Signatur: Wer die Veröffentlichung auf GitHub
-verändern kann, ändert auch die Prüfsumme. Sie schützt gegen beschädigte oder
-unterwegs veränderte Downloads, nicht gegen ein übernommenes Repository. Für ein
-Hobbyprojekt ist das der bewusst gewählte Kompromiss.
+**Was die Prüfsumme nicht leistet.** Sie ersetzt keine Signatur: Wer eine
+Veröffentlichung anlegen kann, legt auch die passende Prüfsumme an. Sie schützt
+gegen beschädigte und unterwegs veränderte Downloads – nicht gegen ein
+übernommenes Konto.
+
+Das ist eine bewusst getroffene Entscheidung: Veröffentlichungen erstellt
+ausschließlich der Repository-Inhaber, das Bedrohungsmodell ist der fehlerhafte
+Download, nicht der Angreifer mit Schreibrechten. Damit gehört allerdings die
+Absicherung des GitHub-Kontos zur Sicherheitskette – ohne
+Zwei-Faktor-Authentifizierung dort ist der Schutz hier hinfällig.
+
+Wer strengere Anforderungen hat, signiert die Pakete mit einem
+Codesignatur-Zertifikat und prüft die Signatur statt der Summe. Für dieses
+Hobbyprojekt steht der Aufwand in keinem Verhältnis.
 
 Der Austausch selbst nutzt aus, dass Windows eine laufende Datei zwar nicht
 überschreiben, wohl aber umbenennen lässt: umbenennen, neue Datei an den alten
