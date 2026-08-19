@@ -350,7 +350,10 @@ zurechtzurücken.
 | 0.1 | Windows-Infobereich, Sitzungs- und Wochenlimit, Token-Verwaltung ✅ |
 | 0.2 | Eigene OAuth-Anmeldung, erste Veröffentlichung als Einzeldatei ✅ |
 | 0.3 | Aktualisierung auf Knopfdruck mit Prüfsummenkontrolle ✅ |
-| 0.4 | macOS-Menüleiste (Schlüsselbund-Anbindung ist bereits vorhanden) |
+| 0.4 | Dauerhafte Einrichtung mit Autostart ✅ |
+| 0.5 | Einrichtung nach %LOCALAPPDATA%\Programs, wo Windows sie erwartet ✅ |
+| 0.6 | Neun Sprachen, modellbezogene Limits, einstellbare Schwellenwerte, Übersicht der Neuerungen nach einem Update ✅ |
+| 0.7 | macOS-Menüleiste (Schlüsselbund-Anbindung ist bereits vorhanden) |
 
 ## Lizenz
 

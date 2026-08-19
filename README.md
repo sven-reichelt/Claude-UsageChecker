@@ -341,7 +341,10 @@ effect, and the window says so instead of quietly correcting the input.
 | 0.1 | Windows tray, session and weekly limit, token management ✅ |
 | 0.2 | Own OAuth sign-in, first release as a single file ✅ |
 | 0.3 | Update at the push of a button with checksum verification ✅ |
-| 0.4 | macOS menu bar (the keychain reader already exists) |
+| 0.4 | Permanent setup with autostart ✅ |
+| 0.5 | Installed into %LOCALAPPDATA%\Programs, where Windows wants it ✅ |
+| 0.6 | Nine languages, model-specific limits, configurable thresholds, summary of changes after an update ✅ |
+| 0.7 | macOS menu bar (the keychain reader already exists) |
 
 ## Contributing
 

@@ -19,7 +19,7 @@ it would change every hash, and the releases and their tags hang off those.
 
 ```powershell
 dotnet build                                      # the whole solution
-dotnet test                                       # 397 tests (Core.Tests + App.Tests)
+dotnet test                                       # 399 tests (Core.Tests + App.Tests)
 dotnet run --project src/ClaudeUsageChecker.App   # run the application
 node build/generate-icons.mjs                     # regenerate the icons
 ```
@@ -65,11 +65,12 @@ Builds into `artifacts/` (centrally through `ArtifactsPath` in
 
 ## Status
 
-Version 0.5.0 released, the repository is public. Finished among other things:
-the application's own sign-in through OAuth with PKCE including refresh, update
-at the push of a button with checksum verification, permanent setup with
-autostart, configurable thresholds, the summary of changes after an update, the
-about window, and nine languages.
+Version 0.6.0, the repository is public and written in English. Finished among
+other things: the application's own sign-in through OAuth with PKCE including
+refresh, update at the push of a button with checksum verification, permanent
+setup with autostart, configurable thresholds, the summary of changes after an
+update, the about window, model-specific weekly limits read from the `limits`
+list, and nine languages.
 
 Open: **the macOS menu bar** - the only larger item. The core is platform
 independent and `MacOsKeychainCredentialReader` exists; what is missing is the

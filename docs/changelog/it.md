@@ -8,6 +8,8 @@ numerazione [Semantic Versioning](https://semver.org/lang/it/).
 
 ## [Non pubblicato]
 
+## [0.6.0] – 2026-08-20
+
 ### Corretto
 - **I limiti settimanali legati a un modello non comparivano.** Chi ha un limite
   Fable non lo vedeva da nessuna parte – né nel suggerimento, né nel menu

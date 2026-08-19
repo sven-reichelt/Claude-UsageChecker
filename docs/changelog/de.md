@@ -8,6 +8,8 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unveröffentlicht]
 
+## [0.6.0] – 2026-08-20
+
 ### Behoben
 - **Modellbezogene Wochenlimits fehlten in der Anzeige.** Wer ein Fable-Limit
   hat, sah es nirgends – weder im Tooltip noch im Kontextmenü noch in der
