@@ -1,9 +1,8 @@
 name: Release
 
-# Eine Veroeffentlichung entsteht durch das Setzen einer Marke, etwa "v0.2.0".
-# Der Ablauf baut, testet und haengt das Ergebnis samt Pruefsumme an die
-# GitHub-Release - genau die Quelle, aus der die Anwendung ihre
-# Aktualisierungspruefung speist.
+# A release is created by pushing a tag, "v0.2.0" for instance. This workflow
+# builds, tests and attaches the result together with its checksum to the GitHub
+# release - exactly the source the application's update check feeds on.
 on:
   push:
     tags:
@@ -19,18 +18,18 @@ permissions:
 
 jobs:
   release:
-    name: Bauen und veröffentlichen
+    name: Build and publish
     runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: .NET einrichten
+      - name: Set up .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
 
-      - name: Version aus der Marke ableiten
+      - name: Derive the version from the tag
         id: version
         shell: bash
         run: |
@@ -39,20 +38,20 @@ jobs:
           else
             VERSION="${GITHUB_REF_NAME#v}"
           fi
-          # Vierstellig ist fuer AssemblyVersion Pflicht, dreistellig fuer die Anzeige.
+          # Four parts are mandatory for AssemblyVersion, three for the display.
           if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
-            echo "::error::Unbrauchbare Version '$VERSION'. Erwartet wird x.y.z."
+            echo "::error::Unusable version '$VERSION'. Expected x.y.z."
             exit 1
           fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Version: $VERSION"
 
-      - name: Testen
+      - name: Test
         run: dotnet test --configuration Release --verbosity normal
 
-      # Trimming und Kompression stehen in der Projektdatei, damit ein lokales
-      # "dotnet publish" dasselbe Ergebnis liefert wie dieser Ablauf.
-      - name: Veröffentlichen
+      # Trimming and compression live in the project file, so that a local
+      # "dotnet publish" produces the same result as this workflow.
+      - name: Publish
         run: >
           dotnet publish src/ClaudeUsageChecker.App
           --configuration Release
@@ -62,23 +61,23 @@ jobs:
           -p:Version=${{ steps.version.outputs.version }}
           --output publish
 
-      - name: Größe prüfen
+      - name: Check the size
         shell: pwsh
         run: |
-          # Waechst das Paket unerwartet, ist meist das Trimming ausgefallen.
+          # If the package grows unexpectedly, trimming has usually failed.
           $mb = [math]::Round((Get-Item publish/ClaudeUsageChecker.exe).Length / 1MB, 1)
-          Write-Host "Paketgröße: $mb MB"
+          Write-Host "Package size: $mb MB"
           if ($mb -gt 35) {
-            Write-Error "Das Paket ist mit $mb MB unerwartet gross - greift das Trimming noch?"
+            Write-Error "At $mb MB the package is unexpectedly large - is trimming still working?"
             exit 1
           }
 
-      # Bewusst ohne Versionsnummer im Dateinamen. Der Selbstaustausch schreibt
-      # die neue Fassung an den Pfad der laufenden Datei; ein versionierter Name
-      # wuerde danach eine falsche Version behaupten. Wichtiger noch: Windows
-      # merkt sich die Anheftung im Infobereich pro Pfad - bliebe der Name nicht
-      # gleich, landete das Symbol nach jedem Update wieder im Ueberlaufbereich.
-      - name: Prüfsumme bilden
+      # Deliberately without a version number in the file name. The self-update
+      # writes the new version to the path of the running file; a versioned name
+      # would afterwards claim the wrong version. More important still: Windows
+      # remembers the tray pinning per path - if the name did not stay the same,
+      # the icon would land in the overflow area after every update.
+      - name: Compute the checksum
         id: package
         shell: pwsh
         run: |
@@ -92,30 +91,29 @@ jobs:
           "sha256=$hash" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
           "size=$size" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
-      - name: Startet die gebaute Fassung überhaupt?
+      - name: Does the built version start at all?
         shell: pwsh
         run: |
-          # Ein Paket, das nicht startet, darf niemanden erreichen. Die Anwendung
-          # lebt im Infobereich, laesst sich hier aber wenigstens auf einen
-          # Sofortabsturz pruefen.
+          # A package that does not start must reach nobody. The application
+          # lives in the tray, but at least an immediate crash can be caught here.
           $exe = "publish/${{ steps.package.outputs.name }}"
           $p = Start-Process -FilePath $exe -PassThru
           Start-Sleep -Seconds 20
           if ($p.HasExited) {
-            Write-Error "Die Anwendung hat sich sofort beendet (Exit-Code $($p.ExitCode))."
+            Write-Error "The application exited immediately (exit code $($p.ExitCode))."
             exit 1
           }
           Stop-Process -Id $p.Id -Force
-          Write-Host "Start erfolgreich."
+          Write-Host "Started successfully."
 
-      - name: Veröffentlichung anlegen
+      - name: Create the release
         uses: softprops/action-gh-release@v2
         with:
           name: v${{ steps.version.outputs.version }}
-          # Nicht github.ref_name: Bei manuellem Start waere das ein Zweigname.
+          # Not github.ref_name: on a manual run that would be a branch name.
           tag_name: v${{ steps.version.outputs.version }}
-          # Entwurf: Die Aktualisierungspruefung sieht ihn erst, wenn er von Hand
-          # veroeffentlicht wird. So geht nichts ungeprueft hinaus.
+          # Draft: the update check only sees it once it is published by hand.
+          # That way nothing goes out unchecked.
           draft: true
           generate_release_notes: true
           files: |
@@ -124,20 +122,19 @@ jobs:
           body: |
             ## Claude UsageChecker ${{ steps.version.outputs.version }}
 
-            Eigenständige Anwendung für Windows (x64) – eine Datei, keine
-            .NET-Runtime nötig, ${{ steps.package.outputs.size }} MB.
+            Self-contained application for Windows (x64) - one file, no .NET
+            runtime required, ${{ steps.package.outputs.size }} MB.
 
             ### Installation
 
-            Datei herunterladen und starten. Beim ersten Start meldet Windows
-            SmartScreen einen unbekannten Herausgeber, weil das Paket nicht
-            signiert ist – über **Weitere Informationen → Trotzdem ausführen**
-            bestätigen.
+            Download the file and start it. On the first start Windows
+            SmartScreen reports an unknown publisher, because the package is not
+            signed - confirm through **More info -> Run anyway**.
 
-            Danach in den Einstellungen anmelden, damit die Anwendung ihr
-            eigenes Zugriffsrecht erhält.
+            Then sign in under Settings, so that the application obtains access
+            rights of its own.
 
-            ### Prüfsumme (SHA-256)
+            ### Checksum (SHA-256)
 
             ```
             ${{ steps.package.outputs.sha256 }}

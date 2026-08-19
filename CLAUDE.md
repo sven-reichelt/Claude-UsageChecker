@@ -1,88 +1,155 @@
-# Claude UsageChecker – Hinweise für Claude Code
+# Claude UsageChecker – notes for Claude Code
 
-Tray-Anwendung für Windows (macOS geplant), die Sitzungs- und Wochenlimit des
-Claude-Abonnements im Infobereich anzeigt.
+Tray application for Windows (macOS planned) that shows the session and weekly
+limits of a Claude subscription in the notification area.
 
-## Kommandos
+## Language
+
+**Talk to the user in German. Write everything in the repository in English.**
+
+That is deliberate: the repository is public, so anyone who finds it should be
+able to read it - but the conversation stays in the language its author thinks
+in. The one exception is the interface strings, which exist in nine languages;
+English is the source there as well.
+
+The commit history up to August 2026 is in German. It stays that way - rewriting
+it would change every hash, and the releases and their tags hang off those.
+
+## Commands
 
 ```powershell
-dotnet build                                      # gesamte Solution
-dotnet test                                       # 75 Tests (Core.Tests + App.Tests)
-dotnet run --project src/ClaudeUsageChecker.App   # Anwendung starten
-node build/generate-icons.mjs                     # Symbole neu erzeugen
+dotnet build                                      # the whole solution
+dotnet test                                       # 397 tests (Core.Tests + App.Tests)
+dotnet run --project src/ClaudeUsageChecker.App   # run the application
+node build/generate-icons.mjs                     # regenerate the icons
 ```
 
-Baut nach `artifacts/` (zentral über `ArtifactsPath` in `Directory.Build.props`),
-nicht in projektlokale `bin/obj`-Ordner.
+Builds into `artifacts/` (centrally through `ArtifactsPath` in
+`Directory.Build.props`), not into per-project `bin/obj` folders.
 
-## Aufbau
+## Layout
 
-* **`ClaudeUsageChecker.Core`** – plattformunabhängig, keine UI-Abhängigkeit.
-  Hier gehören API-Zugriff, Tokenbeschaffung, Zustandslogik und Textaufbereitung
-  hinein. Alles, was hier liegt, ist testbar und wird auch getestet.
-* **`ClaudeUsageChecker.App`** – Avalonia. Composition Root ist `App.axaml.cs`;
-  es gibt bewusst kein DI-Container-Framework und kein MVVM-Framework, um die
-  Abhängigkeiten schlank zu halten.
+* **`ClaudeUsageChecker.Core`** – platform independent, no UI dependency. API
+  access, token retrieval, state logic and text formatting belong here.
+  Everything in it is testable, and everything in it is tested.
+* **`ClaudeUsageChecker.App`** – Avalonia. The composition root is
+  `App.axaml.cs`; there is deliberately no DI container and no MVVM framework,
+  to keep the dependency list short.
 
-## Regeln, die nicht verhandelbar sind
+## Rules that are not up for discussion
 
-1. **Tokens nie erneuern, nie zurückschreiben.** Der Zugriff auf
-   `.credentials.json` ist strikt lesend. Begründung in [SECURITY.md](SECURITY.md).
-2. **Tokens nie protokollieren.** `AccessToken.ToString()` maskiert; ein Test
-   sichert das ab.
-3. **Abrufintervall nie unter 180 Sekunden.** Der Endpunkt drosselt sonst
-   dauerhaft. `MonitorOptions.PollInterval` hebt kleinere Werte automatisch an.
-4. **`User-Agent: claude-code/<version>` ist Pflicht** bei jedem Aufruf von
+1. **Never refresh a foreign token, never write one back.** Access to
+   `.credentials.json` is strictly read-only. Reasoning in
+   [SECURITY.md](SECURITY.md).
+2. **Never log tokens.** `AccessToken.ToString()` masks; a test enforces it.
+3. **Never poll faster than 180 seconds.** The endpoint throttles permanently
+   otherwise. `MonitorOptions.PollInterval` raises smaller values by itself.
+4. **`User-Agent: claude-code/<version>` is mandatory** on every call to
    `/api/oauth/usage`.
-5. **Keine personenbezogenen Daten ins Repository.** Auch nicht in Testdaten,
-   Screenshots oder Beispielausgaben.
+5. **No personal data in the repository.** Not in test data, screenshots or
+   sample output either.
 
-## Konventionen
+## Conventions
 
-* `TreatWarningsAsErrors` ist aktiv. Analyzer-Ausnahmen werden in `.editorconfig`
-  eingetragen und dort begründet – nicht per `#pragma` im Quelltext verstreut.
-* Paketversionen zentral in `Directory.Packages.props`.
-* Kommentare und Oberflächentexte auf Deutsch, Bezeichner auf Englisch.
-* Testmethoden: `Methode_ErwartetesVerhalten`, Beschreibung auf Deutsch.
+* `TreatWarningsAsErrors` is on. Analyzer exceptions are recorded in
+  `.editorconfig` with their reasoning - not scattered as `#pragma` through the
+  source.
+* Package versions centrally in `Directory.Packages.props`.
+* **Interface text never belongs in the source.** It lives in
+  `src/ClaudeUsageChecker.Core/Localization/Texts/<language>.json` and is fetched
+  through `T.Name`; English is the source language. XAML therefore carries no
+  `Text=` or `Content=` attributes any more - each window sets its labels in its
+  `ApplyTexts()` method, so that a language change can refresh them.
+  `LanguageFileTests` and `LabellingTests` catch what gets forgotten.
+* Test methods: `Method_ExpectedBehaviour`.
 
-## Stand
+## Status
 
-Version 0.1 in Arbeit. Offen: Aktualisierungsprüfung aktivieren (hängt an der
-Entscheidung, ob das Repository öffentlich wird), Installationspaket,
-macOS-Menüleiste. Details in [CHANGELOG.md](CHANGELOG.md).
+Version 0.5.0 released, the repository is public. Finished among other things:
+the application's own sign-in through OAuth with PKCE including refresh, update
+at the push of a button with checksum verification, permanent setup with
+autostart, configurable thresholds, the summary of changes after an update, the
+about window, and nine languages.
 
-## Fallstricke, die schon einmal zugeschlagen haben
+Open: **the macOS menu bar** - the only larger item. The core is platform
+independent and `MacOsKeychainCredentialReader` exists; what is missing is the
+connection to the menu bar, a counterpart to `WindowsCredentialStore`, and
+equivalents for autostart and self-installation. It is also unverified how long
+the sign-in survives a longer break, and whether the figures on the Pro
+subscription look the way the README describes. Details in
+[CHANGELOG.md](CHANGELOG.md).
 
-**Kein eigenes `InitializeComponent()` in Fenster-Code-Behind schreiben.**
-Avalonia erzeugt eine Fassung `InitializeComponent(bool loadXaml = true, …)`,
-die nach dem Laden die per `x:Name` benannten Steuerelemente in die Felder
-schreibt. Eine handgeschriebene parameterlose Variante gewinnt bei der
-Überladungsauflösung, lädt nur das XAML und lässt alle Felder null – der
-Konstruktor scheitert dann mit `NullReferenceException`. Das kompiliert
-fehlerfrei. `WindowConstructionTests` fängt es ab.
+## Pitfalls that have bitten before
 
-**Fehler in Tray-Aktionen beenden sonst die Anwendung.** Ohne Fenster läuft eine
-Ausnahme bis in die Nachrichtenschleife und der Prozess verschwindet
-kommentarlos. Neue Handler deshalb immer über `ErrorGuard.Run` bzw.
-`ErrorGuard.Forget` führen.
+**Never write your own `InitializeComponent()` in a window's code-behind.**
+Avalonia generates a version `InitializeComponent(bool loadXaml = true, …)` which
+writes the controls named with `x:Name` into their fields after loading. A
+hand-written parameterless variant wins overload resolution, loads only the XAML
+and leaves every field null - the constructor then fails with a
+`NullReferenceException`. That compiles without error.
+`WindowConstructionTests` catches it.
 
-**Der Windows-Tooltip bricht hart bei 127 Zeichen ab.** Deshalb zeigt er nur
-Sitzung und Wochenlimit; alle weiteren Limits stehen im Kontextmenü. Wer die
-Tooltip-Texte erweitert, prüft `ToTooltip_BleibtInnerhalbDerWindowsGrenze` mit –
-der Test rechnet bewusst mit dem ungünstigsten Fall.
+**Failures in tray actions otherwise end the application.** Without a window an
+exception travels all the way to the message loop and the process disappears
+without a word. New handlers therefore always go through `ErrorGuard.Run` or
+`ErrorGuard.Forget`.
 
-**Fremde und eigene Anmeldedaten strikt trennen.** Das Token von Claude Code
-wird ausschließlich gelesen und nie erneuert (rotierende Refresh-Tokens würden
-dessen Anmeldung entwerten). Das eigene OAuth-Token dagegen verwaltet die
-Anwendung vollständig samt Erneuerung. Getrennte Einträge im Secret-Store,
-niemals vermischen.
+**The Windows tooltip is truncated hard at 127 characters.** It therefore shows
+only session and weekly limit; every further limit lives in the context menu.
+Whoever extends the tooltip texts checks `ToTooltip_StaysWithinTheWindowsLimit`
+along with it - the test deliberately assumes the worst case.
 
-**Beim OAuth-Fluss bleibt es bei `user:profile`.** Mehr braucht die Anwendung
-nicht, und mehr anzufordern hieße, sich Rechte am Konto zu nehmen, die sie nie
-gebraucht. `DerAngeforderteGeltungsbereichBleibtBeimNoetigenMinimum` sichert das ab.
+**Keep foreign and own credentials strictly apart.** The token of Claude Code is
+only ever read and never refreshed (rotating refresh tokens would invalidate its
+sign-in). The application's own OAuth token, by contrast, it manages fully
+including refresh. Separate entries in the secret store, never mixed.
 
-**Der Selbstaustausch ist der heikelste Pfad im Programm.** Er lädt eine
-ausführbare Datei aus dem Netz und startet sie. Drei Bedingungen sichern das ab –
-geprüfte SHA-256-Summe, Adresse aus der GitHub-Antwort, ausdrücklicher Klick.
-Wer dort etwas ändert, lockert die einzige Absicherung, die es gibt. Begründung
-in [SECURITY.md](SECURITY.md), Tests in `UpdateInstallerTests`.
+**The OAuth flow stays at `user:profile`.** The application needs nothing more,
+and asking for more would mean claiming rights over an account it never needed.
+`TheRequestedScopeStaysAtTheNecessaryMinimum` enforces it.
+
+**One new interface string means nine files.** English is the source;
+`LanguageFileTests` reports every key missing from one of the eight
+translations, and additionally checks that the placeholders (`{0}`, `{1}`) are
+the same in every language. A `{2}` in a text that only receives two values
+otherwise throws a `FormatException` - and only once somebody using that
+language opens that particular window.
+
+**The same applies to the changelog.** An entry in `CHANGELOG.md` has to make it
+into the eight versions under `docs/changelog/`. The test checks that all of them
+know the same versions - a missing entry under *Unreleased* escapes it, though.
+
+**`Assembly.GetName().Version` always has four parts, the changelog three.**
+`Version` counts a missing part as −1, so `0.6.0` counts as **smaller** than
+`0.6.0.0`. Comparing the two unguarded makes the application consider the
+running version out of date - the summary of changes would come back on every
+start. Use `ReleaseHistory.ThreePart` before every comparison;
+`ReleaseHistoryTests` pins it down.
+
+**Restoring a file from a backup does not trigger a rebuild.** `Copy-Item` and
+`cp` carry the source's timestamp along, so a restored file looks older than the
+build output and MSBuild leaves it alone - the next run still uses what was
+there before. It struck twice in one session: once with a language file, and
+once more expensively with a counter-check whose deliberately broken code stayed
+in the build and was then measured as if it were the fix. Touch the file
+afterwards, or build with `--no-incremental`.
+
+**Editing language files from the shell mangles the encoding.** `perl -i -CSD`
+decodes the file as UTF-8 but leaves the replacement text from the command line
+as raw bytes - and writes them out encoded a second time. Out of "Prüfsumme"
+comes "PrÃ¼fsumme". It struck 93 lines across eight languages, and nothing
+noticed: English is pure ASCII and stayed clean, so every test was green and the
+damage would have shown only to whoever ran the application in German. Use
+`-CSDA` (the `A` decodes the arguments) or a dedicated tool.
+`NoTextIsDoublyEncoded` catches it now.
+
+**Tests that press "save" in the settings window need an injected autostart
+switch.** The real route writes to the Run key of the registry - a test without
+`applyAutostart` deletes the autostart entry of the user on whose machine it
+happens to run.
+
+**The self-update is the most delicate path in the program.** It downloads an
+executable from the network and starts it. Three conditions secure that - a
+verified SHA-256 sum, an address from GitHub's response, an explicit click.
+Changing anything there loosens the only safeguard that exists. Reasoning in
+[SECURITY.md](SECURITY.md), tests in `UpdateInstallerTests`.

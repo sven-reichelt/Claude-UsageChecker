@@ -1,0 +1,47 @@
+name: Feature request
+description: Suggest something the application should do
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This is a hobby project with a deliberately narrow scope: show the usage
+        limits of a Claude subscription in the system tray, read-only. Suggestions
+        that fit that purpose are welcome — please say what you are trying to
+        achieve, not only what should be built.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: The situation that made you want this. The problem, not the solution.
+      placeholder: I only notice that my weekly limit is nearly used up when it is too late.
+    validations:
+      required: true
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: What do you have in mind?
+      description: How you imagine it working. A rough sketch is fine.
+    validations:
+      required: false
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What did you try instead?
+      description: Existing settings, other tools, a workaround — and why it fell short.
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        **Two things the project will not do**, so nobody spends effort on them:
+
+        * **Send anything anywhere.** It talks to the Anthropic API and to GitHub
+          for update checks. No telemetry, no third parties.
+        * **Write to Claude Code's credentials.** That token is read, never
+          refreshed or replaced — refreshing it would invalidate Claude Code's own
+          sign-in. See [SECURITY.md](../blob/main/SECURITY.md).

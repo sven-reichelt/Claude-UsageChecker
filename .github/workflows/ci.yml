@@ -12,57 +12,57 @@ permissions:
 
 jobs:
   build:
-    name: Bauen und testen
+    name: Build and test
     runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: .NET einrichten
+      - name: Set up .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
 
-      - name: Abhängigkeiten wiederherstellen
+      - name: Restore dependencies
         run: dotnet restore
 
-      - name: Bauen
+      - name: Build
         run: dotnet build --no-restore --configuration Release
 
-      - name: Testen
+      - name: Test
         run: dotnet test --no-build --configuration Release --verbosity normal
 
-      - name: Symbole reproduzierbar erzeugen
+      - name: Regenerate icons reproducibly
         shell: bash
         run: |
           node build/generate-icons.mjs
-          # Die eingecheckten Symbole müssen dem Generator entsprechen.
+          # The committed icons have to match what the generator produces.
           git diff --exit-code -- assets/icons
 
   security:
-    name: Sicherheitsprüfungen
+    name: Security checks
     runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: .NET einrichten
+      - name: Set up .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
 
-      - name: Auf verwundbare Pakete prüfen
+      - name: Check for vulnerable packages
         run: |
           dotnet restore
           dotnet list package --vulnerable --include-transitive 2>&1 | Tee-Object -Variable output
           if ($output -match 'has the following vulnerable packages') { exit 1 }
 
-      - name: Auf versehentlich eingecheckte Geheimnisse prüfen
+      - name: Check for accidentally committed secrets
         shell: bash
         run: |
-          # Grobe, aber wirksame Netzsuche nach Tokenmustern im gesamten Verlauf.
+          # A coarse but effective sweep for token patterns across the tree.
           if git grep -nE 'sk-ant-[a-zA-Z0-9_-]{10,}|oat01-[a-zA-Z0-9_-]{10,}' -- . ':(exclude)docs' ':(exclude)README.md' ':(exclude)SECURITY.md'; then
-            echo "::error::Mögliches Token im Repository gefunden."
+            echo "::error::Possible token found in the repository."
             exit 1
           fi
-          echo "Keine Tokenmuster gefunden."
+          echo "No token patterns found."

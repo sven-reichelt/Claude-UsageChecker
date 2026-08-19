@@ -1,0 +1,104 @@
+name: Bug report
+description: Something does not work as expected
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this.
+
+        > [!CAUTION]
+        > **Never paste an access token.** Tokens look like `sk-ant-oat01-…` and
+        > grant full access to your Claude subscription. They appear in
+        > `%USERPROFILE%\.claude\.credentials.json` — do not attach that file.
+        > `crash.log` and `settings.json` contain no tokens and are safe to share.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you expect, and what happened instead?
+      placeholder: The tray icon stayed grey although the weekly limit was at 95 %.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: If it happens every time, the exact steps help most.
+      placeholder: |
+        1. Start the application
+        2. Open Settings, set …
+        3. Wait for the next refresh
+    validations:
+      required: false
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Shown in "About Claude UsageChecker" in the tray menu.
+      placeholder: "0.5.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - Windows 11
+        - Windows 10
+        - Windows Server
+        - Other (please describe below)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: plan
+    attributes:
+      label: Claude subscription
+      description: Limits differ between plans, and only Max has been measured.
+      options:
+        - Max
+        - Pro
+        - Team or Enterprise
+        - Not sure
+    validations:
+      required: true
+
+  - type: dropdown
+    id: token-source
+    attributes:
+      label: How does the application authenticate?
+      description: Shown at the bottom of the details window ("Source: …").
+      options:
+        - Own sign-in (OAuth)
+        - Token from a running Claude Code installation
+        - Manually stored token
+        - Environment variable
+        - Not sure
+    validations:
+      required: false
+
+  - type: textarea
+    id: log
+    attributes:
+      label: crash.log
+      description: |
+        Found at `%LOCALAPPDATA%\ClaudeUsageChecker\crash.log`, if it exists.
+        It contains no tokens — `AccessToken.ToString()` masks them.
+      render: text
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched the existing issues
+          required: true
+        - label: This report contains no access token and no account data
+          required: true

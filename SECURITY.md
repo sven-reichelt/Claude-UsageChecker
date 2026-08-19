@@ -1,180 +1,178 @@
-# Sicherheit
+# Security
 
-Claude UsageChecker verarbeitet ein OAuth-Token, das vollen Zugriff auf ein
-Claude-Abonnement gewährt. Der Umgang damit folgt einigen festen Regeln.
+*Deutsche Fassung: [docs/de/SECURITY.md](docs/de/SECURITY.md)*
 
-## Grundsätze
+Claude UsageChecker handles an OAuth token that grants full access to a Claude
+subscription. Dealing with it follows a few fixed rules.
 
-### 1. Keine personenbezogenen Daten im Repository
+## Principles
 
-Weder Tokens noch Kontodaten, Nutzungswerte oder Protokolle gehören in die
-Versionsverwaltung. `.gitignore` sperrt die einschlägigen Muster bereits an
-erster Stelle – unter anderem `*.credentials.json`, `*.token`, `.env`, `*.pfx`,
-`*.pem` und `settings.local.json`.
+### 1. No personal data in the repository
 
-Vor jedem Commit prüfen:
+Neither tokens nor account data, usage figures or logs belong in version
+control. `.gitignore` blocks the relevant patterns right at the top - among them
+`*.credentials.json`, `*.token`, `.env`, `*.pfx`, `*.pem` and
+`settings.local.json`.
+
+Check before every commit:
 
 ```powershell
 git diff --cached | Select-String -Pattern "sk-ant-", "Bearer ", "oat01"
 ```
 
-### 2. Tokens niemals im Klartext auf der Platte
+### 2. Tokens never in plaintext on disk
 
-Das Token wird ausschließlich über den Secret-Store des Betriebssystems
-abgelegt:
+The token is only ever stored through the secret store of the operating system:
 
-| Plattform | Ablage | Schutz |
+| Platform | Storage | Protection |
 | --- | --- | --- |
-| Windows | Anmeldeinformationsverwaltung (`CredWriteW`) | DPAPI, an das Benutzerkonto gebunden |
-| macOS | Schlüsselbund (geplant) | Keychain Services |
+| Windows | Credential Manager (`CredWriteW`) | DPAPI, bound to the user account |
+| macOS | Keychain (planned) | Keychain Services |
 
-Zwei getrennte Einträge:
+Two separate entries:
 
-| Eintrag | Inhalt |
+| Entry | Content |
 | --- | --- |
-| `ClaudeUsageChecker:OAuth` | Eigene Anmeldung (Access- und Refresh-Token) |
-| `ClaudeUsageChecker:OAuthToken` | Von Hand hinterlegtes Einzeltoken (Sonderfall) |
+| `ClaudeUsageChecker:OAuth` | The application's own sign-in (access and refresh token) |
+| `ClaudeUsageChecker:OAuthToken` | A manually stored single token (special case) |
 
-Die Einstellungsdatei `%LOCALAPPDATA%\ClaudeUsageChecker\settings.json` enthält
-ausschließlich Verhaltenseinstellungen und niemals Geheimnisse.
+The settings file `%LOCALAPPDATA%\ClaudeUsageChecker\settings.json` holds
+behaviour settings only, and never secrets.
 
-### 2a. Was die Anwendung wo ablegt – vollständig
+### 2a. What the application stores where - in full
 
-| Ort | Inhalt | Bleibt nach Deinstallation |
+| Location | Content | Remains after uninstall |
 | --- | --- | --- |
-| Anmeldeinformationsverwaltung, `ClaudeUsageChecker:OAuth` | eigene Anmeldung (Access- und Refresh-Token) | ja |
-| Anmeldeinformationsverwaltung, `ClaudeUsageChecker:OAuthToken` | von Hand hinterlegtes Einzeltoken | ja |
-| `%LOCALAPPDATA%\ClaudeUsageChecker\settings.json` | Verhaltenseinstellungen, keine Geheimnisse | ja |
-| `%LOCALAPPDATA%\ClaudeUsageChecker\crash.log` | lokale Fehlerberichte | ja |
-| `%LOCALAPPDATA%\Programs\ClaudeUsageChecker\` | die Anwendung selbst, nach Einrichtung | ja |
-| `HKCU\…\CurrentVersion\Run`, Wert `ClaudeUsageChecker` | Autostart-Eintrag | ja |
-| `%TEMP%\.net\ClaudeUsageChecker\<Kennung>\` | von der .NET-Laufzeit ausgepackte Bibliotheken | wird beim Start aufgeräumt |
-| `%TEMP%\ClaudeUsageChecker-<Kennung>.exe` | Zwischenablage beim Aktualisieren | wird sofort gelöscht |
-| Neben der Exe: `ClaudeUsageChecker.exe.alt` | ersetzte Fassung nach einem Update | wird beim nächsten Start gelöscht |
+| Credential Manager, `ClaudeUsageChecker:OAuth` | the application's own sign-in (access and refresh token) | yes |
+| Credential Manager, `ClaudeUsageChecker:OAuthToken` | manually stored single token | yes |
+| `%LOCALAPPDATA%\ClaudeUsageChecker\settings.json` | behaviour settings, no secrets | yes |
+| `%LOCALAPPDATA%\ClaudeUsageChecker\crash.log` | local crash reports | yes |
+| `%LOCALAPPDATA%\Programs\ClaudeUsageChecker\` | the application itself, after setup | yes |
+| `HKCU\…\CurrentVersion\Run`, value `ClaudeUsageChecker` | autostart entry | yes |
+| `%TEMP%\.net\ClaudeUsageChecker\<id>\` | libraries extracted by the .NET runtime | cleaned up at startup |
+| `%TEMP%\ClaudeUsageChecker-<id>.exe` | staging file while updating | deleted immediately |
+| Next to the exe: `ClaudeUsageChecker.exe.alt` | the replaced version after an update | deleted on the next start |
 
-Der Entpackungsordner ist der einzige Ort, den nicht die Anwendung selbst
-anlegt: Eine komprimierte Einzeldatei kann ihre nativen Bibliotheken nicht aus
-dem Bündel laden, die Laufzeit packt sie deshalb aus. Da die Kennung am Inhalt
-hängt, bekäme jede Fassung einen eigenen Ordner – rund 16 MB, die sich mit
-jedem Update sammelten. Die Anwendung räumt die Ordner früherer Fassungen
-deshalb selbst weg.
+The extraction folder is the only location the application does not create
+itself: a compressed single file cannot load its native libraries from the
+bundle, so the runtime extracts them. Since the id depends on the content, every
+version would get a folder of its own - some 16 MB accumulating with every
+update. The application therefore clears away the folders of earlier versions
+itself.
 
-Zum vollständigen Entfernen genügen die Zeilen der Tabelle; es gibt keine
-weiteren Ablagen, keine Datenbank und keine Spuren in anderen Profilen.
+To remove everything, the rows of the table suffice; there are no further
+stores, no database and no traces in other profiles.
 
-**Nichts davon verlässt den Rechner.** Es gibt keine Telemetrie, keine
-Nutzungsstatistik und keine Übermittlung von Fehlerberichten.
+**None of it leaves the machine.** There is no telemetry, no usage statistics
+and no transmission of crash reports.
 
-### 3. Fremde Anmeldedaten werden nur gelesen, eigene selbst verwaltet
+### 3. Foreign credentials are only read, own ones fully managed
 
-Hier ist streng zu trennen:
+A strict distinction applies here:
 
-**Anmeldedaten von Claude Code** (`%USERPROFILE%\.claude\.credentials.json` bzw.
-macOS-Schlüsselbund) werden ausschließlich **gelesen**. Die Anwendung schreibt
-dort nichts zurück und erneuert diese Tokens nicht. Der Grund: Anthropic rotiert
-Refresh-Tokens – eine Erneuerung durch diese Anwendung würde die Anmeldung der
-Claude-Code-Installation entwerten. Der `refreshToken` wird deshalb nicht einmal
-in ein Modell eingelesen (siehe `ClaudeCliCredentials`).
+**Credentials of Claude Code** (`%USERPROFILE%\.claude\.credentials.json` or the
+macOS keychain) are only ever **read**. The application writes nothing back
+there and does not refresh those tokens. The reason: Anthropic rotates refresh
+tokens - a refresh by this application would invalidate the sign-in of the
+Claude Code installation. The `refreshToken` is therefore not even read into a
+model (see `ClaudeCliCredentials`).
 
-**Eigene Anmeldedaten** aus dem OAuth-Fluss dieser Anwendung gehören ihr allein.
-Sie werden sehr wohl erneuert, sobald sie ablaufen – ein rotierender
-Refresh-Token entwertet hier nichts Fremdes. Genau das macht die Anwendung
-unabhängig von einer laufenden Claude-Code-Installation.
+**The application's own credentials** from its OAuth flow belong to it alone.
+They very much are refreshed as they expire - a rotating refresh token
+invalidates nothing foreign here. That is precisely what makes the application
+independent of a running Claude Code installation.
 
-Beide liegen in getrennten Einträgen des Secret-Stores und werden nie vermischt.
+Both live in separate entries of the secret store and are never mixed.
 
-### 3a. Der eigene Anmeldefluss
+### 3a. The application's own sign-in flow
 
-* **PKCE mit S256** (RFC 7636) bindet den Codetausch an den Vorgang, der ihn
-  angefordert hat. Verifier und `state` werden je Vorgang neu aus
-  `RandomNumberGenerator` erzeugt.
-* **Least Privilege:** Angefordert wird ausschließlich `user:profile` – das
-  Recht, den Nutzungsstand zu lesen. Ausdrücklich **nicht** `user:inference`
-  (Anfragen im Namen des Kontos stellen) und **nicht** `org:create_api_key`.
-* **Kein lokaler Webserver.** Der Code wird von Hand eingefügt statt über eine
-  Rückleitung auf `localhost` entgegengenommen. Das erspart einen offenen Port
-  und einen lauschenden Dienst auf dem Rechner des Nutzers.
-* Ein Code aus einem anderen Vorgang wird am `state` erkannt und gar nicht erst
-  abgeschickt.
+* **PKCE with S256** (RFC 7636) ties the code exchange to the flow that
+  requested it. Verifier and `state` are generated afresh per flow from
+  `RandomNumberGenerator`.
+* **Least privilege:** the only scope requested is `user:profile` - the right to
+  read the usage status. Explicitly **not** `user:inference` (making requests on
+  behalf of the account) and **not** `org:create_api_key`.
+* **No local web server.** The code is pasted by hand rather than received
+  through a redirect to `localhost`. That saves an open port and a listening
+  service on the user's machine.
+* A code from another flow is recognised by its `state` and is not even sent.
 
-### 4. Tokenwerte gelangen nie in Protokolle
+### 4. Token values never reach logs
 
-`AccessToken.ToString()` gibt ausschließlich Herkunft und Ablaufzeitpunkt aus.
-Ein Test (`ToString_GibtDenTokenwertNichtPreis`) sichert das ab.
+`AccessToken.ToString()` prints origin and expiry only. A test
+(`ToString_DoesNotGiveAwayTheTokenValue`) enforces it.
 
-### 5. Sparsame Netzwerkkommunikation
+### 5. Frugal network communication
 
-Es werden genau zwei Gegenstellen kontaktiert:
+Exactly these counterparts are contacted:
 
-| Ziel | Zweck | Übertragene Daten |
+| Target | Purpose | Data transmitted |
 | --- | --- | --- |
-| `api.anthropic.com/api/oauth/usage` | Nutzungsstand abrufen | nur das Bearer-Token |
-| `claude.ai/oauth/authorize` | Anmeldeseite, nur im Browser des Nutzers | – |
-| `platform.claude.com/v1/oauth/token` | Code tauschen, Token erneuern | Code, PKCE-Verifier bzw. Refresh-Token |
-| `api.github.com` (optional) | Versionsprüfung | keine, nur ein GET |
+| `api.anthropic.com/api/oauth/usage` | fetch the usage status | the bearer token only |
+| `claude.ai/oauth/authorize` | sign-in page, only in the user's browser | – |
+| `platform.claude.com/v1/oauth/token` | exchange the code, refresh tokens | code, PKCE verifier or refresh token |
+| `api.github.com` (optional) | version check | none, just a GET |
 
-Es gibt keine Telemetrie, keine Absturzberichte an Dritte und keine Analytik.
-Absturzberichte werden lokal nach
-`%LOCALAPPDATA%\ClaudeUsageChecker\crash.log` geschrieben und bleiben dort.
+There is no telemetry, no crash reporting to third parties and no analytics.
+Crash reports are written locally to
+`%LOCALAPPDATA%\ClaudeUsageChecker\crash.log` and stay there.
 
-### 6. Aktualisierungen: heruntergeladener Code nur mit geprüfter Herkunft
+### 6. Updates: downloaded code only with verified provenance
 
-Die Anwendung kann sich auf Knopfdruck selbst ersetzen. Sie lädt dabei eine
-ausführbare Datei aus dem Netz und startet sie – der heikelste Vorgang im
-gesamten Programm. Ursprünglich war das bewusst ausgeschlossen; die Entscheidung
-wurde umgekehrt, weil ein Hinweis, den man von Hand abarbeiten muss, in der
-Praxis liegen bleibt und die Anwendung dann veraltet läuft.
+The application can replace itself at the push of a button. In doing so it
+downloads an executable from the network and starts it - the most delicate
+operation in the whole program. Originally that was deliberately ruled out; the
+decision was reversed because a notice that has to be acted on by hand tends to
+be left lying around, and the application then runs out of date.
 
-Abgesichert ist das durch drei Bedingungen. Fehlt eine, wird nichts eingespielt:
+Three conditions secure it. If one is missing, nothing is installed:
 
-1. **Geprüfte Prüfsumme.** Zu jeder Veröffentlichung gehört eine
-   SHA-256-Summe. Die heruntergeladene Datei wird gehasht und verglichen. Bei
-   Abweichung wird sie verworfen und **nicht** ausgeführt. Ohne
-   Prüfsummendatei wird gar nicht erst begonnen.
-2. **Adresse aus der GitHub-Antwort.** Die Download-Adresse stammt aus der
-   API-Antwort zu genau diesem Repository und wird nicht aus Dateinamen
-   zusammengesetzt oder erraten. Adressen ohne HTTPS werden verworfen.
-3. **Ausdrückliche Handlung des Nutzers.** Eingespielt wird nur nach einem
-   Klick auf **Jetzt einspielen und neu starten**. Es gibt keine stille
-   Aktualisierung im Hintergrund.
+1. **A verified checksum.** Every release comes with a SHA-256 sum. The
+   downloaded file is hashed and compared. On a mismatch it is discarded and
+   **not** executed. Without a checksum file nothing is even started.
+2. **The address from GitHub's response.** The download address comes from the
+   API response for exactly this repository and is not pieced together from file
+   names or guessed. Addresses without HTTPS are discarded.
+3. **An explicit act by the user.** Installing happens only after a click on
+   **Install now and restart**. There is no silent update in the background.
 
-**Was die Prüfsumme nicht leistet.** Sie ersetzt keine Signatur: Wer eine
-Veröffentlichung anlegen kann, legt auch die passende Prüfsumme an. Sie schützt
-gegen beschädigte und unterwegs veränderte Downloads – nicht gegen ein
-übernommenes Konto.
+**What the checksum does not achieve.** It is no substitute for a signature:
+whoever can create a release can create the matching checksum too. It protects
+against corrupted downloads and downloads altered in transit - not against a
+compromised account.
 
-Das ist eine bewusst getroffene Entscheidung: Veröffentlichungen erstellt
-ausschließlich der Repository-Inhaber, das Bedrohungsmodell ist der fehlerhafte
-Download, nicht der Angreifer mit Schreibrechten. Damit gehört allerdings die
-Absicherung des GitHub-Kontos zur Sicherheitskette – ohne
-Zwei-Faktor-Authentifizierung dort ist der Schutz hier hinfällig.
+That is a deliberate decision: releases are created solely by the repository
+owner, and the threat model is the faulty download, not the attacker with write
+access. It does mean, though, that securing the GitHub account is part of the
+security chain - without two-factor authentication there, the protection here is
+moot.
 
-Wer strengere Anforderungen hat, signiert die Pakete mit einem
-Codesignatur-Zertifikat und prüft die Signatur statt der Summe. Für dieses
-Hobbyprojekt steht der Aufwand in keinem Verhältnis.
+Anyone with stricter requirements signs the packages with a code-signing
+certificate and verifies the signature instead of the sum. For this hobby
+project the effort is out of all proportion.
 
-Der Austausch selbst nutzt aus, dass Windows eine laufende Datei zwar nicht
-überschreiben, wohl aber umbenennen lässt: umbenennen, neue Datei an den alten
-Platz, neue Fassung starten, selbst beenden. Scheitert der zweite Schritt, wird
-der erste zurückgenommen – es bleibt immer ein lauffähiges Programm zurück.
+The replacement itself exploits the fact that Windows does not allow a running
+file to be overwritten but does allow it to be renamed: rename, put the new file
+in the old place, start the new version, end this one. If the second step fails,
+the first is undone - a working program always remains.
 
-### 7. Rücksicht auf die API
+### 7. Consideration for the API
 
-Der Endpunkt drosselt aggressiv. `MonitorOptions.MinimumInterval` erzwingt
-mindestens 180 Sekunden zwischen zwei Abrufen; ein `Retry-After` des Servers hat
-immer Vorrang, und nach Fehlschlägen greift ein exponentiell wachsender Backoff
-bis 30 Minuten.
+The endpoint throttles aggressively. `MonitorOptions.MinimumInterval` enforces at
+least 180 seconds between two calls; a `Retry-After` from the server always takes
+precedence, and after failures an exponentially growing backoff up to 30 minutes
+applies.
 
-## Schwachstellen melden
+## Reporting a vulnerability
 
-Bitte **kein** öffentliches Issue anlegen. Meldungen gehen über
+Please do **not** open a public issue. Reports go through
 [GitHub Security Advisories](https://github.com/sven-reichelt/Claude-UsageChecker/security/advisories/new)
-oder direkt an den Repository-Inhaber.
+or directly to the repository owner.
 
-## Prüfliste vor einer Veröffentlichung
+## Checklist before a release
 
-- [ ] `git log -p` nach Tokenmustern durchsucht (`sk-ant-`, `oat01`, `Bearer `)
-- [ ] Keine Datei aus `%USERPROFILE%\.claude\` im Repository
-- [ ] Screenshots enthalten keine Kontodaten
-- [ ] `settings.json` und `crash.log` nicht eingecheckt
-- [ ] Abhängigkeiten geprüft (`dotnet list package --vulnerable`)
+- [ ] `git log -p` searched for token patterns (`sk-ant-`, `oat01`, `Bearer `)
+- [ ] No file from `%USERPROFILE%\.claude\` in the repository
+- [ ] Screenshots contain no account data
+- [ ] `settings.json` and `crash.log` not committed
+- [ ] Dependencies checked (`dotnet list package --vulnerable`)
