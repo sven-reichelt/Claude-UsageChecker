@@ -38,9 +38,17 @@
               CornerRadius="4" Padding="10">
         <StackPanel Spacing="8">
           <TextBlock x:Name="UpdateText" TextWrapping="Wrap" FontSize="12" />
-          <StackPanel Orientation="Horizontal" Spacing="8">
-            <Button x:Name="InstallButton" Content="Jetzt einspielen und neu starten" IsVisible="False" />
-            <Button x:Name="UpdateButton" Content="Release-Seite öffnen" IsVisible="False" />
+          <!-- Untereinander, nicht nebeneinander: Bei 380 Pixel Fensterbreite
+               bleiben nach den Rändern rund 324 Pixel, die beiden Beschriftungen
+               brauchen zusammen aber gut 420. Nebeneinander ragte die zweite
+               Schaltfläche aus dem Fenster heraus. -->
+          <StackPanel Spacing="6" HorizontalAlignment="Stretch">
+            <Button x:Name="InstallButton" Content="Jetzt einspielen und neu starten"
+                    IsVisible="False" HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Center" />
+            <Button x:Name="UpdateButton" Content="Release-Seite öffnen"
+                    IsVisible="False" HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Center" />
           </StackPanel>
         </StackPanel>
       </Border>

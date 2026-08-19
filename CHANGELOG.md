@@ -5,6 +5,21 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unveröffentlicht]
 
+## [0.3.2] – 2026-08-19
+
+### Behoben
+- Die Schaltflächen des Update-Hinweises ragten aus dem Fenster. Nebeneinander
+  brauchten sie rund 420 Pixel, das Fenster ist 380 breit – „Release-Seite
+  öffnen" war nur halb lesbar. Sie stehen jetzt untereinander.
+
+### Hinzugefügt
+- Tests, die Überlauf im Detailfenster aufdecken. Sie vermessen die
+  tatsächliche Platzierung nach einem vollständigen Layout-Durchlauf und
+  vergleichen den rechten Rand jedes Elements mit der Fensterbreite. Weder die
+  gewünschte Größe der Steuerelemente noch die des Fensters taugen dafür:
+  Avalonia begrenzt beide auf die Vorgabe, sodass ein Überlauf darin gar nicht
+  auftauchen kann.
+
 ## [0.3.1] – 2026-08-19
 
 ### Geändert
