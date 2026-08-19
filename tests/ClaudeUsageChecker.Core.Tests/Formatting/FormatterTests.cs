@@ -87,16 +87,40 @@ public class FormatterTests
         Assert.Contains("Week 13 %", tooltip, StringComparison.Ordinal);
     }
 
-    [Fact]
-    public void ToTooltip_ContainsTheResetTime()
+    /// <summary>The reset time is written in the culture that is set.</summary>
+    /// <remarks>
+    /// This test used to build its expectation with the invariant culture while
+    /// the tooltip formats with the current one. On a German machine both write
+    /// "07:14" and it passed by coincidence; the English CI runner writes
+    /// "7:14 AM" and it failed there. Since a language change now sets the
+    /// culture of the process, the format is a promise worth pinning down - and
+    /// the English row is the one that would catch a fall back to the invariant
+    /// culture.
+    ///
+    /// The time itself is derived rather than written out: it depends on the
+    /// time zone of whoever runs the tests.
+    /// </remarks>
+    [Theory]
+    [InlineData("de-DE")]
+    [InlineData("en-US")]
+    public void ToTooltip_WritesTheResetTimeInTheCurrentCulture(string code)
     {
-        var state = ReadyState(33, 13);
-        var expected = DurationFormatter.ToResetMoment(
-            state.Snapshot!.Session!.ResetsAt, Now, CultureInfo.InvariantCulture);
+        var culture = CultureInfo.GetCultureInfo(code);
+        var before = CultureInfo.CurrentCulture;
+        CultureInfo.CurrentCulture = culture;
+        try
+        {
+            var state = ReadyState(33, 13);
+            var expected = state.Snapshot!.Session!.ResetsAt.ToLocalTime().ToString("t", culture);
 
-        var tooltip = UsageFormatter.ToTooltip(state, Now);
+            var tooltip = UsageFormatter.ToTooltip(state, Now);
 
-        Assert.Contains(expected, tooltip, StringComparison.Ordinal);
+            Assert.Contains(expected, tooltip, StringComparison.Ordinal);
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = before;
+        }
     }
 
     [Fact]
