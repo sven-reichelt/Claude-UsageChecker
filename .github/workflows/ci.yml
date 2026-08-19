@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Bauen und testen
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: .NET einrichten
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Abhängigkeiten wiederherstellen
+        run: dotnet restore
+
+      - name: Bauen
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Testen
+        run: dotnet test --no-build --configuration Release --verbosity normal
+
+      - name: Symbole reproduzierbar erzeugen
+        shell: bash
+        run: |
+          node build/generate-icons.mjs
+          # Die eingecheckten Symbole müssen dem Generator entsprechen.
+          git diff --exit-code -- assets/icons
+
+  security:
+    name: Sicherheitsprüfungen
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: .NET einrichten
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Auf verwundbare Pakete prüfen
+        run: |
+          dotnet restore
+          dotnet list package --vulnerable --include-transitive 2>&1 | Tee-Object -Variable output
+          if ($output -match 'has the following vulnerable packages') { exit 1 }
+
+      - name: Auf versehentlich eingecheckte Geheimnisse prüfen
+        shell: bash
+        run: |
+          # Grobe, aber wirksame Netzsuche nach Tokenmustern im gesamten Verlauf.
+          if git grep -nE 'sk-ant-[a-zA-Z0-9_-]{10,}|oat01-[a-zA-Z0-9_-]{10,}' -- . ':(exclude)docs' ':(exclude)README.md' ':(exclude)SECURITY.md'; then
+            echo "::error::Mögliches Token im Repository gefunden."
+            exit 1
+          fi
+          echo "Keine Tokenmuster gefunden."

@@ -1,0 +1,38 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+
+[*.{json,yml,yaml,md,axaml,xml,csproj,props,targets}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.cs]
+# Namespaces
+csharp_style_namespace_declarations = file_scoped:warning
+# var
+csharp_style_var_when_type_is_apparent = true:suggestion
+# Moderne C#-Idiome
+csharp_style_prefer_primary_constructors = true:suggestion
+csharp_prefer_braces = true:suggestion
+dotnet_style_require_accessibility_modifiers = for_non_interface_members:warning
+dotnet_sort_system_directives_first = true
+# Nullable-Verstoesse als Fehler behandeln
+dotnet_diagnostic.CS8600.severity = error
+dotnet_diagnostic.CS8602.severity = error
+dotnet_diagnostic.CS8618.severity = error
+
+# CA1848 verlangt LoggerMessage-Delegaten. Die Anwendung protokolliert nur wenige
+# Ereignisse pro Stunde; der Mehraufwand steht in keinem Verhaeltnis zum Nutzen.
+dotnet_diagnostic.CA1848.severity = none
+
+# CA1859 draengt zu konkreten Rueckgabetypen. Update-Dienst und Tokenquellen sind
+# absichtlich hinter Schnittstellen gekapselt, damit sie austauschbar bleiben.
+dotnet_diagnostic.CA1859.severity = suggestion

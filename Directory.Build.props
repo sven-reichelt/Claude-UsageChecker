@@ -1,0 +1,29 @@
+<Project>
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <InvariantGlobalization>false</InvariantGlobalization>
+  </PropertyGroup>
+
+  <!-- Versionierung: wird von der CI ueber -p:Version=x.y.z ueberschrieben. -->
+  <PropertyGroup>
+    <VersionPrefix>0.1.0</VersionPrefix>
+    <Product>Claude UsageChecker</Product>
+    <Company>Sven Reichelt</Company>
+    <Authors>Sven Reichelt</Authors>
+    <Copyright>Copyright (c) 2026 Sven Reichelt</Copyright>
+    <RepositoryUrl>https://github.com/sven-reichelt/Claude-UsageChecker</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <ArtifactsPath>$(MSBuildThisFileDirectory)artifacts</ArtifactsPath>
+  </PropertyGroup>
+
+</Project>

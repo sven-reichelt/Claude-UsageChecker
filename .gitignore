@@ -1,0 +1,63 @@
+# ---------------------------------------------------------------------------
+# SICHERHEIT: Nichts hiervon darf jemals in das Repository gelangen.
+# ---------------------------------------------------------------------------
+*.credentials.json
+.credentials.json
+credentials.json
+*.token
+*.secret
+secrets.json
+appsettings.Local.json
+appsettings.*.local.json
+local.settings.json
+.env
+.env.*
+!.env.example
+*.pfx
+*.p12
+*.snk
+*.key
+*.pem
+# Lokale Laufzeit-/Nutzerkonfiguration der App (kann Kontodaten enthalten)
+config.local.json
+usage-cache.json
+*.log
+
+# ---------------------------------------------------------------------------
+# .NET Build-Artefakte
+# ---------------------------------------------------------------------------
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+artifacts/
+publish/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+project.lock.json
+project.fragment.lock.json
+.packages/
+*.nupkg
+*.snupkg
+!.nuget/packages/
+
+# ---------------------------------------------------------------------------
+# IDE / Tooling
+# ---------------------------------------------------------------------------
+.vs/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json.example
+.idea/
+*.swp
+*~
+
+# ---------------------------------------------------------------------------
+# OS
+# ---------------------------------------------------------------------------
+Thumbs.db
+Desktop.ini
+.DS_Store

@@ -1,0 +1,6 @@
+# Ergaenzungen fuer Testprojekte.
+
+[*.cs]
+# CA1707 verbietet Unterstriche in Membernamen. In Tests ist das Muster
+# Methode_Erwartung jedoch die uebliche und gut lesbare Konvention.
+dotnet_diagnostic.CA1707.severity = none

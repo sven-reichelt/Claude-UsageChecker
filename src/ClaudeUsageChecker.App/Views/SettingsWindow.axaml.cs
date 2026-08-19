@@ -1,0 +1,124 @@
+using System;
+using System.Reflection;
+using Avalonia.Controls;
+using Avalonia.Markup.Xaml;
+using ClaudeUsageChecker.App.Settings;
+using ClaudeUsageChecker.Core.Authentication;
+using ClaudeUsageChecker.Core.Platform;
+
+namespace ClaudeUsageChecker.App.Views;
+
+/// <summary>
+/// Einstellungen samt Hinterlegung des Zugriffstokens.
+/// Der Tokenwert wird nie in die Einstellungsdatei geschrieben, sondern
+/// ausschliesslich an den verschluesselten Secret-Store uebergeben.
+/// </summary>
+public partial class SettingsWindow : Window
+{
+    private readonly ISecretStore _secretStore;
+    private readonly SettingsStore _settingsStore;
+    private AppSettings _settings;
+
+    public SettingsWindow() : this(SecretStoreFactory.CreateForCurrentPlatform(), new SettingsStore(), new AppSettings())
+    {
+    }
+
+    public SettingsWindow(ISecretStore secretStore, SettingsStore settingsStore, AppSettings settings)
+    {
+        _secretStore = secretStore;
+        _settingsStore = settingsStore;
+        _settings = settings;
+
+        InitializeComponent();
+
+        IntervalBox.Value = settings.PollIntervalSeconds;
+        LaunchAtLoginBox.IsChecked = settings.LaunchAtLogin;
+        CheckUpdatesBox.IsChecked = settings.CheckForUpdates;
+
+        VersionText.Text = "Version "
+            + (Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "unbekannt");
+
+        SaveTokenButton.Click += (_, _) => SaveToken();
+        DeleteTokenButton.Click += (_, _) => DeleteToken();
+        SaveButton.Click += (_, _) => SaveAndClose();
+        CancelButton.Click += (_, _) => Close();
+
+        UpdateTokenStatus();
+    }
+
+    /// <summary>Wird ausgeloest, wenn Einstellungen oder Token geaendert wurden.</summary>
+    public event EventHandler<AppSettings>? SettingsChanged;
+
+    private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+
+    private void UpdateTokenStatus()
+    {
+        if (!_secretStore.IsSupported)
+        {
+            TokenStatus.Text = "Auf diesem System steht kein sicherer Speicher zur Verfuegung.";
+            SaveTokenButton.IsEnabled = false;
+            DeleteTokenButton.IsEnabled = false;
+            return;
+        }
+
+        var hasToken = !string.IsNullOrEmpty(_secretStore.Read(SecretStoreTokenProvider.DefaultKey));
+        TokenStatus.Text = hasToken
+            ? "Ein Token ist hinterlegt."
+            : "Kein eigenes Token hinterlegt - es wird versucht, das Token der "
+              + "Claude-Code-Installation mitzulesen.";
+        DeleteTokenButton.IsEnabled = hasToken;
+    }
+
+    private void SaveToken()
+    {
+        var value = TokenBox.Text?.Trim();
+        if (string.IsNullOrEmpty(value))
+        {
+            TokenStatus.Text = "Bitte zuerst ein Token einfuegen.";
+            return;
+        }
+
+        try
+        {
+            _secretStore.Write(SecretStoreTokenProvider.DefaultKey, value);
+            TokenBox.Text = string.Empty;
+            UpdateTokenStatus();
+            SettingsChanged?.Invoke(this, _settings);
+        }
+        catch (InvalidOperationException ex)
+        {
+            TokenStatus.Text = ex.Message;
+        }
+    }
+
+    private void DeleteToken()
+    {
+        try
+        {
+            _secretStore.Delete(SecretStoreTokenProvider.DefaultKey);
+            UpdateTokenStatus();
+            SettingsChanged?.Invoke(this, _settings);
+        }
+        catch (InvalidOperationException ex)
+        {
+            TokenStatus.Text = ex.Message;
+        }
+    }
+
+    private void SaveAndClose()
+    {
+        _settings = new AppSettings
+        {
+            PollIntervalSeconds = (int)(IntervalBox.Value ?? 300),
+            LaunchAtLogin = LaunchAtLoginBox.IsChecked ?? false,
+            CheckForUpdates = CheckUpdatesBox.IsChecked ?? true,
+            WarningThreshold = _settings.WarningThreshold,
+            CriticalThreshold = _settings.CriticalThreshold
+        };
+
+        _settingsStore.Save(_settings);
+        AutostartManager.Apply(_settings.LaunchAtLogin);
+        SettingsChanged?.Invoke(this, _settings);
+        Close();
+    }
+}

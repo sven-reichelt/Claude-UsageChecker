@@ -1,0 +1,19 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="ClaudeUsageChecker.App.App"
+             RequestedThemeVariant="Default">
+
+  <Application.Styles>
+    <FluentTheme />
+  </Application.Styles>
+
+  <Application.Resources>
+    <ResourceDictionary>
+      <SolidColorBrush x:Key="AccentBrush" Color="#D97757" />
+      <SolidColorBrush x:Key="WarningBrush" Color="#E0A030" />
+      <SolidColorBrush x:Key="CriticalBrush" Color="#D04040" />
+      <SolidColorBrush x:Key="MutedBrush" Color="#888888" />
+    </ResourceDictionary>
+  </Application.Resources>
+
+</Application>

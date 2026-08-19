@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AssemblyName>ClaudeUsageChecker</AssemblyName>
+    <RootNamespace>ClaudeUsageChecker.App</RootNamespace>
+    <ApplicationIcon>../../assets/icons/app.ico</ApplicationIcon>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="Avalonia.Desktop" />
+    <PackageReference Include="Avalonia.Themes.Fluent" />
+    <PackageReference Include="Avalonia.Fonts.Inter" />
+    <PackageReference Include="Avalonia.Diagnostics" Condition="'$(Configuration)' == 'Debug'" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ClaudeUsageChecker.Core\ClaudeUsageChecker.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="../../assets/icons/*.png" Link="Assets/%(Filename)%(Extension)" />
+    <AvaloniaResource Include="../../assets/icons/*.ico" Link="Assets/%(Filename)%(Extension)" />
+  </ItemGroup>
+
+</Project>

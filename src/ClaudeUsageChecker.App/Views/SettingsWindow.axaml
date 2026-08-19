@@ -1,0 +1,47 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="ClaudeUsageChecker.App.Views.SettingsWindow"
+        Title="Claude UsageChecker - Einstellungen"
+        Width="460" SizeToContent="Height"
+        CanResize="False"
+        WindowStartupLocation="CenterScreen">
+
+  <StackPanel Margin="20" Spacing="18">
+
+    <StackPanel Spacing="6">
+      <TextBlock Text="Zugriffstoken" FontWeight="SemiBold" />
+      <TextBlock TextWrapping="Wrap" FontSize="12" Opacity="0.8"
+                 Text="Erzeuge ein Langzeit-Token mit &quot;claude setup-token&quot; und fuege es hier ein. Es wird verschluesselt in der Windows-Anmeldeinformationsverwaltung abgelegt und niemals im Klartext gespeichert." />
+      <TextBox x:Name="TokenBox" PasswordChar="•" Watermark="sk-ant-oat01-..." />
+      <TextBlock x:Name="TokenStatus" FontSize="11" Opacity="0.75" TextWrapping="Wrap" />
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <Button x:Name="SaveTokenButton" Content="Token speichern" />
+        <Button x:Name="DeleteTokenButton" Content="Token entfernen" />
+      </StackPanel>
+    </StackPanel>
+
+    <Separator />
+
+    <StackPanel Spacing="10">
+      <TextBlock Text="Verhalten" FontWeight="SemiBold" />
+
+      <Grid ColumnDefinitions="*,Auto" >
+        <TextBlock Text="Abrufintervall (Sekunden, mindestens 180)" VerticalAlignment="Center" FontSize="12" />
+        <NumericUpDown Grid.Column="1" x:Name="IntervalBox"
+                       Minimum="180" Maximum="3600" Increment="60" Width="120" />
+      </Grid>
+
+      <CheckBox x:Name="LaunchAtLoginBox" Content="Mit Windows starten" />
+      <CheckBox x:Name="CheckUpdatesBox" Content="Beim Start auf Aktualisierungen pruefen" />
+    </StackPanel>
+
+    <Separator />
+
+    <Grid ColumnDefinitions="*,Auto,Auto">
+      <TextBlock x:Name="VersionText" FontSize="11" Opacity="0.6" VerticalAlignment="Center" />
+      <Button Grid.Column="1" x:Name="CancelButton" Content="Abbrechen" Margin="0,0,8,0" />
+      <Button Grid.Column="2" x:Name="SaveButton" Content="Speichern" IsDefault="True" />
+    </Grid>
+
+  </StackPanel>
+</Window>

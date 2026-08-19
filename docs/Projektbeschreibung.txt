@@ -1,0 +1,13 @@
+Ich möchte eine Applikation (Claude UsageChecker) für Windows und MacOS entwickeln, die im Windows-Infobereich neben der Uhr bzw. in der macOS-Menüleiste neben der Uhr läuft.
+Diese soll beim drüber halten der Maus das aktuelle Sitzungslimit sowie das wöchentliche Sitzungslimit meines Claude-Abos (inkl. Zeit bis zum Reset) anzeigen.
+
+Die Applikation soll unabhängig von Claude Code laufen. Eventuell hilft hier /api/oauth/usage weiter.
+Such zur Vorbereitung des Projektes aber gerne noch nach weiteren Möglichkeiten.
+
+Zuerst entwickeln wir die Applikation für Windows, macOS folgt später.
+
+Eine klare Ordnerstruktur ist mir wichtig. Zur Versionierung verwenden wir Github (Repository unter https://github.com/sven-reichelt/Claude-UsageChecker.git ).
+
+Es dürfen zu keinem Zeitpunkt persönliche Daten im Github landen. Sicherheit ist mir wichtig.
+
+Die Applikation sollte wenn möglich eine Update-Funktion besitzen, damit Änderungen einfach erfolgen können.
