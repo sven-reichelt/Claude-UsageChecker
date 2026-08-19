@@ -22,6 +22,13 @@ public sealed class OAuthTokens
     [JsonPropertyName("expiresAt")]
     public DateTimeOffset? ExpiresAt { get; init; }
 
+    /// <summary>
+    /// Ablauf des Refresh-Tokens, sofern der Server ihn mitteilt. Ist er
+    /// unbekannt, laesst sich ueber die Haltbarkeit der Anmeldung nichts sagen.
+    /// </summary>
+    [JsonPropertyName("refreshTokenExpiresAt")]
+    public DateTimeOffset? RefreshTokenExpiresAt { get; init; }
+
     [JsonPropertyName("scope")]
     public string? Scope { get; init; }
 

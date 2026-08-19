@@ -77,6 +77,12 @@ public partial class App : Application, IDisposable
         _oauthTokenStore = new OAuthTokenStore(_secretStore);
         _oauthTokenProvider = new OAuthTokenProvider(_oauthTokenStore, _oauthClient);
 
+        // Laeuft die eigene Anmeldung ab, faellt der Abruf zwar auf Claude Code
+        // zurueck - der Nutzer soll das aber erfahren, statt die Unabhaengigkeit
+        // unbemerkt zu verlieren.
+        _oauthTokenProvider.SignInExpired += (_, grund) => Dispatcher.UIThread.Post(
+            () => ErrorGuard.Run("Hinweis auf abgelaufene Anmeldung", () => ShowSignInExpired(grund)));
+
         var apiClient = new AnthropicUsageApiClient(_usageHttpClient, BuildTokenProviders(), options);
 
         _monitor = new UsageMonitor(apiClient, new MonitorOptions
@@ -184,12 +190,26 @@ public partial class App : Application, IDisposable
         window.Activate();
     }
 
+    /// <summary>
+    /// Weist auf eine abgelaufene eigene Anmeldung hin. Das Fenster wird dabei
+    /// nicht aufgedraengt - der Hinweis steht bereit, sobald es geoeffnet wird.
+    /// </summary>
+    private void ShowSignInExpired(string grund)
+    {
+        _detailsWindow ??= CreateDetailsWindow();
+        _detailsWindow.SetSignInNotice(
+            "Die eigene Anmeldung ist abgelaufen und wurde entfernt. "
+            + "Bitte in den Einstellungen neu anmelden. Bis dahin wird - sofern vorhanden - "
+            + "das Token von Claude Code mitgelesen. Grund: " + grund);
+    }
+
     private void ShowSignIn(SettingsWindow owner)
     {
         var window = new SignInWindow(_oauthClient, _oauthTokenStore);
         window.SignedIn += (_, _) =>
         {
             owner.RefreshSignInStatus();
+            _detailsWindow?.SetSignInNotice(null);
             ErrorGuard.Forget("Abruf nach Anmeldung", RefreshAsync);
         };
         window.Show();

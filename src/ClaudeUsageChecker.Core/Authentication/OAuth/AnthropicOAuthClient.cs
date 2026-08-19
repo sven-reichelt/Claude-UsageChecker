@@ -126,7 +126,14 @@ public sealed class AnthropicOAuthClient(HttpClient httpClient, OAuthOptions? op
 
             if (!response.IsSuccessStatusCode)
             {
-                throw new OAuthException($"{fehlertext} (HTTP {(int)response.StatusCode}). {Beschreibe(body)}");
+                // 400/401 heisst: Der Server hat die Anmeldedaten selbst verworfen.
+                // Alles andere (404, 5xx, Drosselung) sagt nichts ueber sie aus.
+                var abgewiesen = response.StatusCode is System.Net.HttpStatusCode.BadRequest
+                    or System.Net.HttpStatusCode.Unauthorized;
+
+                throw new OAuthException(
+                    $"{fehlertext} (HTTP {(int)response.StatusCode}). {Beschreibe(body)}",
+                    isCredentialRejected: abgewiesen);
             }
 
             TokenResponseDto? dto;
@@ -150,6 +157,9 @@ public sealed class AnthropicOAuthClient(HttpClient httpClient, OAuthOptions? op
                 RefreshToken = dto.RefreshToken,
                 ExpiresAt = dto.ExpiresIn is { } seconds and > 0
                     ? DateTimeOffset.UtcNow.AddSeconds(seconds)
+                    : null,
+                RefreshTokenExpiresAt = dto.RefreshTokenExpiresIn is { } refreshSeconds and > 0
+                    ? DateTimeOffset.UtcNow.AddSeconds(refreshSeconds)
                     : null,
                 Scope = dto.Scope
             };
@@ -203,8 +213,18 @@ public sealed class AnthropicOAuthClient(HttpClient httpClient, OAuthOptions? op
 }
 
 /// <summary>Fehler im Anmeldevorgang.</summary>
-public sealed class OAuthException(string message, Exception? innerException = null)
-    : Exception(message, innerException);
+public sealed class OAuthException(
+    string message,
+    Exception? innerException = null,
+    bool isCredentialRejected = false) : Exception(message, innerException)
+{
+    /// <summary>
+    /// Der Server hat die Anmeldedaten selbst abgewiesen - im Gegensatz zu einem
+    /// Netzwerkproblem, das nichts ueber ihre Gueltigkeit aussagt. Nur in diesem
+    /// Fall ist eine erneute Anmeldung noetig.
+    /// </summary>
+    public bool IsCredentialRejected { get; } = isCredentialRejected;
+}
 
 /// <summary>Eine begonnene Anmeldung: Adresse fuer den Browser plus die Geheimnisse dazu.</summary>
 /// <param name="Url">Die im Browser zu oeffnende Adresse.</param>
@@ -228,6 +248,10 @@ internal sealed class TokenResponseDto
     [JsonPropertyName("access_token")] public string? AccessToken { get; set; }
     [JsonPropertyName("refresh_token")] public string? RefreshToken { get; set; }
     [JsonPropertyName("expires_in")] public int? ExpiresIn { get; set; }
+
+    // Ob Anthropic dieses Feld ueberhaupt liefert, ist unbekannt - erfasst wird
+    // es trotzdem, damit sich die Frage beim naechsten Erneuern von selbst klaert.
+    [JsonPropertyName("refresh_token_expires_in")] public int? RefreshTokenExpiresIn { get; set; }
     [JsonPropertyName("scope")] public string? Scope { get; set; }
 }
 

@@ -115,9 +115,18 @@ Anwendung keinen Port.
 
 Das Zugriffstoken gilt rund acht Stunden. Die Anwendung erneuert es fünf Minuten
 vor Ablauf selbst über den Refresh-Token, der dabei rotiert – ein erneutes
-Anmelden ist im laufenden Betrieb nicht nötig. Läuft die Anwendung sehr lange
-gar nicht, kann der Refresh-Token seinerseits verfallen; dann ist einmal
-neu anzumelden.
+Anmelden ist im laufenden Betrieb nicht nötig.
+
+**Wie lange die Anmeldung eine Pause übersteht, ist unbekannt.** Anthropic
+dokumentiert die Lebensdauer des Refresh-Tokens nicht und liefert sie in der
+Antwort bislang nicht mit. Die Anwendung wertet das Feld
+`refresh_token_expires_in` aus, falls es doch einmal kommt.
+
+Sollte die Anmeldung abgelaufen sein, wird sie entfernt und die Detailansicht
+weist darauf hin. Die Anzeige läuft dann – sofern vorhanden – über das Token von
+Claude Code weiter; ein stilles Zurückfallen ohne Hinweis gibt es nicht.
+Eine bloße Störung (Netzwerk, Serverfehler, Drosselung) lässt die Anmeldung
+dagegen unangetastet.
 
 ### Ohne Anmeldung
 

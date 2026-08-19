@@ -27,6 +27,12 @@
         <TextBlock x:Name="MessageText" TextWrapping="Wrap" FontSize="12" />
       </Border>
 
+      <Border x:Name="SignInNoticeBorder" IsVisible="False"
+              Background="{DynamicResource SystemControlBackgroundBaseLowBrush}"
+              CornerRadius="4" Padding="10">
+        <TextBlock x:Name="SignInNoticeText" TextWrapping="Wrap" FontSize="12" />
+      </Border>
+
       <Border x:Name="UpdateBorder" IsVisible="False"
               Background="{DynamicResource SystemControlBackgroundBaseLowBrush}"
               CornerRadius="4" Padding="10">

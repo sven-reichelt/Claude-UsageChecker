@@ -54,6 +54,16 @@ public partial class DetailsWindow : Window
     /// <summary>Der Nutzer moechte die Release-Seite der neuen Version oeffnen.</summary>
     public event EventHandler<Uri>? ReleasePageRequested;
 
+    /// <summary>
+    /// Zeigt einen dauerhaften Hinweis an, etwa dass die eigene Anmeldung
+    /// abgelaufen ist. Ohne Text wird er ausgeblendet.
+    /// </summary>
+    public void SetSignInNotice(string? message)
+    {
+        SignInNoticeText.Text = message;
+        SignInNoticeBorder.IsVisible = !string.IsNullOrWhiteSpace(message);
+    }
+
     /// <summary>Stellt den uebergebenen Zustand dar.</summary>
     public void Render(UsageState state)
     {

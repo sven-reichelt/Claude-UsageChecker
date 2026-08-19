@@ -26,6 +26,12 @@ public sealed class OAuthTokenProvider(
 
     public string Name => "oauth";
 
+    /// <summary>
+    /// Die eigene Anmeldung wurde vom Server endgueltig abgewiesen und entfernt.
+    /// Der Nutzer muss sich neu anmelden.
+    /// </summary>
+    public event EventHandler<string>? SignInExpired;
+
     /// <summary>Ob eine eigene Anmeldung vorliegt.</summary>
     public bool IsSignedIn => tokenStore.Read() is not null;
 
@@ -76,6 +82,7 @@ public sealed class OAuthTokenProvider(
                     AccessToken = erneuert.AccessToken,
                     RefreshToken = refreshToken,
                     ExpiresAt = erneuert.ExpiresAt,
+                    RefreshTokenExpiresAt = erneuert.RefreshTokenExpiresAt,
                     Scope = erneuert.Scope
                 };
 
@@ -83,9 +90,24 @@ public sealed class OAuthTokenProvider(
             logger?.LogInformation("Die eigene Anmeldung wurde erneuert.");
             return ToAccessToken(zuSpeichern);
         }
+        catch (OAuthException ex) when (ex.IsCredentialRejected)
+        {
+            // Der Server hat die Anmeldedaten verworfen - sie sind endgueltig hin.
+            // Sie werden entfernt, damit die Oberflaeche nicht faelschlich eine
+            // bestehende Anmeldung anzeigt, und der Nutzer wird darauf
+            // hingewiesen. Stillschweigend auf Claude Code zurueckzufallen waere
+            // hier das Schlechteste: Die Anzeige liefe weiter, und die
+            // Unabhaengigkeit waere unbemerkt verloren.
+            logger?.LogWarning(ex, "Die eigene Anmeldung wurde abgewiesen und wird entfernt.");
+            tokenStore.Clear();
+            SignInExpired?.Invoke(this, ex.Message);
+            return null;
+        }
         catch (OAuthException ex)
         {
-            logger?.LogWarning(ex, "Die eigene Anmeldung konnte nicht erneuert werden.");
+            // Netzwerkproblem oder Serverfehler: Die Anmeldedaten bleiben, was
+            // sie sind. Beim naechsten Versuch kann es wieder klappen.
+            logger?.LogWarning(ex, "Die eigene Anmeldung konnte gerade nicht erneuert werden.");
             return null;
         }
         finally

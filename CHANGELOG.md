@@ -117,3 +117,13 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
   „Claude Code" aus: Der neue Quellentyp fiel in den Sammelfall der
   Beschriftung. Jede Quelle hat jetzt ihre eigene, und ein Test verlangt, dass
   keine zwei sich eine teilen.
+
+### Hinzugefügt
+- Eine abgelaufene eigene Anmeldung wird entfernt und in der Detailansicht
+  gemeldet, statt still auf das Token von Claude Code zurückzufallen. Sonst
+  ginge die Unabhängigkeit unbemerkt verloren.
+- Unterscheidung zwischen endgültiger Ablehnung (HTTP 400/401) und
+  vorübergehender Störung (404, 5xx, Drosselung, Netzwerkausfall). Nur die
+  Ablehnung entfernt die Anmeldedaten; eine Störung lässt sie unangetastet.
+- `refresh_token_expires_in` wird ausgewertet, falls der Server es liefert.
+  Bislang tut er das nicht, sodass die Haltbarkeit der Anmeldung offen bleibt.
