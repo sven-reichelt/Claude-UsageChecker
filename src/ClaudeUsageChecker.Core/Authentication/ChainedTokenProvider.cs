@@ -25,7 +25,11 @@ public sealed class ChainedTokenProvider(
                 var token = await provider.TryGetTokenAsync(cancellationToken).ConfigureAwait(false);
                 if (token is not null)
                 {
-                    logger?.LogDebug("Token aus Quelle {Source} bezogen.", provider.Name);
+                    if (logger?.IsEnabled(LogLevel.Debug) == true)
+                    {
+                        logger.LogDebug("Token aus Quelle {Source} bezogen.", provider.Name);
+                    }
+
                     return token;
                 }
             }

@@ -79,7 +79,11 @@ public sealed class AnthropicUsageApiClient(
                     UsageApiFailure.InvalidResponse, response.StatusCode);
             }
 
-            logger?.LogDebug("Nutzungsstand erfolgreich abgerufen (Tokenquelle {Source}).", token.Source);
+            if (logger?.IsEnabled(LogLevel.Debug) == true)
+            {
+                logger.LogDebug("Nutzungsstand erfolgreich abgerufen (Tokenquelle {Source}).", token.Source);
+            }
+
             return MapToSnapshot(dto, _timeProvider.GetUtcNow());
         }
     }
