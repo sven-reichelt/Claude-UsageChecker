@@ -12,6 +12,14 @@ internal static class Program
     {
         CrashReporter.InstallGlobalHandlers();
 
+        // Eine zweite Instanz wuerde ein zweites Symbol im Infobereich anlegen
+        // und die API doppelt abfragen. Sie beendet sich deshalb stillschweigend.
+        using var instance = SingleInstance.TryAcquire();
+        if (instance is null)
+        {
+            return 0;
+        }
+
         try
         {
             BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);

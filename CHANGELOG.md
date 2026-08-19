@@ -35,3 +35,6 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 - Kopfloses UI-Testprojekt (`ClaudeUsageChecker.App.Tests`, 7 Tests), das die
   Erzeugung beider Fenster und die Verknüpfung der benannten Steuerelemente
   absichert – genau die Fehlerklasse, die zuvor unbemerkt blieb.
+- Die Anwendung läuft nur noch einmal je Anmeldesitzung. Ein zweiter Start legte
+  bislang ein zweites Symbol im Infobereich an und fragte die API doppelt ab, was
+  den drosselungsempfindlichen Endpunkt unnötig belastet.
