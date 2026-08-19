@@ -6,7 +6,7 @@ namespace ClaudeUsageChecker.Core.Tests.Api;
 
 public class UsageResponseMappingTests
 {
-    /// <summary>Die Antwort des Endpunkts in der dokumentierten Form.</summary>
+    /// <summary>The endpoint response in its documented form.</summary>
     private const string SampleJson = """
         {
             "five_hour":        { "utilization": 33.0, "resets_at": "2026-04-11T07:00:00.528743+00:00" },
@@ -20,7 +20,7 @@ public class UsageResponseMappingTests
         """;
 
     [Fact]
-    public void MapToSnapshot_LiestAlleFensterAus()
+    public void MapToSnapshot_ReadsEveryWindow()
     {
         var dto = Deserialize(SampleJson);
         var retrievedAt = new DateTimeOffset(2026, 4, 11, 5, 0, 0, TimeSpan.Zero);
@@ -29,22 +29,22 @@ public class UsageResponseMappingTests
 
         Assert.Equal(33.0, snapshot.Session!.Utilization);
         Assert.Equal(13.0, snapshot.Weekly!.Utilization);
-        Assert.Equal(1.0, snapshot.WeeklySonnet!.Utilization);
+        Assert.Equal(1.0, snapshot.ScopedWeekly.Single(w => w.ModelName == "Sonnet").Window.Utilization);
         Assert.Equal(retrievedAt, snapshot.RetrievedAt);
     }
 
     [Fact]
-    public void MapToSnapshot_BehandeltFehlendeFensterAlsNull()
+    public void MapToSnapshot_TreatsMissingWindowsAsNull()
     {
         var dto = Deserialize(SampleJson);
 
         var snapshot = AnthropicUsageApiClient.MapToSnapshot(dto, DateTimeOffset.UnixEpoch);
 
-        Assert.Null(snapshot.WeeklyOpus);
+        Assert.DoesNotContain(snapshot.ScopedWeekly, w => w.ModelName == "Opus");
     }
 
     [Fact]
-    public void MapToSnapshot_UebernimmtZusatzkontingent()
+    public void MapToSnapshot_TakesOverTheExtraUsage()
     {
         var dto = Deserialize(SampleJson);
 
@@ -55,7 +55,7 @@ public class UsageResponseMappingTests
     }
 
     [Fact]
-    public void MapToSnapshot_BegrenztAusreisserAufHundertProzent()
+    public void MapToSnapshot_ClampsOutliersToOneHundredPercent()
     {
         const string json = """
             { "five_hour": { "utilization": 142.5, "resets_at": "2026-04-11T07:00:00+00:00" } }
@@ -67,7 +67,7 @@ public class UsageResponseMappingTests
     }
 
     [Fact]
-    public void MapToSnapshot_IgnoriertFensterOhneResetZeitpunkt()
+    public void MapToSnapshot_IgnoresWindowsWithoutAResetMoment()
     {
         const string json = """{ "five_hour": { "utilization": 50.0 } }""";
 

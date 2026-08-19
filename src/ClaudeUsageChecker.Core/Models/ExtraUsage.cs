@@ -1,7 +1,7 @@
 namespace ClaudeUsageChecker.Core.Models;
 
 /// <summary>
-/// Zusatzkontingent ("extra usage"), sofern im Abo aktiviert.
+/// Extra usage credits, where enabled on the subscription.
 /// </summary>
 public sealed record ExtraUsage(
     bool IsEnabled,

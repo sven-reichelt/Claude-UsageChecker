@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 using System.Text.Json;
 using ClaudeUsageChecker.Core.Authentication;
 using ClaudeUsageChecker.Core.Configuration;
+using ClaudeUsageChecker.Core.Localization;
 using ClaudeUsageChecker.Core.Models;
 using ClaudeUsageChecker.Core.Models.Api;
 using Microsoft.Extensions.Logging;
@@ -10,16 +11,15 @@ using Microsoft.Extensions.Logging;
 namespace ClaudeUsageChecker.Core.Api;
 
 /// <summary>
-/// Ruft GET /api/oauth/usage bei der Anthropic-API ab.
+/// Calls GET /api/oauth/usage on the Anthropic API.
 /// </summary>
 /// <remarks>
-/// Die Tokenquellen werden der Reihe nach durchprobiert - und zwar auch dann,
-/// wenn eine Quelle zwar ein Token liefert, die API dieses aber ablehnt. Das ist
-/// keine Feinheit: Ein Token aus <c>claude setup-token</c> traegt den
-/// Geltungsbereich <c>user:profile</c> nicht und wird hier mit HTTP 403
-/// abgewiesen, obwohl es fuer Inferenz voellig gueltig ist. Ohne dieses
-/// Weiterreichen wuerde ein solches Token die Anwendung lahmlegen, statt nur
-/// selbst zu scheitern.
+/// The token sources are tried in order - including the case where a source does
+/// supply a token but the API rejects it. That is not a nicety: a token from
+/// <c>claude setup-token</c> does not carry the <c>user:profile</c> scope and is
+/// turned away here with HTTP 403, although it is perfectly valid for inference.
+/// Without moving on, such a token would paralyse the application instead of
+/// merely failing itself.
 /// </remarks>
 public sealed class AnthropicUsageApiClient(
     HttpClient httpClient,
@@ -57,16 +57,16 @@ public sealed class AnthropicUsageApiClient(
             }
             catch (UsageApiException ex) when (ex.Failure == UsageApiFailure.Unauthorized)
             {
-                // Diese Quelle taugt nicht - die naechste bekommt ihre Chance.
-                logger?.LogWarning("Token aus {Source} wurde abgelehnt: {Message}", provider.Name, ex.Message);
+                // This source is no good - the next one gets its turn.
+                logger?.LogWarning("Token from {Source} was rejected: {Message}", provider.Name, ex.Message);
                 rejection = ex;
             }
         }
 
         throw rejection ?? new UsageApiException(
             sawToken
-                ? "Kein verwendbares Token gefunden."
-                : "Kein Zugriffsrecht vorhanden. Bitte in den Einstellungen anmelden.",
+                ? T.ErrorNoToken
+                : T.ErrorNotSignedIn,
             UsageApiFailure.NoToken);
     }
 
@@ -79,7 +79,7 @@ public sealed class AnthropicUsageApiClient(
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            logger?.LogWarning(ex, "Tokenquelle {Source} nicht verfügbar.", provider.Name);
+            logger?.LogWarning(ex, "Token source {Source} not available.", provider.Name);
             return null;
         }
     }
@@ -98,13 +98,13 @@ public sealed class AnthropicUsageApiClient(
         catch (TaskCanceledException ex) when (!cancellationToken.IsCancellationRequested)
         {
             throw new UsageApiException(
-                "Zeitüberschreitung beim Abruf des Nutzungsstands.",
+                T.ErrorTimeout,
                 UsageApiFailure.Network, innerException: ex);
         }
         catch (HttpRequestException ex)
         {
             throw new UsageApiException(
-                "Die Anthropic-API ist nicht erreichbar.",
+                T.ErrorUnreachable,
                 UsageApiFailure.Network, innerException: ex);
         }
 
@@ -125,20 +125,20 @@ public sealed class AnthropicUsageApiClient(
             catch (JsonException ex)
             {
                 throw new UsageApiException(
-                    "Die Antwort der API konnte nicht ausgewertet werden.",
+                    T.ErrorUnreadable,
                     UsageApiFailure.InvalidResponse, response.StatusCode, innerException: ex);
             }
 
             if (dto is null)
             {
                 throw new UsageApiException(
-                    "Die API lieferte eine leere Antwort.",
+                    T.ErrorEmptyResponse,
                     UsageApiFailure.InvalidResponse, response.StatusCode);
             }
 
             if (logger?.IsEnabled(LogLevel.Debug) == true)
             {
-                logger.LogDebug("Nutzungsstand erfolgreich abgerufen (Tokenquelle {Source}).", token.Source);
+                logger.LogDebug("Usage status fetched successfully (token source {Source}).", token.Source);
             }
 
             return MapToSnapshot(dto, _timeProvider.GetUtcNow(), token.Source);
@@ -174,23 +174,23 @@ public sealed class AnthropicUsageApiClient(
                 UsageApiFailure.Unauthorized, response.StatusCode),
 
             HttpStatusCode.TooManyRequests => new UsageApiException(
-                "Die API drosselt die Abrufe (HTTP 429).",
+                T.ErrorRateLimited,
                 UsageApiFailure.RateLimited, response.StatusCode, retryAfter),
 
             >= HttpStatusCode.InternalServerError => new UsageApiException(
-                $"Serverfehler der Anthropic-API (HTTP {(int)response.StatusCode}).",
+                T.ErrorServer((int)response.StatusCode),
                 UsageApiFailure.Server, response.StatusCode, retryAfter),
 
             _ => new UsageApiException(
-                $"Unerwartete Antwort der Anthropic-API (HTTP {(int)response.StatusCode}).",
+                T.ErrorUnexpectedResponse((int)response.StatusCode),
                 UsageApiFailure.InvalidResponse, response.StatusCode, retryAfter)
         };
     }
 
     /// <summary>
-    /// Unterscheidet ein abgelaufenes Token von einem mit unzureichendem
-    /// Geltungsbereich - fuer den Nutzer ein grosser Unterschied, weil das eine
-    /// eine neue Anmeldung erfordert und das andere ein anderes Token.
+    /// Distinguishes an expired token from one with insufficient scope - a large
+    /// difference for the user, because one calls for a new sign-in and the
+    /// other for a different token.
     /// </summary>
     private static async Task<string> DescribeRejectionAsync(
         HttpResponseMessage response, CancellationToken cancellationToken)
@@ -207,26 +207,81 @@ public sealed class AnthropicUsageApiClient(
 
         if (body.Contains("user:profile", StringComparison.OrdinalIgnoreCase))
         {
-            return "Dem Token fehlt der Geltungsbereich \"user:profile\". "
-                   + "Tokens aus \"claude setup-token\" taugen nur für Inferenz, nicht für den Nutzungsstand.";
+            return T.ErrorMissingScope;
         }
 
-        return "Das Token wurde abgelehnt. Es ist abgelaufen oder ungültig.";
+        return T.ErrorTokenRejected;
     }
 
     internal static UsageSnapshot MapToSnapshot(
         UsageResponseDto dto, DateTimeOffset retrievedAt, TokenSource tokenSource = TokenSource.ClaudeCli) => new()
     {
-        Session = MapWindow(dto.FiveHour),
-        Weekly = MapWindow(dto.SevenDay),
-        WeeklyOpus = MapWindow(dto.SevenDayOpus),
-        WeeklySonnet = MapWindow(dto.SevenDaySonnet),
+        // The individual fields still supply session and weekly limit reliably;
+        // only the model-specific limits are missing there. They therefore stay
+        // the basis, and the list adds to or overrides what it knows.
+        Session = MapFromLimits(dto, "session") ?? MapWindow(dto.FiveHour),
+        Weekly = MapFromLimits(dto, "weekly_all") ?? MapWindow(dto.SevenDay),
+        ScopedWeekly = MapScopedWeekly(dto),
         ExtraUsage = dto.ExtraUsage is { } extra
             ? new ExtraUsage(extra.IsEnabled, extra.MonthlyLimit, extra.UsedCredits, extra.Utilization)
             : null,
         RetrievedAt = retrievedAt,
         TokenSource = tokenSource
     };
+
+    /// <summary>Finds a limit of a given kind in the <c>limits</c> list.</summary>
+    private static UsageWindow? MapFromLimits(UsageResponseDto dto, string kind) =>
+        dto.Limits?
+            .Where(l => string.Equals(l.Kind, kind, StringComparison.OrdinalIgnoreCase))
+            .Select(MapLimit)
+            .FirstOrDefault(w => w is not null);
+
+    /// <summary>
+    /// The model-specific weekly limits.
+    /// </summary>
+    /// <remarks>
+    /// The <c>limits</c> list takes precedence, because only it carries the model
+    /// name in its content. Where it is missing - because an older version of the
+    /// endpoint answers, say - the old individual fields step in. Their names sit
+    /// in the identifier and have to be added here by hand; that was exactly why
+    /// Fable turned up nowhere.
+    /// </remarks>
+    private static IReadOnlyList<ScopedUsageWindow> MapScopedWeekly(UsageResponseDto dto)
+    {
+        if (dto.Limits is { Count: > 0 } limits)
+        {
+            var ausListe = limits
+                .Where(l => string.Equals(l.Kind, "weekly_scoped", StringComparison.OrdinalIgnoreCase))
+                .Select(l => (Name: l.Scope?.Model?.DisplayName, Window: MapLimit(l)))
+                .Where(e => !string.IsNullOrWhiteSpace(e.Name) && e.Window is not null)
+                .Select(e => new ScopedUsageWindow(e.Name!, e.Window!))
+                .ToList();
+
+            if (ausListe.Count > 0)
+            {
+                return ausListe;
+            }
+        }
+
+        var ausEinzelfeldern = new List<ScopedUsageWindow>(2);
+
+        if (MapWindow(dto.SevenDayOpus) is { } opus)
+        {
+            ausEinzelfeldern.Add(new ScopedUsageWindow("Opus", opus));
+        }
+
+        if (MapWindow(dto.SevenDaySonnet) is { } sonnet)
+        {
+            ausEinzelfeldern.Add(new ScopedUsageWindow("Sonnet", sonnet));
+        }
+
+        return ausEinzelfeldern;
+    }
+
+    private static UsageWindow? MapLimit(LimitDto dto) =>
+        dto.Percent is { } percent && dto.ResetsAt is { } resetsAt
+            ? new UsageWindow(Math.Clamp(percent, 0d, 100d), resetsAt.ToUniversalTime())
+            : null;
 
     private static UsageWindow? MapWindow(UsageWindowDto? dto) =>
         dto?.Utilization is { } utilization && dto.ResetsAt is { } resetsAt
