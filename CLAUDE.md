@@ -52,6 +52,13 @@ Builds into `artifacts/` (centrally through `ArtifactsPath` in
    `/api/oauth/usage`.
 5. **No personal data in the repository.** Not in test data, screenshots or
    sample output either.
+6. **The macOS keychain is written through the Security framework, never
+   through `/usr/bin/security`.** That tool takes the password as an
+   argument, and the arguments of a running process are readable by every
+   account on the machine. Reading would be harmless either way - the value
+   comes back on standard output - which is why the CLI reader still uses it.
+   `MacOsKeychainStore` does the writing, and a test names the three entry
+   points it must go through.
 
 ## Conventions
 
@@ -69,17 +76,27 @@ Builds into `artifacts/` (centrally through `ArtifactsPath` in
 
 ## Status
 
-Version 0.7.2 released, the repository is public and written in English.
+Version 0.7.2 released and 0.8.0 in test builds; the repository is public and
+written in English.
 Finished among other things: the application's own sign-in through OAuth with
 PKCE including refresh, update at the push of a button with checksum
 verification, permanent setup with autostart, configurable thresholds, the
 summary of changes after an update, the about window, model-specific weekly
 limits read from the `limits` list, and nine languages.
 
-macOS arrived with 0.8.0 and has been tried on a real machine: menu bar,
-keychain, autostart, the token of a Claude Code installation, and the sign-in
-through the browser all work. Two things stay off there on purpose -
-self-replacement, and a signature from a registered developer.
+macOS arrived with 0.8.0 and has been tried on a real machine (Apple silicon,
+Tahoe 26.5): menu bar, keychain, autostart, the token of a Claude Code
+installation, the sign-in through the browser and the update check all work.
+Two things stay off there on purpose - self-replacement, and a signature from a
+registered developer.
+
+0.8.0 also brought the choice of appearance (light, dark, or the system) and an
+overview of both sign-ins at the top of the settings.
+
+The suite runs on macOS in CI as well, and the release workflow starts the
+bundle it has just built. For a platform nobody here can open, that start is
+the most valuable test there is - it caught a crash that all 593 green tests
+had missed.
 
 Open: how long the sign-in survives a longer break (Anthropic does not document
 the lifetime of the refresh token), and whether the figures on the Pro
@@ -87,6 +104,52 @@ subscription look the way the README describes. Details in
 [CHANGELOG.md](CHANGELOG.md).
 
 ## Pitfalls that have bitten before
+
+**Avalonia's native menus on macOS are set once and never watched.** Three
+attempts went into this, each one guessing where reading would have answered it.
+What holds:
+
+* The **application menu** beside the apple is read out of
+  `NativeMenu.GetMenu(Application.Current)` exactly once, as the exporter comes
+  up. Finding nothing there, it builds its own - the one saying "About
+  Avalonia" - and writes that into the same property. So ours has to be in place
+  by then: `Initialize()`, beside the XAML load, is early enough.
+* Handing over a **different** menu afterwards reaches nobody. The property is
+  watched only where something provides an exporter, and that is a tray icon or
+  a window, never the application.
+* What is watched is the **item collection** of the menu already exported:
+  `IAvnMenu` subscribes to it and asks the exporter to run again. So a menu is
+  emptied and refilled and stays the same object - which is also why replacing
+  the tray menu throws "The menu being updated does not match".
+* Supplying an application menu means supplying **all** of it. Avalonia appends
+  Services, Hide and Quit, but only on the first export, so a menu refilled
+  later loses them - Quit included. `DisableDefaultApplicationMenuItems` in the
+  builder settles it.
+
+**The language has to be settled before the macOS menu is built** - and only
+there. Its labels come out of the language file, and the lifetime callback that
+settles the language runs after `Initialize()`; that is how the application came
+up German with an English menu. Pulling the settings load forward for *everyone*
+made the test process read the developer's own `settings.json` and switch
+language: eleven tests red.
+
+**`Environment.ProcessPath` points inside the bundle, not at it.** `open -a`
+with the executable fails, and launchd does not complain about an agent whose
+program fails - autostart would simply never happen. `MacOsLaunchAgent` derives
+the `.app` itself, by text: `Path.GetDirectoryName` bends separators to the
+platform it runs on, tests included.
+
+**A pre-release label is counted, not spelled.** Compared as text, "beta.10"
+sorts below "beta.9", and the update check tells whoever is testing that they are
+up to date. This was written into the source as a known limit with the reasoning
+that nobody counts that far; the tenth test build of a single day arrived a week
+later. Where a limit is written down as acceptable, write down what would make it
+unacceptable too.
+
+**`mv` will not overwrite a bundle that is already there.** It moves the new one
+inside the old, and the application carries on running from the version that was
+meant to be replaced. Updating on macOS is `pkill`, `rm -rf`, then move - and
+`ditto -xk` rather than `unzip`, which asks and scatters `__MACOSX` folders.
 
 **Never write your own `InitializeComponent()` in a window's code-behind.**
 Avalonia generates a version `InitializeComponent(bool loadXaml = true, …)` which

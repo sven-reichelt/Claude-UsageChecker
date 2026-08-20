@@ -35,6 +35,8 @@ in the macOS menu bar.
 | Automatic refresh of the application's own token | ✅ |
 | Update at the push of a button, with checksum verification | ✅ |
 | macOS menu bar, keychain and autostart | ✅ |
+| Light, dark, or whatever the system says | ✅ |
+| Both sign-ins at a glance in the settings | ✅ |
 
 ## Data source
 

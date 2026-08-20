@@ -36,6 +36,8 @@ in der macOS-Menüleiste.
 | Selbsttätige Erneuerung des eigenen Tokens | ✅ |
 | Aktualisierung auf Knopfdruck, mit Prüfsummenkontrolle | ✅ |
 | macOS-Menüleiste, Schlüsselbund und Autostart | ✅ |
+| Hell, dunkel oder wie das System | ✅ |
+| Beide Anmeldungen auf einen Blick in den Einstellungen | ✅ |
 
 ## Datenquelle
 

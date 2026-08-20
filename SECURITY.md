@@ -29,6 +29,12 @@ The token is only ever stored through the secret store of the operating system:
 | Windows | Credential Manager (`CredWriteW`) | DPAPI, bound to the user account |
 | macOS | Keychain (`SecItemAdd` through the Security framework) | Keychain Services, bound to the login keychain |
 
+The framework and not `/usr/bin/security`: that tool takes the password as a
+command line argument, and the arguments of a running process are readable by
+every account on the machine. Reading is a different matter - the value comes
+back on standard output, where nobody else can see it - so the reader for the
+Claude Code credentials still uses the tool.
+
 Two separate entries:
 
 | Entry | Content |

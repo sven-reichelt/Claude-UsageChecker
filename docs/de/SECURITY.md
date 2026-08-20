@@ -31,6 +31,12 @@ abgelegt:
 | Windows | Anmeldeinformationsverwaltung (`CredWriteW`) | DPAPI, an das Benutzerkonto gebunden |
 | macOS | Schlüsselbund (`SecItemAdd` über das Security-Framework) | Keychain Services, an den Anmeldeschlüsselbund gebunden |
 
+Das Framework und nicht `/usr/bin/security`: Jenes Werkzeug nimmt das Kennwort
+als Kommandozeilenargument entgegen, und die Argumente eines laufenden
+Prozesses kann jedes Konto auf der Maschine mitlesen. Beim Lesen ist das anders
+– der Wert kommt über die Standardausgabe zurück, die sonst niemand sieht –,
+weshalb der Leser für die Claude-Code-Anmeldedaten es weiterhin benutzt.
+
 Zwei getrennte Einträge:
 
 | Eintrag | Inhalt |
