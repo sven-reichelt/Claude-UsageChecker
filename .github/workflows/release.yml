@@ -196,6 +196,20 @@ jobs:
             | xargs -0 -n1 codesign --force --timestamp --options runtime \
                 --keychain "$KEYCHAIN" --sign "$IDENTITY"
 
+          # Two entitlements, and the reasoning belongs here because it cannot
+          # live in the file: codesign parses that plist with AMFI, which
+          # rejects XML comments outright ("syntax error near line 6").
+          #
+          # The hardened runtime is what Apple requires before it will notarise
+          # anything, and it forbids by default exactly what a just-in-time
+          # compiler does: write machine code and then execute it. Without
+          # allow-jit and allow-unsigned-executable-memory the bundle would be
+          # signed, notarised, and dead on arrival.
+          #
+          # Deliberately absent: disabling library validation. Every library in
+          # the bundle carries the same signature as the bundle, which is what
+          # that check asks for - so switching it off would buy nothing and give
+          # up a real safeguard.
           codesign --force --timestamp --options runtime \
             --entitlements build/macos/entitlements.plist \
             --keychain "$KEYCHAIN" --sign "$IDENTITY" "$APP"
