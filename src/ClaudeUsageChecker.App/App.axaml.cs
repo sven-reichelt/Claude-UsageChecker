@@ -76,6 +76,11 @@ public partial class App : Application, IDisposable
             Localizer.Use(Language.Find(_settings.Language) ?? Language.FromSystem());
 
             Compose();
+
+            if (OperatingSystem.IsMacOS())
+            {
+                ErrorGuard.Run("build the application menu", BuildMacOsApplicationMenu);
+            }
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -240,6 +245,48 @@ public partial class App : Application, IDisposable
                 window.Render(_monitor.State);
             }
         }
+    }
+
+    /// <summary>
+    /// The menu beside the apple, the one named after the application.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Avalonia builds a default one where the first entry reads "About
+    /// Avalonia" - a literal inside the framework, not the application name, so
+    /// there is nothing to correct. The whole menu has to be supplied instead.
+    /// </para>
+    /// <para>
+    /// What macOS expects there is: what this program is, where to set it up,
+    /// and how to leave. The entries are the ones the menu in the menu bar
+    /// already offers - a Mac user looks for them here first, and finding them
+    /// missing is what would feel wrong.
+    /// </para>
+    /// </remarks>
+    private void BuildMacOsApplicationMenu()
+    {
+        var about = new NativeMenuItem(T.AboutTitle);
+        about.Click += (_, _) => ErrorGuard.Run("open the about window", ShowAbout);
+
+        var settings = new NativeMenuItem(T.TraySettings);
+        settings.Click += (_, _) => ErrorGuard.Run("open settings", ShowSettings);
+
+        var quit = new NativeMenuItem(T.TrayExit);
+        quit.Click += (_, _) => ErrorGuard.Run("exit", RequestShutdown);
+
+        var menu = new NativeMenu
+        {
+            Items =
+            {
+                about,
+                new NativeMenuItemSeparator(),
+                settings,
+                new NativeMenuItemSeparator(),
+                quit
+            }
+        };
+
+        NativeMenu.SetMenu(this, menu);
     }
 
     private void ShowAbout()
