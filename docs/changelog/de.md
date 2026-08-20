@@ -8,6 +8,11 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unveröffentlicht]
 
+## [0.6.1] – 2026-08-20
+
+### Geändert
+- Service-Release.
+
 ## [0.6.0] – 2026-08-20
 
 ### Behoben

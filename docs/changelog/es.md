@@ -8,6 +8,11 @@ versionado [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+## [0.6.1] – 2026-08-20
+
+### Cambiado
+- Versión de mantenimiento.
+
 ## [0.6.0] – 2026-08-20
 
 ### Corregido
