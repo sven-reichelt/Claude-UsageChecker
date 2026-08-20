@@ -188,11 +188,18 @@ jobs:
           set -euo pipefail
           APP="ClaudeUsageChecker.app"
 
-          # Inside out: every library first, the bundle last. A signature made
-          # over a bundle whose contents change afterwards is broken, and
-          # --deep, which would do this in one call, is deprecated by Apple and
-          # known to miss things.
-          find "$APP/Contents/MacOS" -name "*.dylib" -print0 \
+          # Inside out: everything beside the launcher first, the bundle last. A
+          # signature made over a bundle whose contents change afterwards is
+          # broken, and --deep, which would do this in one call, is deprecated
+          # by Apple and known to miss things.
+          #
+          # Everything, not only the libraries: codesign treats every file in
+          # Contents/MacOS as part of the program, whatever its format, and
+          # refuses to verify a bundle in which one of them is unsigned - "code
+          # object is not signed at all", pointing at a managed .NET assembly.
+          # Those assemblies have to sit beside the launcher, because that is
+          # where the .NET host looks for them.
+          find "$APP/Contents/MacOS" -type f ! -name "ClaudeUsageChecker" -print0 \
             | xargs -0 -n1 codesign --force --timestamp --options runtime \
                 --keychain "$KEYCHAIN" --sign "$IDENTITY"
 
