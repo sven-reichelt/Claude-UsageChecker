@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup Label="Tests">
+    <PackageVersion Include="Avalonia.Skia" Version="11.3.20" />
     <PackageVersion Include="Avalonia.Headless" Version="11.3.20" />
     <PackageVersion Include="Avalonia.Headless.XUnit" Version="11.3.20" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />

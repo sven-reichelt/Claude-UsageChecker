@@ -23,5 +23,10 @@ namespace ClaudeUsageChecker.App.Tests;
 public static class TestAppBuilder
 {
     public static AppBuilder BuildAvaloniaApp() =>
-        AppBuilder.Configure<App>().UseHeadless(new AvaloniaHeadlessPlatformOptions());
+        AppBuilder.Configure<App>()
+            .UseSkia()
+            // Real drawing rather than the headless stub: it lets a test capture
+            // what a window actually looks like, and it exercises the rendering
+            // path instead of skipping it.
+            .UseHeadless(new AvaloniaHeadlessPlatformOptions { UseHeadlessDrawing = false });
 }
