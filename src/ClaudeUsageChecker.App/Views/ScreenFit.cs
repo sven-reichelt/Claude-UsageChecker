@@ -42,7 +42,13 @@ internal static class ScreenFit
     /// To be called from <c>Opened</c>: the screen is only known once the window
     /// is open.
     /// </remarks>
-    public static void Apply(Window window, Control? scroller = null)
+    /// <param name="keepCentred">
+    /// Whether the window should be centred again whenever its content changes
+    /// size. For a window that is created once and reused this matters:
+    /// <c>CenterScreen</c> only ever takes effect the first time it opens, and a
+    /// window that sizes itself to its content grows downwards afterwards.
+    /// </param>
+    public static void Apply(Window window, Control? scroller = null, bool keepCentred = false)
     {
         ArgumentNullException.ThrowIfNull(window);
 
@@ -61,13 +67,13 @@ internal static class ScreenFit
         }
 
         // Content that arrives after the window is open - the changelog is
-        // rendered into it - changes the height once more. A single pass after
-        // opening would measure the state before that.
-        window.SizeChanged += (_, _) => Fit(window, scroller);
+        // rendered into it, or an update notice appears - changes the height once
+        // more. A single pass after opening would measure the state before that.
+        window.SizeChanged += (_, _) => Fit(window, scroller, keepCentred);
 
         // The correction has to wait for the layout to run, otherwise the height
         // read is still the one from before the cap took effect.
-        PostWhenStillOpen(window, () => Fit(window, scroller));
+        PostWhenStillOpen(window, () => Fit(window, scroller, keepCentred));
     }
 
     /// <summary>
@@ -99,7 +105,7 @@ internal static class ScreenFit
     /// below it so that "save" stays reachable on a low screen, and no fixed
     /// allowance would have known about that.
     /// </remarks>
-    private static void Fit(Window window, Control? scroller)
+    private static void Fit(Window window, Control? scroller, bool keepCentred)
     {
         // SizeChanged also fires while a window is closing, and a closed window
         // has no platform implementation left to ask for its screen.
@@ -123,11 +129,11 @@ internal static class ScreenFit
 
             // Shrinking changes the height, so the position is settled in the
             // next pass rather than on a value that is about to be stale.
-            PostWhenStillOpen(window, () => MoveIntoWorkingArea(window));
+            PostWhenStillOpen(window, () => Place(window, keepCentred));
             return;
         }
 
-        MoveIntoWorkingArea(window);
+        Place(window, keepCentred);
     }
 
     /// <summary>
@@ -151,6 +157,42 @@ internal static class ScreenFit
                 }
             },
             DispatcherPriority.Loaded);
+    }
+
+    /// <summary>Puts the window where it belongs: centred, or at least on screen.</summary>
+    private static void Place(Window window, bool keepCentred)
+    {
+        if (keepCentred)
+        {
+            Centre(window);
+        }
+
+        MoveIntoWorkingArea(window);
+    }
+
+    /// <summary>Centres a window in the working area of its screen.</summary>
+    /// <remarks>
+    /// Called again on every change of size, because the position Avalonia works
+    /// out when the window opens belongs to the height it had at that moment.
+    /// The details window is created once and reused, and its update notice
+    /// arrives from a network call seconds later - it grew a hundred pixels
+    /// downwards and sat visibly below the middle of the screen.
+    /// </remarks>
+    private static void Centre(Window window)
+    {
+        if (window.Screens.ScreenFromWindow(window) is not { } screen)
+        {
+            return;
+        }
+
+        var frame = window.FrameSize ?? window.Bounds.Size;
+        var width = (int)Math.Round(frame.Width * screen.Scaling);
+        var height = (int)Math.Round(frame.Height * screen.Scaling);
+        var area = screen.WorkingArea;
+
+        window.Position = new PixelPoint(
+            area.X + (area.Width - width) / 2,
+            area.Y + (area.Height - height) / 2);
     }
 
     /// <summary>Moves a window up if it extends past the bottom of the screen.</summary>

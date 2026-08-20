@@ -8,6 +8,16 @@ numérotation [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+## [0.6.3] – 2026-08-20
+
+### Corrigé
+- **La fenêtre de détails se plaçait sous le milieu de l'écran dès qu'une mise
+  à jour était disponible.** Elle est créée une fois puis réutilisée, si bien
+  que `CenterScreen` n'agissait qu'à la première ouverture ; l'avis de mise à
+  jour arrive quelques secondes plus tard et la grandit d'une centaine de
+  pixels, vers le bas. Elle est désormais recentrée à chaque changement de
+  taille.
+
 ## [0.6.2] – 2026-08-20
 
 ### Modifié

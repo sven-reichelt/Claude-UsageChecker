@@ -29,9 +29,10 @@ public partial class DetailsWindow : Window
         _timeProvider = timeProvider;
         InitializeComponent();
 
-        // Longer translations grow the window downwards; without this it
-        // can end up reaching past the bottom edge of the screen.
-        Opened += (_, _) => ScreenFit.Apply(this);
+        // This window is created once and reused, and its update notice arrives
+        // from a network call after it has already been placed. Without keeping
+        // it centred it grows downwards and sits below the middle of the screen.
+        Opened += (_, _) => ScreenFit.Apply(this, keepCentred: true);
         ApplyTexts();
 
         RefreshButton.Click += (_, _) => RefreshRequested?.Invoke(this, EventArgs.Empty);

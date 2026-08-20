@@ -8,6 +8,18 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unveröffentlicht]
 
+## [0.6.3] – 2026-08-20
+
+### Behoben
+- **Das Detailfenster saß unterhalb der Bildschirmmitte, sobald ein Update
+  bereitstand.** Es wird einmal erzeugt und wiederverwendet, `CenterScreen`
+  wirkte also nur beim allerersten Öffnen – die Update-Meldung trifft aber
+  Sekunden später aus dem Netzabruf ein und macht das Fenster gut hundert
+  Pixel höher. Ein Fenster, das sich nach seinem Inhalt bemisst, wächst nach
+  unten, von einer Oberkante aus, die für die kleinere Höhe berechnet wurde –
+  seine Mitte lag damit um die halbe Meldung zu tief. Es wird jetzt bei jeder
+  Größenänderung neu zentriert.
+
 ## [0.6.2] – 2026-08-20
 
 ### Geändert

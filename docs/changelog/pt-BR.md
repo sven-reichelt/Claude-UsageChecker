@@ -8,6 +8,15 @@ versionamento [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+## [0.6.3] – 2026-08-20
+
+### Corrigido
+- **A janela de detalhes ficava abaixo do centro da tela quando havia uma
+  atualização disponível.** Ela é criada uma vez e reutilizada, então
+  `CenterScreen` só valia na primeira abertura; o aviso chega segundos depois
+  e a deixa cerca de cem pixels mais alta, crescendo para baixo. Agora ela é
+  recentralizada sempre que o conteúdo muda de tamanho.
+
 ## [0.6.2] – 2026-08-20
 
 ### Alterado

@@ -1,4 +1,4 @@
-# Claude UsageChecker – notes for Claude Code
+﻿# Claude UsageChecker â€“ notes for Claude Code
 
 Tray application for Windows (macOS planned) that shows the session and weekly
 limits of a Claude subscription in the notification area.
@@ -23,7 +23,7 @@ and a second one would break every clone that exists by then.
 
 ```powershell
 dotnet build                                      # the whole solution
-dotnet test                                       # 484 tests (Core.Tests + App.Tests)
+dotnet test                                       # 486 tests (Core.Tests + App.Tests)
 dotnet run --project src/ClaudeUsageChecker.App   # run the application
 node build/generate-icons.mjs                     # regenerate the icons
 ```
@@ -33,10 +33,10 @@ Builds into `artifacts/` (centrally through `ArtifactsPath` in
 
 ## Layout
 
-* **`ClaudeUsageChecker.Core`** – platform independent, no UI dependency. API
+* **`ClaudeUsageChecker.Core`** â€“ platform independent, no UI dependency. API
   access, token retrieval, state logic and text formatting belong here.
   Everything in it is testable, and everything in it is tested.
-* **`ClaudeUsageChecker.App`** – Avalonia. The composition root is
+* **`ClaudeUsageChecker.App`** â€“ Avalonia. The composition root is
   `App.axaml.cs`; there is deliberately no DI container and no MVVM framework,
   to keep the dependency list short.
 
@@ -69,7 +69,7 @@ Builds into `artifacts/` (centrally through `ArtifactsPath` in
 
 ## Status
 
-Version 0.6.2 released, the repository is public and written in English.
+Version 0.6.3 released, the repository is public and written in English.
 Finished among other things: the application's own sign-in through OAuth with
 PKCE including refresh, update at the push of a button with checksum
 verification, permanent setup with autostart, configurable thresholds, the
@@ -87,7 +87,7 @@ subscription look the way the README describes. Details in
 ## Pitfalls that have bitten before
 
 **Never write your own `InitializeComponent()` in a window's code-behind.**
-Avalonia generates a version `InitializeComponent(bool loadXaml = true, …)` which
+Avalonia generates a version `InitializeComponent(bool loadXaml = true, â€¦)` which
 writes the controls named with `x:Name` into their fields after loading. A
 hand-written parameterless variant wins overload resolution, loads only the XAML
 and leaves every field null - the constructor then fails with a
@@ -125,7 +125,7 @@ into the eight versions under `docs/changelog/`. The test checks that all of the
 know the same versions - a missing entry under *Unreleased* escapes it, though.
 
 **`Assembly.GetName().Version` always has four parts, the changelog three.**
-`Version` counts a missing part as −1, so `0.6.0` counts as **smaller** than
+`Version` counts a missing part as âˆ’1, so `0.6.0` counts as **smaller** than
 `0.6.0.0`. Comparing the two unguarded makes the application consider the
 running version out of date - the summary of changes would come back on every
 start. Use `ReleaseHistory.ThreePart` before every comparison;
@@ -151,8 +151,8 @@ afterwards, or build with `--no-incremental`.
 
 **Editing language files from the shell mangles the encoding.** `perl -i -CSD`
 decodes the file as UTF-8 but leaves the replacement text from the command line
-as raw bytes - and writes them out encoded a second time. Out of "Prüfsumme"
-comes "PrÃ¼fsumme". It struck 93 lines across eight languages, and nothing
+as raw bytes - and writes them out encoded a second time. Out of "PrÃ¼fsumme"
+comes "PrÃƒÂ¼fsumme". It struck 93 lines across eight languages, and nothing
 noticed: English is pure ASCII and stayed clean, so every test was green and the
 damage would have shown only to whoever ran the application in German. Use
 `-CSDA` (the `A` decodes the arguments) or a dedicated tool.

@@ -8,6 +8,15 @@ versionado [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+## [0.6.3] – 2026-08-20
+
+### Corregido
+- **La ventana de detalles quedaba por debajo del centro cuando había una
+  actualización disponible.** Se crea una vez y se reutiliza, de modo que
+  `CenterScreen` solo actuaba la primera vez; el aviso de actualización llega
+  segundos después y la hace unos cien píxeles más alta, creciendo hacia
+  abajo. Ahora se vuelve a centrar cada vez que su contenido cambia de tamaño.
+
 ## [0.6.2] – 2026-08-20
 
 ### Cambiado

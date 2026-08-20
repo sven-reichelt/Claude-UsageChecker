@@ -8,6 +8,17 @@ the versioning [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.6.3] – 2026-08-20
+
+### Fixed
+- **The details window sat below the middle of the screen whenever an update
+  was on offer.** It is created once and reused, so `CenterScreen` only ever
+  took effect the first time it opened - while the update notice arrives from
+  a network call seconds later and makes the window a good hundred pixels
+  taller. A window that sizes itself to its content grows downwards, from a
+  top edge worked out for the smaller height, so its middle ended up half the
+  notice too low. It is now centred again whenever its content changes size.
+
 ## [0.6.2] – 2026-08-20
 
 ### Changed

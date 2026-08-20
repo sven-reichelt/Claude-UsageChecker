@@ -1,4 +1,4 @@
-name: Bug report
+﻿name: Bug report
 description: Something does not work as expected
 labels: ["bug"]
 body:
@@ -8,9 +8,9 @@ body:
         Thanks for taking the time to report this.
 
         > [!CAUTION]
-        > **Never paste an access token.** Tokens look like `sk-ant-oat01-…` and
+        > **Never paste an access token.** Tokens look like `sk-ant-oat01-â€¦` and
         > grant full access to your Claude subscription. They appear in
-        > `%USERPROFILE%\.claude\.credentials.json` — do not attach that file.
+        > `%USERPROFILE%\.claude\.credentials.json` â€” do not attach that file.
         > `crash.log` and `settings.json` contain no tokens and are safe to share.
 
   - type: textarea
@@ -29,7 +29,7 @@ body:
       description: If it happens every time, the exact steps help most.
       placeholder: |
         1. Start the application
-        2. Open Settings, set …
+        2. Open Settings, set â€¦
         3. Wait for the next refresh
     validations:
       required: false
@@ -39,7 +39,7 @@ body:
     attributes:
       label: Version
       description: Shown in "About Claude UsageChecker" in the tray menu.
-      placeholder: "0.6.2"
+      placeholder: "0.6.3"
     validations:
       required: true
 
@@ -72,7 +72,7 @@ body:
     id: token-source
     attributes:
       label: How does the application authenticate?
-      description: Shown at the bottom of the details window ("Source: …").
+      description: Shown at the bottom of the details window ("Source: â€¦").
       options:
         - Own sign-in (OAuth)
         - Token from a running Claude Code installation
@@ -88,7 +88,7 @@ body:
       label: crash.log
       description: |
         Found at `%LOCALAPPDATA%\ClaudeUsageChecker\crash.log`, if it exists.
-        It contains no tokens — `AccessToken.ToString()` masks them.
+        It contains no tokens â€” `AccessToken.ToString()` masks them.
       render: text
     validations:
       required: false

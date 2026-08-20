@@ -18,9 +18,12 @@ local.settings.json
 *.snk
 *.key
 *.pem
-# Personal working notes - not for version control
+# Personal working notes - not for version control. The screenshots in
+# notizen/ show a real desktop with real file names; that is exactly what must
+# never reach a public repository.
 Fortsetzungspromt.md
 Fortsetzungsprompt.md
+notizen/
 
 # Local runtime and user configuration of the app (may hold account data)
 config.local.json
