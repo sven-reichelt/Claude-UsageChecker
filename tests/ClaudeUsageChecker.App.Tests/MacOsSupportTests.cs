@@ -112,6 +112,44 @@ public class MacOsSupportTests
         Assert.DoesNotContain("Avalonia", name ?? string.Empty, StringComparison.OrdinalIgnoreCase);
     }
 
+    /// <summary>
+    /// The application menu stands before anything can read it.
+    /// </summary>
+    /// <remarks>
+    /// Avalonia's exporter reads this property once and, finding nothing,
+    /// builds its own menu - the one whose first entry says "About Avalonia" -
+    /// and writes that into the very same property. Setting it afterwards
+    /// changes a value nobody reads again, which is exactly what the first
+    /// attempt did. The test therefore asks the question that matters: is it
+    /// there once Initialize has run?
+    ///
+    /// Only on macOS is it built at all; elsewhere nothing shows it and the
+    /// property stays empty.
+    /// </remarks>
+    [AvaloniaFact]
+    public void TheApplicationMenuIsInPlaceAfterInitialisation()
+    {
+        var application = Avalonia.Application.Current!;
+        var menu = Avalonia.Controls.NativeMenu.GetMenu(application);
+
+        if (!OperatingSystem.IsMacOS())
+        {
+            Assert.Null(menu);
+            return;
+        }
+
+        Assert.NotNull(menu);
+
+        var headers = menu.Items
+            .OfType<Avalonia.Controls.NativeMenuItem>()
+            .Select(i => i.Header)
+            .ToList();
+
+        Assert.Contains(T.AboutTitle, headers);
+        Assert.Contains(T.TrayExit, headers);
+        Assert.DoesNotContain(headers, h => h?.Contains("Avalonia", StringComparison.OrdinalIgnoreCase) == true);
+    }
+
     /// <summary>The label is a reverse domain name, as launchd expects.</summary>
     [Fact]
     public void TheLabelIsAReverseDomainName()

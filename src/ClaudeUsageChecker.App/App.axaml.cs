@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
@@ -58,6 +59,14 @@ public partial class App : Application, IDisposable
         // interface text does not belong in the source; the product name is
         // the one string the language files deliberately leave untranslated.
         Name = T.AppName;
+
+        // Here and not later: the menu exporter reads this once, and if it
+        // finds nothing it builds its own and writes that in. See the remarks
+        // on the method.
+        if (OperatingSystem.IsMacOS())
+        {
+            ErrorGuard.Run("build the application menu", BuildMacOsApplicationMenu);
+        }
     }
 
     public override void OnFrameworkInitializationCompleted()
@@ -76,11 +85,6 @@ public partial class App : Application, IDisposable
             Localizer.Use(Language.Find(_settings.Language) ?? Language.FromSystem());
 
             Compose();
-
-            if (OperatingSystem.IsMacOS())
-            {
-                ErrorGuard.Run("build the application menu", BuildMacOsApplicationMenu);
-            }
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -260,7 +264,17 @@ public partial class App : Application, IDisposable
     /// What macOS expects there is: what this program is, where to set it up,
     /// and how to leave. The entries are the ones the menu in the menu bar
     /// already offers - a Mac user looks for them here first, and finding them
-    /// missing is what would feel wrong.
+    /// missing is what would feel wrong. Their shortcuts are the ones every Mac
+    /// application uses, because that is where the fingers go.
+    /// </para>
+    /// <para>
+    /// The timing decides whether any of it arrives. Avalonia's exporter reads
+    /// this property exactly once; where it finds nothing, it builds its own
+    /// menu, writes that into the very same property, and never looks again.
+    /// Setting it afterwards changes a value nobody reads a second time - which
+    /// is what the first attempt did, from the lifetime callback, with no
+    /// visible effect whatsoever. Read out of AvaloniaNativeMenuExporter rather
+    /// than guessed at a third time.
     /// </para>
     /// </remarks>
     private void BuildMacOsApplicationMenu()
@@ -268,10 +282,16 @@ public partial class App : Application, IDisposable
         var about = new NativeMenuItem(T.AboutTitle);
         about.Click += (_, _) => ErrorGuard.Run("open the about window", ShowAbout);
 
-        var settings = new NativeMenuItem(T.TraySettings);
+        var settings = new NativeMenuItem(T.TraySettings)
+        {
+            Gesture = new KeyGesture(Key.OemComma, KeyModifiers.Meta)
+        };
         settings.Click += (_, _) => ErrorGuard.Run("open settings", ShowSettings);
 
-        var quit = new NativeMenuItem(T.TrayExit);
+        var quit = new NativeMenuItem(T.TrayExit)
+        {
+            Gesture = new KeyGesture(Key.Q, KeyModifiers.Meta)
+        };
         quit.Click += (_, _) => ErrorGuard.Run("exit", RequestShutdown);
 
         var menu = new NativeMenu
