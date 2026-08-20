@@ -82,8 +82,12 @@ public sealed class GitHubReleaseUpdateService(
                 return UpdateCheckResult.UpToDate(currentVersion);
             }
 
+            // https only, like the download addresses: the value comes from the
+            // GitHub response, but a page handed to the browser deserves the
+            // same bar as a file handed to the installer.
             var page = root.TryGetProperty("html_url", out var urlElement)
                        && Uri.TryCreate(urlElement.GetString(), UriKind.Absolute, out var parsed)
+                       && parsed.Scheme == Uri.UriSchemeHttps
                 ? parsed
                 : null;
 
