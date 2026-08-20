@@ -10,6 +10,7 @@
   "app.version": "版本 {0}",
   "app.versionPreRelease": "版本 {0}（预发布）",
 
+  "tray.showDetails": "显示详情 ...",
   "tray.refreshNow": "立即刷新",
   "tray.settings": "设置 ...",
   "tray.checkUpdates": "检查更新 ...",

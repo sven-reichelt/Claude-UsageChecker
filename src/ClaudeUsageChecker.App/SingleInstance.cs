@@ -15,18 +15,39 @@ namespace ClaudeUsageChecker.App;
 /// </remarks>
 internal sealed class SingleInstance : IDisposable
 {
-    private const string MutexName = @"Local\ClaudeUsageChecker.SingleInstance";
+    /// <summary>
+    /// The name of the lock. Windows wants the "Local\" prefix for a lock that
+    /// applies per login session; on macOS and Linux the name becomes a file
+    /// name, where a backslash has no such meaning and only makes trouble.
+    /// </summary>
+    internal static string MutexName => OperatingSystem.IsWindows()
+        ? @"Local\ClaudeUsageChecker.SingleInstance"
+        : "ClaudeUsageChecker.SingleInstance";
 
-    private readonly Mutex _mutex;
+    private readonly Mutex? _mutex;
 
-    private SingleInstance(Mutex mutex) => _mutex = mutex;
+    private SingleInstance(Mutex? mutex) => _mutex = mutex;
 
     /// <summary>
     /// Tries to take the lock. Returns null when an instance is already running.
     /// </summary>
     public static SingleInstance? TryAcquire()
     {
-        var mutex = new Mutex(initiallyOwned: false, MutexName);
+        Mutex mutex;
+
+        try
+        {
+            mutex = new Mutex(initiallyOwned: false, MutexName);
+        }
+        catch (Exception ex) when (ex is not OutOfMemoryException)
+        {
+            // Named locks are not available everywhere, and where they are the
+            // rules about names differ. Going without one costs a second icon
+            // if the application is started twice; refusing to start over it
+            // would cost the application altogether. Note it and carry on.
+            CrashReporter.Write(ex, "SingleInstance.TryAcquire");
+            return new SingleInstance(mutex: null);
+        }
 
         try
         {
@@ -46,6 +67,11 @@ internal sealed class SingleInstance : IDisposable
 
     public void Dispose()
     {
+        if (_mutex is null)
+        {
+            return;
+        }
+
         try
         {
             _mutex.ReleaseMutex();

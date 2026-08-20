@@ -8,6 +8,23 @@ the versioning [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.8.0] – 2026-08-20
+
+### Added
+- **macOS.** The application now lives in the menu bar as well: an icon with
+  the reported limits, the same windows, the same nine languages. Sign-in of
+  its own goes into the keychain, autostart through a launch agent of the
+  user, and the token of a Claude Code installation is read from the keychain
+  as before.
+
+  The menu there is a native one, which is the opposite decision to Windows and
+  the same reasoning: a menu bar item opens a system menu, and a window painted
+  to look like one would be the part that stood out.
+
+  Delivered as an application bundle for Apple silicon, signed ad hoc rather
+  than by a registered developer. Self-replacement stays off on macOS for now -
+  a new version is fetched by hand.
+
 ## [0.7.2] – 2026-08-20
 
 ### Fixed

@@ -8,6 +8,23 @@ numerazione [Semantic Versioning](https://semver.org/lang/it/).
 
 ## [Non pubblicato]
 
+## [0.8.0] – 2026-08-20
+
+### Aggiunto
+- **macOS.** L'applicazione vive ora anche nella barra dei menù: un'icona con i
+  limiti segnalati, le stesse finestre, le stesse nove lingue. L'accesso
+  integrato finisce nel portachiavi, l'avvio automatico passa per un agente di
+  avvio dell'utente, e il token di un'installazione di Claude Code viene letto
+  dal portachiavi come prima.
+
+  Il menù lì è nativo: la decisione opposta a quella di Windows, per la stessa
+  ragione. Un'icona della barra dei menù apre un menù di sistema, e una finestra
+  che ne imitasse uno sarebbe proprio ciò che stonerebbe.
+
+  Distribuita come pacchetto applicativo per Apple silicon, firmato ad hoc e non
+  da uno sviluppatore registrato. La sostituzione automatica resta disattivata
+  su macOS per ora: la nuova versione si scarica a mano.
+
 ## [0.7.2] – 2026-08-20
 
 ### Corretto

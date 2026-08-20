@@ -8,6 +8,23 @@ numeração [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+## [0.8.0] – 2026-08-20
+
+### Adicionado
+- **macOS.** A aplicação passa a viver também na barra de menús: um ícone com os
+  limites indicados, as mesmas janelas, os mesmos nove idiomas. O início de
+  sessão próprio vai para o porta-chaves, o arranque automático usa um agente de
+  lançamento do utilizador, e o token de uma instalação do Claude Code é lido do
+  porta-chaves como antes.
+
+  Aí o menú é nativo: a decisão oposta à do Windows, pela mesma razão. Um ícone
+  da barra de menús abre um menú do sistema, e uma janela a imitá-lo seria
+  precisamente o que destoaria.
+
+  Entregue como pacote de aplicação para Apple silicon, assinado ad hoc e não por
+  um programador registado. A substituição automática mantém-se desligada no
+  macOS por agora: a versão nova é obtida à mão.
+
 ## [0.7.2] – 2026-08-20
 
 ### Corrigido

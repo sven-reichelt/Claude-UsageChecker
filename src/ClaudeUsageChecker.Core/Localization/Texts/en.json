@@ -10,6 +10,7 @@
   "app.version": "Version {0}",
   "app.versionPreRelease": "Version {0} (pre-release)",
 
+  "tray.showDetails": "Show details ...",
   "tray.refreshNow": "Refresh now",
   "tray.settings": "Settings ...",
   "tray.checkUpdates": "Check for updates ...",

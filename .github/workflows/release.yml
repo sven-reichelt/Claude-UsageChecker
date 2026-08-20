@@ -17,9 +17,160 @@ permissions:
   contents: write
 
 jobs:
+  # The Mac build runs first and hands its bundle over as an artifact. It has to
+  # happen on a Mac: the icon is made with sips and iconutil, and only there does
+  # a bundle end up with the right shape.
+  macos:
+    name: Build the macOS bundle
+    runs-on: macos-15
+
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Derive the version from the tag
+        id: version
+        shell: bash
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION="${GITHUB_REF_NAME#v}"
+          fi
+          if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$'; then
+            echo "::error::Unusable version '$VERSION'. Expected x.y.z or x.y.z-label."
+            exit 1
+          fi
+          # Apple wants one to three numbers and nothing else in the bundle
+          # version. The label lives on in the informational version, which is
+          # where the application reads it from anyway.
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "numbers=${VERSION%%-*}" >> "$GITHUB_OUTPUT"
+
+      # No single file here. On macOS the native libraries stay beside the
+      # executable rather than being packed in, and a bundle is the place where
+      # they are meant to sit: Contents/MacOS, loaded straight from there. Self
+      # extraction would unpack them into a temporary folder on every start, for
+      # nothing.
+      - name: Publish
+        run: >
+          dotnet publish src/ClaudeUsageChecker.App
+          --configuration Release
+          --runtime osx-arm64
+          --self-contained true
+          -p:Version=${{ steps.version.outputs.version }}
+          --output publish
+
+      - name: Build the application bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          APP="ClaudeUsageChecker.app"
+          mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
+          cp -R publish/. "$APP/Contents/MacOS/"
+          chmod +x "$APP/Contents/MacOS/ClaudeUsageChecker"
+
+          # The icon, in the sizes macOS asks for.
+          mkdir -p icon.iconset
+          for size in 16 32 128 256 512; do
+            sips -z $size $size assets/icons/app.png \
+              --out "icon.iconset/icon_${size}x${size}.png" >/dev/null
+            double=$((size * 2))
+            sips -z $double $double assets/icons/app.png \
+              --out "icon.iconset/icon_${size}x${size}@2x.png" >/dev/null
+          done
+          iconutil -c icns icon.iconset -o "$APP/Contents/Resources/AppIcon.icns"
+
+          cat > "$APP/Contents/Info.plist" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>CFBundleName</key>
+              <string>Claude UsageChecker</string>
+              <key>CFBundleDisplayName</key>
+              <string>Claude UsageChecker</string>
+              <key>CFBundleIdentifier</key>
+              <string>de.sven-reichelt.claudeusagechecker</string>
+              <key>CFBundleExecutable</key>
+              <string>ClaudeUsageChecker</string>
+              <key>CFBundleIconFile</key>
+              <string>AppIcon</string>
+              <key>CFBundlePackageType</key>
+              <string>APPL</string>
+              <key>CFBundleShortVersionString</key>
+              <string>${{ steps.version.outputs.numbers }}</string>
+              <key>CFBundleVersion</key>
+              <string>${{ steps.version.outputs.numbers }}</string>
+              <key>LSMinimumSystemVersion</key>
+              <string>12.0</string>
+              <!-- A menu bar application and nothing else: no dock icon, no
+                   window on start, no entry in the app switcher. Without this
+                   the program would sit in the dock with no window to show. -->
+              <key>LSUIElement</key>
+              <true/>
+              <key>NSHighResolutionCapable</key>
+              <true/>
+          </dict>
+          </plist>
+          PLIST
+
+          plutil -lint "$APP/Contents/Info.plist"
+
+      # Ad-hoc, not a developer certificate. It gives the bundle a stable
+      # identity on the machine it runs on, which is what the keychain hangs the
+      # right of access on - without it every start would look like a different
+      # program and ask again.
+      - name: Sign the bundle ad hoc
+        run: codesign --force --deep --sign - ClaudeUsageChecker.app
+
+      - name: Does the bundle start at all?
+        shell: bash
+        run: |
+          set -euo pipefail
+          # A package that does not start must reach nobody. There is no screen
+          # on the runner, so this catches an immediate crash and nothing more.
+          "ClaudeUsageChecker.app/Contents/MacOS/ClaudeUsageChecker" &
+          PID=$!
+          sleep 25
+          if ! kill -0 "$PID" 2>/dev/null; then
+            wait "$PID" && STATUS=0 || STATUS=$?
+            echo "::error::The application exited immediately (exit code $STATUS)."
+            exit 1
+          fi
+          kill "$PID"
+          echo "Started successfully."
+
+      - name: Pack it up
+        shell: bash
+        run: |
+          set -euo pipefail
+          # ditto rather than zip: it keeps the symbolic links and the flags of
+          # the bundle, which a plain zip quietly flattens.
+          ditto -c -k --sequesterRsrc --keepParent \
+            ClaudeUsageChecker.app ClaudeUsageChecker-macos-arm64.zip
+          shasum -a 256 ClaudeUsageChecker-macos-arm64.zip \
+            | sed 's/  .*/  ClaudeUsageChecker-macos-arm64.zip/' \
+            > ClaudeUsageChecker-macos-arm64.zip.sha256
+          cat ClaudeUsageChecker-macos-arm64.zip.sha256
+
+      - name: Hand it over
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: macos-bundle
+          path: |
+            ClaudeUsageChecker-macos-arm64.zip
+            ClaudeUsageChecker-macos-arm64.zip.sha256
+          if-no-files-found: error
+
   release:
     name: Build and publish
     runs-on: windows-latest
+    needs: macos
 
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -115,6 +266,30 @@ jobs:
           Stop-Process -Id $p.Id -Force
           Write-Host "Started successfully."
 
+      - name: Collect the macOS bundle
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: macos-bundle
+          path: publish
+
+      - name: Read the macOS checksum
+        id: macos
+        shell: pwsh
+        run: |
+          $name = "ClaudeUsageChecker-macos-arm64.zip"
+          # Recomputed here rather than trusted: the file travelled through
+          # an artifact store between two machines.
+          $hash = (Get-FileHash "publish/$name" -Algorithm SHA256).Hash.ToLower()
+          $claimed = (Get-Content "publish/$name.sha256").Split(" ")[0]
+          if ($hash -ne $claimed) {
+            Write-Error "The macOS bundle does not match its checksum."
+            exit 1
+          }
+          $size = [math]::Round((Get-Item "publish/$name").Length / 1MB, 1)
+          "name=$name" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "sha256=$hash" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "size=$size" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
       - name: Create the release
         uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2
         with:
@@ -134,14 +309,20 @@ jobs:
           files: |
             publish/${{ steps.package.outputs.name }}
             publish/${{ steps.package.outputs.name }}.sha256
+            publish/${{ steps.macos.outputs.name }}
+            publish/${{ steps.macos.outputs.name }}.sha256
             LICENSE
           body: |
             ## Claude UsageChecker ${{ steps.version.outputs.version }}
 
-            Self-contained application for Windows (x64) - one file, no .NET
-            runtime required, ${{ steps.package.outputs.size }} MB.
+            Self-contained - no .NET runtime required.
 
-            ### Installation
+            | | |
+            |---|---|
+            | **Windows (x64)** | `ClaudeUsageChecker.exe`, ${{ steps.package.outputs.size }} MB |
+            | **macOS (Apple silicon)** | `${{ steps.macos.outputs.name }}`, ${{ steps.macos.outputs.size }} MB |
+
+            ### Installation on Windows
 
             Download the file and start it. On the first start Windows
             SmartScreen reports an unknown publisher, because the package is not
@@ -150,10 +331,30 @@ jobs:
             Then sign in under Settings, so that the application obtains access
             rights of its own.
 
-            ### Checksum (SHA-256)
+            ### Installation on macOS
+
+            The bundle is signed ad hoc, not by a registered developer.
+            Downloading it through a browser therefore puts it in quarantine and
+            macOS refuses to open it. Fetching it from the terminal avoids that
+            entirely:
 
             ```
-            ${{ steps.package.outputs.sha256 }}
+            curl -L -O https://github.com/${{ github.repository }}/releases/download/v${{ steps.version.outputs.version }}/${{ steps.macos.outputs.name }}
+            unzip ${{ steps.macos.outputs.name }}
+            mv ClaudeUsageChecker.app /Applications/
+            open -a /Applications/ClaudeUsageChecker.app
+            ```
+
+            The icon appears in the menu bar; the application has no dock icon
+            and no window of its own on start. If it was downloaded through a
+            browser after all: `xattr -dr com.apple.quarantine
+            /Applications/ClaudeUsageChecker.app`.
+
+            ### Checksums (SHA-256)
+
+            ```
+            ${{ steps.package.outputs.sha256 }}  ClaudeUsageChecker.exe
+            ${{ steps.macos.outputs.sha256 }}  ${{ steps.macos.outputs.name }}
             ```
 
             ### License

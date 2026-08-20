@@ -96,8 +96,8 @@ public sealed class GitHubReleaseUpdateService(
                 Status = UpdateCheckStatus.UpdateAvailable,
                 AvailableVersion = latest,
                 ReleasePage = page,
-                DownloadUrl = FindAsset(root, ".exe"),
-                ChecksumUrl = FindAsset(root, ".exe.sha256"),
+                DownloadUrl = FindAsset(root, PackageSuffix),
+                ChecksumUrl = FindAsset(root, PackageSuffix + ".sha256"),
                 // Said in words, not only in the label: whoever is offered a
                 // test build should know that is what it is.
                 Message = latest.IsPreRelease
@@ -155,6 +155,17 @@ public sealed class GitHubReleaseUpdateService(
 
         return best;
     }
+
+    /// <summary>
+    /// The file that belongs to the running platform.
+    /// </summary>
+    /// <remarks>
+    /// A release carries one package per platform. Looking for ".exe"
+    /// regardless would hand a Mac the Windows program - it could not be
+    /// installed there anyway, but an address pointing at the wrong file has no
+    /// business being passed around at all.
+    /// </remarks>
+    internal static string PackageSuffix => OperatingSystem.IsMacOS() ? ".zip" : ".exe";
 
     /// <summary>
     /// Finds the attached file with the matching extension.

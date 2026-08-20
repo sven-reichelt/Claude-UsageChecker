@@ -20,9 +20,10 @@ namespace ClaudeUsageChecker.App.Tests;
 /// </remarks>
 public class TrayIconHandleTests
 {
-    // Windows only, like the notification area itself. The project builds and
-    // runs on Windows; a run elsewhere should say so loudly rather than skip.
-    [SupportedOSPlatform("windows")]
+    // Windows only, like the Win32 call it checks. Since macOS became a target
+    // this has to step aside there rather than fail: the icon handle is a thing
+    // the macOS menu bar has no use for. What both platforms share - that the
+    // pictures exist at all - is checked below, everywhere.
     [AvaloniaTheory]
     [InlineData(TrayIconSeverity.Normal)]
     [InlineData(TrayIconSeverity.Warning)]
@@ -30,6 +31,11 @@ public class TrayIconHandleTests
     [InlineData(TrayIconSeverity.Inactive)]
     public void EveryStateYieldsAnIconHandle(TrayIconSeverity severity)
     {
+        if (!OperatingSystem.IsWindows())
+        {
+            return;
+        }
+
         var handle = TrayIconImages.CreateHandle(severity);
 
         Assert.NotEqual(IntPtr.Zero, handle);

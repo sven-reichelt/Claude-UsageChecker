@@ -34,6 +34,7 @@ public static class T
         L.Format("app.versionPreRelease", version);
 
     // Tray
+    public static string TrayShowDetails => L["tray.showDetails"];
     public static string TrayRefreshNow => L["tray.refreshNow"];
     public static string TraySettings => L["tray.settings"];
     public static string TrayCheckForUpdates => L["tray.checkUpdates"];

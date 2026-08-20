@@ -2,14 +2,20 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
     <AssemblyName>ClaudeUsageChecker</AssemblyName>
     <RootNamespace>ClaudeUsageChecker.App</RootNamespace>
-    <ApplicationIcon>../../assets/icons/app.ico</ApplicationIcon>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <!-- COM interop prevents trimming and is not needed here: the application
          uses neither drag and drop nor shell integration. -->
     <BuiltInComInteropSupport>false</BuiltInComInteropSupport>
+  </PropertyGroup>
+
+  <!-- Windows dressing. A manifest is a Windows resource and an .ico a Windows
+       icon; handing either to a macOS build is at best ignored and at worst an
+       error. The Mac gets its icon from the application bundle instead. -->
+  <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Windows')) or $(RuntimeIdentifier.StartsWith('win'))">
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>../../assets/icons/app.ico</ApplicationIcon>
   </PropertyGroup>
 
   <!--

@@ -8,6 +8,23 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unveröffentlicht]
 
+## [0.8.0] – 2026-08-20
+
+### Hinzugefügt
+- **macOS.** Die Anwendung wohnt jetzt auch in der Menüleiste: ein Symbol mit
+  den gemeldeten Limits, dieselben Fenster, dieselben neun Sprachen. Die eigene
+  Anmeldung wandert in den Schlüsselbund, der Autostart läuft über einen
+  Launch-Agent des Benutzers, und das Token einer Claude-Code-Installation wird
+  wie bisher aus dem Schlüsselbund mitgelesen.
+
+  Das Menü ist dort ein natives – die umgekehrte Entscheidung wie unter Windows,
+  aus demselben Grund: Ein Menüleisten-Symbol öffnet ein Systemmenü, und ein
+  nachgebautes Fenster wäre genau das, was auffiele.
+
+  Ausgeliefert als Programmbündel für Apple Silicon, ad hoc signiert statt von
+  einem eingetragenen Entwickler. Der Selbstaustausch bleibt auf macOS vorerst
+  aus – eine neue Fassung wird von Hand geholt.
+
 ## [0.7.2] – 2026-08-20
 
 ### Behoben

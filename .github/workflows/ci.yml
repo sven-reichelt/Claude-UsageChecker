@@ -39,6 +39,30 @@ jobs:
           # The committed icons have to match what the generator produces.
           git diff --exit-code -- assets/icons
 
+  # The macOS build is checked on every push, not first at the release. The
+  # application is developed on Windows, so nothing else would notice a
+  # platform check gone wrong until the day it mattered.
+  macos:
+    name: Build and test on macOS
+    runs-on: macos-15
+
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Build for Apple silicon
+        run: dotnet build src/ClaudeUsageChecker.App --configuration Release -r osx-arm64 --self-contained true
+
+      # The whole suite, including the windows and the rendering. Avalonia's
+      # headless platform runs on macOS too, and a layout that only holds on
+      # one operating system is worth knowing about.
+      - name: Test
+        run: dotnet test --configuration Release --verbosity normal
+
   security:
     name: Security checks
     runs-on: windows-latest

@@ -4,9 +4,21 @@ namespace ClaudeUsageChecker.Core.Platform;
 public static class SecretStoreFactory
 {
     /// <summary>
-    /// Returns the Windows Credential Manager on Windows, otherwise a stand-in
-    /// that says plainly that it cannot store anything.
+    /// The Windows Credential Manager on Windows, the keychain on macOS, and
+    /// elsewhere a stand-in that says plainly that it cannot store anything.
     /// </summary>
-    public static ISecretStore CreateForCurrentPlatform() =>
-        OperatingSystem.IsWindows() ? new WindowsCredentialStore() : new UnsupportedSecretStore();
+    public static ISecretStore CreateForCurrentPlatform()
+    {
+        if (OperatingSystem.IsWindows())
+        {
+            return new WindowsCredentialStore();
+        }
+
+        if (OperatingSystem.IsMacOS())
+        {
+            return new MacOsKeychainStore();
+        }
+
+        return new UnsupportedSecretStore();
+    }
 }

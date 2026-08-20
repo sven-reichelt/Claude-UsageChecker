@@ -357,7 +357,8 @@ zurechtzurücken.
 | 0.5 | Einrichtung nach %LOCALAPPDATA%\Programs, wo Windows sie erwartet ✅ |
 | 0.6 | Neun Sprachen, modellbezogene Limits, einstellbare Schwellenwerte, Übersicht der Neuerungen nach einem Update ✅ |
 | 0.7 | Eigenes Menü im Infobereich, im Stil der Fenster ✅ |
-| 0.8 | macOS-Menüleiste (Schlüsselbund-Anbindung ist bereits vorhanden) |
+| 0.8 | macOS-Menüleiste ✅ |
+| 0.9 | Selbstaustausch unter macOS, und ein signiertes Bündel |
 
 ## Lizenz
 

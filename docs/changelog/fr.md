@@ -8,6 +8,23 @@ numérotation [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+## [0.8.0] – 2026-08-20
+
+### Ajouté
+- **macOS.** L'application habite désormais aussi la barre des menus : une icône
+  avec les limites signalées, les mêmes fenêtres, les mêmes neuf langues. La
+  connexion intégrée va dans le trousseau, le démarrage automatique passe par un
+  agent de lancement de l'utilisateur, et le jeton d'une installation Claude
+  Code est lu dans le trousseau comme auparavant.
+
+  Le menu y est natif : la décision inverse de celle prise sous Windows, pour la
+  même raison. Une icône de barre des menus ouvre un menu système, et une
+  fenêtre imitant un menu serait précisément ce qui détonnerait.
+
+  Livrée sous forme de paquet d'application pour Apple silicon, signée ad hoc et
+  non par un développeur enregistré. Le remplacement automatique reste
+  désactivé sur macOS pour l'instant : la nouvelle version se récupère à la main.
+
 ## [0.7.2] – 2026-08-20
 
 ### Corrigé

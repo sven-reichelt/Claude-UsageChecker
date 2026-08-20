@@ -6,9 +6,9 @@ using Microsoft.Win32;
 namespace ClaudeUsageChecker.App.Views;
 
 /// <summary>
-/// Registers or unregisters the application for automatic startup. On Windows
-/// through the Run key of the current user - no interference with system-wide
-/// settings, no elevated rights needed.
+/// Registers or unregisters the application for automatic startup: on Windows
+/// through the Run key of the current user, on macOS through a launch agent.
+/// Neither touches system-wide settings, and neither needs elevated rights.
 /// </summary>
 internal static class AutostartManager
 {
@@ -22,13 +22,20 @@ internal static class AutostartManager
     /// </param>
     public static void Apply(bool enabled, string? path = null)
     {
-        if (!OperatingSystem.IsWindows())
+        if (OperatingSystem.IsWindows())
         {
+            ApplyWindows(enabled, path);
             return;
         }
 
-        ApplyWindows(enabled, path);
+        if (OperatingSystem.IsMacOS())
+        {
+            ClaudeUsageChecker.App.Services.MacOsLaunchAgent.Apply(enabled, path);
+        }
     }
+
+    /// <summary>Whether autostart can be set up on the running system at all.</summary>
+    public static bool IsSupported => OperatingSystem.IsWindows() || OperatingSystem.IsMacOS();
 
     [SupportedOSPlatform("windows")]
     private static void ApplyWindows(bool enabled, string? path)

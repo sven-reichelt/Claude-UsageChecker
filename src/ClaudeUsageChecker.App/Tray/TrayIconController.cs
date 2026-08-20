@@ -17,12 +17,9 @@ namespace ClaudeUsageChecker.App.Tray;
 /// area: keeps tooltip, colour and menu up to date.
 /// </summary>
 /// <remarks>
-/// The icon is registered with Windows by the application itself rather than
-/// through Avalonia's <c>TrayIcon</c>. The reason is the menu: Avalonia offers
-/// only a <c>NativeMenu</c>, which under Windows is a real Win32 menu that
-/// cannot be styled from inside the process - system font, hairline separators,
-/// no frame. Beside the other windows it looked like a different program. See
-/// <see cref="WindowsTrayIcon"/>.
+/// What the icon actually is differs by platform, and deliberately so - see
+/// <see cref="ITrayPresenter"/>. Everything above that line is the same on both:
+/// the same figures, the same entries, the same texts.
 /// </remarks>
 public sealed class TrayIconController : IDisposable
 {
@@ -43,11 +40,8 @@ public sealed class TrayIconController : IDisposable
     private readonly Func<AppSettings> _settings;
     private readonly TimeProvider _timeProvider;
 
-    private readonly WindowsTrayIcon _icon;
+    private readonly ITrayPresenter _icon;
     private readonly DispatcherTimer _tooltipTimer;
-
-    private TrayMenuWindow? _menu;
-    private TrayIconSeverity? _shown;
 
     public TrayIconController(
         UsageMonitor monitor,
@@ -58,15 +52,8 @@ public sealed class TrayIconController : IDisposable
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _timeProvider = timeProvider ?? TimeProvider.System;
 
-        if (!OperatingSystem.IsWindows())
-        {
-            throw new PlatformNotSupportedException(
-                "The notification area is only implemented for Windows. The macOS menu bar is still open.");
-        }
-
-        _icon = new WindowsTrayIcon();
+        _icon = CreateIcon();
         _icon.Clicked += (_, _) => ShowDetails?.Invoke(this, EventArgs.Empty);
-        _icon.MenuRequested += (_, cursor) => ShowMenu(cursor);
 
         _monitor.StateChanged += OnStateChanged;
 
@@ -104,34 +91,58 @@ public sealed class TrayIconController : IDisposable
 
     /// <summary>Relabels what outlives a language change.</summary>
     /// <remarks>
-    /// The menu needs nothing here: its entries are built afresh every time it
-    /// opens, so they carry the language of that moment by themselves. Only the
-    /// tooltip is standing text.
+    /// Rendering does it all: the entries are rebuilt from the texts of the
+    /// moment, and the tooltip along with them.
     /// </remarks>
     public void ApplyTexts() => Render(_monitor.State);
 
-    private void ShowMenu(PixelPoint cursor)
+    /// <summary>The icon that belongs on the running platform.</summary>
+    private static ITrayPresenter CreateIcon()
     {
-        _menu ??= new TrayMenuWindow();
+        if (OperatingSystem.IsWindows())
+        {
+            return new WindowsTrayPresenter();
+        }
 
-        _menu.Render(
-            BuildStatusLines(_monitor.State, _timeProvider.GetLocalNow()),
-            // No "show details": a left click on the icon opens the details
-            // window, and the figures are already in the status lines above. An
-            // entry offering the same route again makes the menu longer without
-            // adding anything.
-            [
-                (T.TrayRefreshNow, () => RefreshRequested?.Invoke(this, EventArgs.Empty)),
-                (T.TraySettings, () => ShowSettings?.Invoke(this, EventArgs.Empty)),
-                (T.TrayCheckForUpdates, () => CheckForUpdatesRequested?.Invoke(this, EventArgs.Empty)),
-                // The version stands in the entry itself: it leads to the
-                // window that states it, and anyone reporting a problem is
-                // asked for it before anything else.
-                (T.TrayAbout(Version()), () => ShowAboutRequested?.Invoke(this, EventArgs.Empty)),
-                (T.TrayExit, () => ExitRequested?.Invoke(this, EventArgs.Empty))
-            ]);
+        if (OperatingSystem.IsMacOS())
+        {
+            return new MacOsTrayIcon();
+        }
 
-        _menu.ShowAt(cursor);
+        throw new PlatformNotSupportedException(
+            "The notification area is implemented for Windows and macOS.");
+    }
+
+    /// <summary>
+    /// The entries of the menu, in the order they should appear.
+    /// </summary>
+    /// <remarks>
+    /// "Show details" only where it is needed. Under Windows a left click on the
+    /// icon opens that window, and an entry offering the same route again makes
+    /// the menu longer without adding anything. On macOS a click on the status
+    /// item opens the menu itself, so without the entry the window would have no
+    /// way in at all.
+    /// </remarks>
+    private List<(string Text, Action Run)> BuildCommands()
+    {
+        var commands = new List<(string Text, Action Run)>(6);
+
+        if (!OperatingSystem.IsWindows())
+        {
+            commands.Add((T.TrayShowDetails, () => ShowDetails?.Invoke(this, EventArgs.Empty)));
+        }
+
+        commands.Add((T.TrayRefreshNow, () => RefreshRequested?.Invoke(this, EventArgs.Empty)));
+        commands.Add((T.TraySettings, () => ShowSettings?.Invoke(this, EventArgs.Empty)));
+        commands.Add((T.TrayCheckForUpdates, () => CheckForUpdatesRequested?.Invoke(this, EventArgs.Empty)));
+
+        // The version stands in the entry itself: it leads to the window that
+        // states it, and anyone reporting a problem is asked for it before
+        // anything else.
+        commands.Add((T.TrayAbout(Version()), () => ShowAboutRequested?.Invoke(this, EventArgs.Empty)));
+        commands.Add((T.TrayExit, () => ExitRequested?.Invoke(this, EventArgs.Empty)));
+
+        return commands;
     }
 
     /// <summary>
@@ -149,27 +160,13 @@ public sealed class TrayIconController : IDisposable
 
     private void Render(UsageState state)
     {
-        if (!OperatingSystem.IsWindows())
-        {
-            return;
-        }
-
         var now = _timeProvider.GetLocalNow();
         var settings = _settings();
 
         _icon.SetToolTip(UsageFormatter.ToTooltip(state, now));
-
-        var severity = TrayIconSeverityResolver.Resolve(
-            state, settings.WarningThreshold, settings.CriticalThreshold);
-
-        // Only on a change: every call builds a new icon handle, and swapping
-        // the icon thirty times an hour for the same picture is work for
-        // nothing.
-        if (_shown != severity)
-        {
-            _icon.SetIcon(TrayIconImages.CreateHandle(severity));
-            _shown = severity;
-        }
+        _icon.SetSeverity(TrayIconSeverityResolver.Resolve(
+            state, settings.WarningThreshold, settings.CriticalThreshold));
+        _icon.SetMenu(BuildStatusLines(state, now), BuildCommands());
     }
 
     /// <summary>
@@ -203,12 +200,6 @@ public sealed class TrayIconController : IDisposable
     {
         _tooltipTimer.Stop();
         _monitor.StateChanged -= OnStateChanged;
-
-        _menu?.Close();
-
-        if (OperatingSystem.IsWindows())
-        {
-            _icon.Dispose();
-        }
+        _icon.Dispose();
     }
 }
