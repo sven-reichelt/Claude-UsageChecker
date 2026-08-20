@@ -8,6 +8,13 @@ numérotation [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+### Corrigé
+- **Une fenêtre dont la réinitialisation était échue n'avait aucune phrase
+  correcte.** Le bloc prévu pour une durée était inséré dans un emplacement
+  qui en attend une, ce qui donnait « Session : 39 % - encore maintenant ».
+  Les quatre endroits qui parlent d'un temps restant disposent désormais
+  d'une phrase propre : « réinitialisation attendue ».
+
 ## [0.6.3] – 2026-08-20
 
 ### Corrigé

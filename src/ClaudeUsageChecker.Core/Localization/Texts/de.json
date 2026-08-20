@@ -36,6 +36,10 @@
   "usage.notAvailable": "{0}: nicht verfügbar",
   "usage.percent": "{0:0.#} %",
   "usage.resetIn": "Reset in {0} - um {1}",
+  "tooltip.lineDue": "{0} {1:0} % - Reset fällig",
+  "usage.menuLineDue": "{0}: {1:0.#} % - Reset fällig",
+  "usage.detailLineDue": "{0}: {1:0.#} % verbraucht - Reset fällig (war {2})",
+  "usage.resetDue": "Reset fällig - war {0}",
 
   "extra.title": "Zusatzkontingent",
   "extra.active": "aktiv",

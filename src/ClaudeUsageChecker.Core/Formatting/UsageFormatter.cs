@@ -79,11 +79,15 @@ public static class UsageFormatter
             builder.Append('\n');
         }
 
-        builder.Append(T.TooltipLine(
-            label,
-            window.Utilization,
-            DurationFormatter.ToResetMoment(window.ResetsAt, now),
-            DurationFormatter.ToCompact(window.TimeUntilReset(now))));
+        var remaining = window.TimeUntilReset(now);
+
+        builder.Append(DurationFormatter.IsDue(remaining)
+            ? T.TooltipLineDue(label, window.Utilization)
+            : T.TooltipLine(
+                label,
+                window.Utilization,
+                DurationFormatter.ToResetMoment(window.ResetsAt, now),
+                DurationFormatter.ToCompact(remaining)));
     }
 
     /// <summary>
@@ -123,8 +127,11 @@ public static class UsageFormatter
     {
         ArgumentNullException.ThrowIfNull(window);
 
-        return T.MenuLine(
-            label, window.Utilization, DurationFormatter.ToCompact(window.TimeUntilReset(now)));
+        var remaining = window.TimeUntilReset(now);
+
+        return DurationFormatter.IsDue(remaining)
+            ? T.MenuLineDue(label, window.Utilization)
+            : T.MenuLine(label, window.Utilization, DurationFormatter.ToCompact(remaining));
     }
 
     /// <summary>
@@ -179,11 +186,12 @@ public static class UsageFormatter
             return T.NotAvailable(label);
         }
 
-        return T.DetailLine(
-            label,
-            window.Utilization,
-            DurationFormatter.ToCompact(window.TimeUntilReset(now)),
-            DurationFormatter.ToResetMoment(window.ResetsAt, now));
+        var remaining = window.TimeUntilReset(now);
+        var moment = DurationFormatter.ToResetMoment(window.ResetsAt, now);
+
+        return DurationFormatter.IsDue(remaining)
+            ? T.DetailLineDue(label, window.Utilization, moment)
+            : T.DetailLine(label, window.Utilization, DurationFormatter.ToCompact(remaining), moment);
     }
 
     private static string Truncate(string value, int maxLength) =>

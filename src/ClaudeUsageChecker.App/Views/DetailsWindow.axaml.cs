@@ -186,6 +186,21 @@ public partial class DetailsWindow : Window
         ExtraUsagePanel.Children.Add(new TextBlock { Text = detail, FontSize = 11, Opacity = 0.7 });
     }
 
+
+    /// <summary>
+    /// The line beneath the bar: how long a window still has, or that its reset
+    /// has fallen due.
+    /// </summary>
+    private static string ResetText(UsageWindow window, DateTimeOffset now)
+    {
+        var remaining = window.TimeUntilReset(now);
+        var moment = DurationFormatter.ToResetMoment(window.ResetsAt, now);
+
+        return DurationFormatter.IsDue(remaining)
+            ? T.ResetDue(moment)
+            : T.ResetIn(DurationFormatter.ToCompact(remaining), moment);
+    }
+
     /// <summary>Readable name of the token source for the footer.</summary>
     internal static string SourceName(TokenSource source) => source switch
     {
@@ -243,9 +258,7 @@ public partial class DetailsWindow : Window
 
         var reset = new TextBlock
         {
-            Text = T.ResetIn(
-                DurationFormatter.ToCompact(window.TimeUntilReset(now)),
-                DurationFormatter.ToResetMoment(window.ResetsAt, now)),
+            Text = ResetText(window, now),
             FontSize = 11,
             Opacity = 0.7
         };

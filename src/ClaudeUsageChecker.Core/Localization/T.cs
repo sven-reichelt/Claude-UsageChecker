@@ -52,6 +52,12 @@ public static class T
     public static string TooltipLine(string label, double percent, string moment, string remaining) =>
         L.Format("tooltip.line", label, percent, moment, remaining);
 
+    // Sentences of their own for a window whose reset is already due. The
+    // building block for a duration does not fit a slot that expects one - "in
+    // now" is no sentence in any of the nine languages.
+    public static string TooltipLineDue(string label, double percent) =>
+        L.Format("tooltip.lineDue", label, percent);
+
     // Usage windows
     public static string WindowSession => L["usage.session"];
     public static string WindowWeeklyAll => L["usage.weeklyAll"];
@@ -60,9 +66,14 @@ public static class T
         L.Format("usage.menuLine", label, percent, remaining);
     public static string DetailLine(string label, double percent, string remaining, string moment) =>
         L.Format("usage.detailLine", label, percent, remaining, moment);
+    public static string MenuLineDue(string label, double percent) =>
+        L.Format("usage.menuLineDue", label, percent);
+    public static string DetailLineDue(string label, double percent, string moment) =>
+        L.Format("usage.detailLineDue", label, percent, moment);
     public static string NotAvailable(string label) => L.Format("usage.notAvailable", label);
     public static string Percent(double value) => L.Format("usage.percent", value);
     public static string ResetIn(string remaining, string moment) => L.Format("usage.resetIn", remaining, moment);
+    public static string ResetDue(string moment) => L.Format("usage.resetDue", moment);
 
     // Extra usage
     public static string ExtraTitle => L["extra.title"];

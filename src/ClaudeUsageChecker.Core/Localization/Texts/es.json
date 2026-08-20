@@ -36,6 +36,10 @@
   "usage.notAvailable": "{0}: no disponible",
   "usage.percent": "{0:0.#} %",
   "usage.resetIn": "Reinicio en {0} - a las {1}",
+  "tooltip.lineDue": "{0} {1:0} % - reinicio pendiente",
+  "usage.menuLineDue": "{0}: {1:0.#} % - reinicio pendiente",
+  "usage.detailLineDue": "{0}: {1:0.#} % usado - reinicio pendiente (era {2})",
+  "usage.resetDue": "Reinicio pendiente - era {0}",
 
   "extra.title": "Créditos adicionales",
   "extra.active": "activos",

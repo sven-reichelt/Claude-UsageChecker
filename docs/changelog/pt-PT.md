@@ -8,6 +8,12 @@ numeração [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Corrigido
+- **Uma janela cuja reposição já tinha vencido não tinha uma frase própria.**
+  O bloco de duração era inserido num espaço que espera uma duração, dando
+  «Sessão: 39 % - ainda já». Os quatro pontos que falam de tempo restante
+  passam a ter uma frase própria: «reposição prevista».
+
 ## [0.6.3] – 2026-08-20
 
 ### Corrigido

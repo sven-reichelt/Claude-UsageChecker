@@ -8,6 +8,12 @@ versionamento [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Corrigido
+- **Uma janela cujo reinício já havia vencido não tinha uma frase própria.** O
+  bloco de duração era inserido num espaço que espera uma duração, resultando
+  em «Sessão: 39 % - ainda agora». Os quatro pontos que falam de tempo
+  restante passam a ter uma frase própria: «reinício previsto».
+
 ## [0.6.3] – 2026-08-20
 
 ### Corrigido

@@ -36,6 +36,10 @@
   "usage.notAvailable": "{0}: indisponível",
   "usage.percent": "{0:0.#} %",
   "usage.resetIn": "Reinício em {0} - às {1}",
+  "tooltip.lineDue": "{0} {1:0} % - reinício previsto",
+  "usage.menuLineDue": "{0}: {1:0.#} % - reinício previsto",
+  "usage.detailLineDue": "{0}: {1:0.#} % usado - reinício previsto (era {2})",
+  "usage.resetDue": "Reinício previsto - era {0}",
 
   "extra.title": "Créditos adicionais",
   "extra.active": "ativos",

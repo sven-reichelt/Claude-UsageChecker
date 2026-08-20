@@ -36,6 +36,10 @@
   "usage.notAvailable": "{0}: not available",
   "usage.percent": "{0:0.#} %",
   "usage.resetIn": "Resets in {0} - at {1}",
+  "tooltip.lineDue": "{0} {1:0} % - reset due",
+  "usage.menuLineDue": "{0}: {1:0.#} % - reset due",
+  "usage.detailLineDue": "{0}: {1:0.#} % used - reset due (was {2})",
+  "usage.resetDue": "Reset due - was {0}",
 
   "extra.title": "Extra usage",
   "extra.active": "active",

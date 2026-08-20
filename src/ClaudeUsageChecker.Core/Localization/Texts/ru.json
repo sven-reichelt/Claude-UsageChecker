@@ -36,6 +36,10 @@
   "usage.notAvailable": "{0}: недоступно",
   "usage.percent": "{0:0.#} %",
   "usage.resetIn": "Сброс через {0} - в {1}",
+  "tooltip.lineDue": "{0} {1:0} % - сброс ожидается",
+  "usage.menuLineDue": "{0}: {1:0.#} % - сброс ожидается",
+  "usage.detailLineDue": "{0}: {1:0.#} % использовано - сброс ожидается (в {2})",
+  "usage.resetDue": "Сброс ожидается - в {0}",
 
   "extra.title": "Дополнительные кредиты",
   "extra.active": "активны",

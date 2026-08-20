@@ -36,6 +36,10 @@
   "usage.notAvailable": "{0}: non disponibile",
   "usage.percent": "{0:0.#} %",
   "usage.resetIn": "Reset tra {0} - alle {1}",
+  "tooltip.lineDue": "{0} {1:0} % - reset atteso",
+  "usage.menuLineDue": "{0}: {1:0.#} % - reset atteso",
+  "usage.detailLineDue": "{0}: {1:0.#} % utilizzato - reset atteso (era {2})",
+  "usage.resetDue": "Reset atteso - era {0}",
 
   "extra.title": "Crediti aggiuntivi",
   "extra.active": "attivi",

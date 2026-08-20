@@ -8,6 +8,12 @@ versionado [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+### Corregido
+- **Una ventana cuyo reinicio ya vencía no tenía una frase propia.** El bloque
+  para una duración se insertaba en un hueco que espera una duración, y salía
+  «Sesión: 39 % - ahora restante». Los cuatro lugares que hablan de tiempo
+  restante tienen ahora una frase para este caso: «reinicio pendiente».
+
 ## [0.6.3] – 2026-08-20
 
 ### Corregido

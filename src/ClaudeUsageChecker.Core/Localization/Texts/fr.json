@@ -36,6 +36,10 @@
   "usage.notAvailable": "{0} : indisponible",
   "usage.percent": "{0:0.#} %",
   "usage.resetIn": "Réinitialisation dans {0} - à {1}",
+  "tooltip.lineDue": "{0} {1:0} % - réinit. attendue",
+  "usage.menuLineDue": "{0} : {1:0.#} % - réinitialisation attendue",
+  "usage.detailLineDue": "{0} : {1:0.#} % utilisés - réinitialisation attendue (à {2})",
+  "usage.resetDue": "Réinitialisation attendue - à {0}",
 
   "extra.title": "Crédits supplémentaires",
   "extra.active": "actifs",

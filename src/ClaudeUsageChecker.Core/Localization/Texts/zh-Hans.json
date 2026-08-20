@@ -36,6 +36,10 @@
   "usage.notAvailable": "{0}：不可用",
   "usage.percent": "{0:0.#} %",
   "usage.resetIn": "{0} 后重置 - {1}",
+  "tooltip.lineDue": "{0} {1:0} % - 应已重置",
+  "usage.menuLineDue": "{0}：{1:0.#} % - 应已重置",
+  "usage.detailLineDue": "{0}：已用 {1:0.#} % - 应已重置（{2}）",
+  "usage.resetDue": "应已重置 - {0}",
 
   "extra.title": "额外额度",
   "extra.active": "已启用",

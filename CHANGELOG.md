@@ -8,6 +8,17 @@ the versioning [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+- **A window whose reset had fallen due was described in no sentence at all.**
+  The building block for a duration was pushed into a slot that expects one,
+  and out came "Session: 39 % - now left". The four places that say something
+  about a remaining time now have a sentence of their own for the case:
+  "reset due", with the moment it was due where that helps.
+
+  It shows only between the moment a window runs out and the next call, which
+  is why it survived from the earliest days - nobody was ever looking at that
+  minute.
+
 ## [0.6.3] – 2026-08-20
 
 ### Fixed

@@ -8,6 +8,17 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unveröffentlicht]
 
+### Behoben
+- **Für ein Fenster, dessen Reset fällig war, gab es gar keinen richtigen
+  Satz.** Der Baustein für eine Dauer wurde in eine Lücke gesetzt, die eine
+  Dauer erwartet – heraus kam „Sitzung: 39 % – noch gleich". Die vier Stellen,
+  die etwas über eine Restzeit sagen, haben für diesen Fall jetzt einen
+  eigenen Satz: „Reset fällig", mit dem Zeitpunkt dahinter, wo er hilft.
+
+  Zu sehen ist das nur zwischen dem Ablauf eines Fensters und dem nächsten
+  Abruf – deshalb hat es seit den Anfangstagen überlebt, es hat schlicht nie
+  jemand in dieser Minute hingesehen.
+
 ## [0.6.3] – 2026-08-20
 
 ### Behoben

@@ -6,6 +6,15 @@ namespace ClaudeUsageChecker.Core.Formatting;
 /// <summary>Turns durations and moments into compact, readable text.</summary>
 public static class DurationFormatter
 {
+    /// <summary>Whether the reset of a window has already fallen due.</summary>
+    /// <remarks>
+    /// The figures then belong to a window that has run out, and stay that way
+    /// until the next call - up to the polling interval. Sentences about a
+    /// remaining time do not fit that case, which is why the callers pick a
+    /// different one.
+    /// </remarks>
+    public static bool IsDue(TimeSpan remaining) => remaining <= TimeSpan.Zero;
+
     /// <summary>
     /// Formats a remaining time tersely: "4 d 3 h", "2 h 14 min", "47 min", "now".
     /// Deliberately short, because the Windows tooltip is capped at 127 characters.

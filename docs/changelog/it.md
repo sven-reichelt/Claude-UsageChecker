@@ -8,6 +8,12 @@ numerazione [Semantic Versioning](https://semver.org/lang/it/).
 
 ## [Non pubblicato]
 
+### Corretto
+- **Per una finestra il cui reset era già dovuto non esisteva una frase
+  corretta.** Il blocco per una durata veniva inserito in uno spazio che ne
+  attende una: «Sessione: 39 % - ancora subito». I quattro punti che parlano
+  di tempo rimanente hanno ora una frase propria: «reset atteso».
+
 ## [0.6.3] – 2026-08-20
 
 ### Corretto
