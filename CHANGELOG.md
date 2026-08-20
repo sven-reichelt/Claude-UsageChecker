@@ -8,6 +8,18 @@ the versioning [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+- **The tray icon says which state it is in.** Signed out it stays plain grey.
+  Signed in and everything within its limits, it carries a green tick; from the
+  warning threshold an amber question mark, from the critical one a red
+  exclamation mark. The colour alone was doing that work before, which is lost
+  on anyone who cannot tell amber from red.
+
+  One character per state, no more: at sixteen pixels - the usual size in the
+  taskbar - the badge is barely seven across, and two characters beside each
+  other are a smear rather than a reading. The application icon itself keeps no
+  badge; it reports no state.
+
 ### Fixed
 - **The extra usage quota was shown a hundred times too large, in the wrong
   unit.** The API reports `used_credits: 2276`, and those are not 2276 credits

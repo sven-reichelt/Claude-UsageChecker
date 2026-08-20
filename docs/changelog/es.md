@@ -8,6 +8,13 @@ versionado [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+### Cambiado
+- **El icono del área de notificación indica su estado.** Sin sesión: gris. Con
+  sesión y todo en orden: una marca verde; a partir del umbral de aviso, un
+  signo de interrogación ámbar; del crítico, una exclamación roja. Antes esto
+  lo hacía solo el color. Un signo por estado: a dieciséis píxeles, dos no se
+  distinguen.
+
 ### Corregido
 - **El saldo adicional se mostraba cien veces mayor y en la unidad equivocada.**
   La API informa `used_credits: 2276`, y no son 2276 créditos sino 22,76 EUR:

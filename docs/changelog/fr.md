@@ -8,6 +8,13 @@ numérotation [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+### Modifié
+- **L'icône de la zone de notification indique son état.** Déconnecté : gris.
+  Connecté et tout va bien : une coche verte ; au seuil d'avertissement, un
+  point d'interrogation ambre ; au seuil critique, un point d'exclamation
+  rouge. Auparavant la couleur s'en chargeait seule. Un seul signe par état :
+  à seize pixels, deux ne se distinguent plus.
+
 ### Corrigé
 - **Le crédit supplémentaire était affiché cent fois trop grand et dans la
   mauvaise unité.** L'API indique `used_credits: 2276`, et ce ne sont pas 2276

@@ -8,6 +8,18 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unveröffentlicht]
 
+### Geändert
+- **Das Symbol im Infobereich sagt, in welchem Zustand es ist.** Abgemeldet
+  bleibt es schlicht grau. Angemeldet und alles im Rahmen, trägt es einen
+  grünen Haken; ab der Warnschwelle ein gelbes Fragezeichen, ab der kritischen
+  ein rotes Ausrufezeichen. Bisher tat das die Farbe allein – was niemandem
+  hilft, der Gelb und Rot nicht auseinanderhält.
+
+  Ein Zeichen je Zustand, nicht mehr: Bei sechzehn Pixeln – der üblichen Größe
+  in der Taskleiste – ist das Abzeichen keine sieben Pixel breit, und zwei
+  Zeichen nebeneinander sind ein Fleck statt einer Lesung. Das Anwendungssymbol
+  selbst bleibt ohne Abzeichen; es meldet keinen Zustand.
+
 ### Behoben
 - **Das Zusatzkontingent wurde hundertfach zu groß und in der falschen Einheit
   angezeigt.** Die API meldet `used_credits: 2276`, und das sind keine 2276

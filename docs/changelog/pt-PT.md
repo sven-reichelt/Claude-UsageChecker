@@ -8,6 +8,13 @@ numeração [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Alterado
+- **O ícone da área de notificação mostra em que estado está.** Sem sessão:
+  cinzento. Com sessão e tudo dentro do limite: um visto verde; a partir do
+  limiar de aviso, uma interrogação âmbar; do crítico, uma exclamação vermelha.
+  Antes isso ficava apenas a cargo da cor. Um sinal por estado: a dezasseis
+  pixels, dois já não se distinguem.
+
 ### Corrigido
 - **O crédito adicional era apresentado cem vezes maior e na unidade errada.** A
   API indica `used_credits: 2276`, e não são 2276 créditos mas 22,76 EUR: um

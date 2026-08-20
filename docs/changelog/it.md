@@ -8,6 +8,13 @@ numerazione [Semantic Versioning](https://semver.org/lang/it/).
 
 ## [Non pubblicato]
 
+### Modificato
+- **L'icona nell'area di notifica dice in che stato si trova.** Disconnessa:
+  grigia. Connessa e tutto nei limiti: un segno di spunta verde; dalla soglia
+  di avviso un punto interrogativo ambra, da quella critica un punto
+  esclamativo rosso. Prima ci pensava il solo colore. Un segno per stato: a
+  sedici pixel due non si distinguono più.
+
 ### Corretto
 - **Il credito aggiuntivo veniva mostrato cento volte più grande e nell'unità
   sbagliata.** L'API riporta `used_credits: 2276`, e non sono 2276 crediti ma
