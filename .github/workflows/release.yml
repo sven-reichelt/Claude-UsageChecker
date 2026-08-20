@@ -234,6 +234,23 @@ jobs:
           set -euo pipefail
           APP="ClaudeUsageChecker.app"
 
+          # Pasted values pick up stray whitespace, and the complaint that
+          # comes back names only the mangled value - which the log masks. So
+          # they are trimmed here and checked before Apple is troubled.
+          KEY_ID="$(printf %s "$API_KEY_ID" | tr -d '[:space:]')"
+          ISSUER_ID="$(printf %s "$API_ISSUER_ID" | tr -d '[:space:]')"
+
+          UUID='^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
+          if ! printf %s "$ISSUER_ID" | grep -qE "$UUID"; then
+            echo "::error::APPLE_API_ISSUER_ID is not a UUID. It is the Issuer ID standing above the key table in App Store Connect - not the Key ID, which is ten characters and belongs in APPLE_API_KEY_ID."
+            exit 1
+          fi
+
+          if ! printf %s "$KEY_ID" | grep -qE '^[0-9A-Za-z]{8,12}$'; then
+            echo "::error::APPLE_API_KEY_ID does not look like a Key ID. It is the ten-character value in the key table, and it also stands in the name of the .p8 file."
+            exit 1
+          fi
+
           echo "$API_KEY" | base64 --decode > "$RUNNER_TEMP/api-key.p8"
 
           # Apple wants an archive, and the answer takes a few minutes.
@@ -241,8 +258,8 @@ jobs:
 
           xcrun notarytool submit "$RUNNER_TEMP/notarise.zip" \
             --key "$RUNNER_TEMP/api-key.p8" \
-            --key-id "$API_KEY_ID" \
-            --issuer "$API_ISSUER_ID" \
+            --key-id "$KEY_ID" \
+            --issuer "$ISSUER_ID" \
             --wait --timeout 30m
 
           rm -f "$RUNNER_TEMP/api-key.p8" "$RUNNER_TEMP/notarise.zip"
