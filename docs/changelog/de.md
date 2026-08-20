@@ -10,8 +10,16 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [0.7.1] – 2026-08-20
 
+### Hinzugefügt
+- **Der Aktualisieren-Knopf sieht unterwegs nach einer neuen Fassung.** Ein
+  Druck statt zwei. In den Einstellungen abwählbar, für wen das Netz nicht
+  öfter angefasst werden soll als nötig.
+- **Die Einstellungen stehen in zwei Spalten.** In einer Spalte wurde das
+  Fenster hoch und schmal – auf einem Laptop-Bildschirm hieß das scrollen für
+  Einstellungen, die bequem nebeneinander passen.
+
 ### Geändert
-- Service-Release. Vorarbeit für Testfassungen; im Alltag ändert sich nichts.
+- Vorarbeit für Testfassungen. Davon ist im Alltag nichts zu sehen.
 
 ### Behoben
 - **Übersetzungskorrekturen.** Sechs Sprachen nannten das Zusatzkontingent

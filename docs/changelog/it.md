@@ -10,9 +10,17 @@ numerazione [Semantic Versioning](https://semver.org/lang/it/).
 
 ## [0.7.1] – 2026-08-20
 
+### Aggiunto
+- **Il pulsante di aggiornamento cerca per strada una nuova versione.** Una
+  pressione invece di due. Disattivabile nelle impostazioni, per chi preferisce
+  non toccare la rete più del necessario.
+- **Le impostazioni sono disposte su due colonne.** Su una sola la finestra
+  diventava alta e stretta: sullo schermo di un portatile occorreva scorrere
+  per impostazioni che stanno comodamente affiancate.
+
 ### Modificato
-- Versione di manutenzione. Preparazione delle versioni di prova; nell'uso
-  quotidiano non cambia nulla.
+- Preparazione delle versioni di prova. Nell'uso quotidiano non se ne vede
+  nulla.
 
 ### Corretto
 - **Correzioni di traduzione.** Sei lingue chiamavano ancora «crediti»

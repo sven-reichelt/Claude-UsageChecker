@@ -85,6 +85,31 @@ public class LayoutInEveryLanguageTests : IDisposable
         AssertFits(window, code);
     }
 
+    /// <summary>
+    /// The same window with the choice of update channel unfolded.
+    /// </summary>
+    /// <remarks>
+    /// That section is hidden almost always, so it was never measured. It is
+    /// the longest of them all - a heading, two lines of explanation and a
+    /// picker - and it lands in the taller of the two columns.
+    /// </remarks>
+    [AvaloniaTheory]
+    [MemberData(nameof(Languages))]
+    public void TheSettingsWindowFitsWithTheChannelSectionUnfolded(string code)
+    {
+        Localizer.Use(Language.Find(code)!);
+
+        using var file = new TemporaryFile();
+        var window = new SettingsWindow(
+            new SettingsStore(file.Path),
+            new AppSettings { Channel = UpdateChannel.PreRelease },
+            applyAutostart: _ => { });
+
+        Assert.True(window.FindControl<StackPanel>("ChannelSection")!.IsVisible);
+
+        AssertFits(window, code);
+    }
+
     [AvaloniaTheory]
     [MemberData(nameof(Languages))]
     public void TheSignInWindowFitsInEveryLanguage(string code)

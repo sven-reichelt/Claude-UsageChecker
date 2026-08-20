@@ -61,6 +61,7 @@ public partial class SettingsWindow : Window
         IntervalBox.Value = settings.PollIntervalSeconds;
         LaunchAtLoginBox.IsChecked = settings.LaunchAtLogin;
         CheckUpdatesBox.IsChecked = settings.CheckForUpdates;
+        RefreshChecksUpdatesBox.IsChecked = settings.RefreshChecksForUpdates;
         WarningThresholdBox.Value = (decimal)settings.WarningThreshold;
         CriticalThresholdBox.Value = (decimal)settings.CriticalThreshold;
 
@@ -130,6 +131,7 @@ public partial class SettingsWindow : Window
         IntervalLabel.Text = T.SettingsInterval;
         LaunchAtLoginBox.Content = T.SettingsLaunchAtLogin;
         CheckUpdatesBox.Content = T.SettingsCheckForUpdates;
+        RefreshChecksUpdatesBox.Content = T.SettingsRefreshChecksForUpdates;
 
         LanguageHeading.Text = T.SettingsLanguageSection;
         LanguageHint.Text = T.SettingsLanguageHint;
@@ -256,6 +258,7 @@ public partial class SettingsWindow : Window
             PollIntervalSeconds = (int)(IntervalBox.Value ?? 300),
             LaunchAtLogin = LaunchAtLoginBox.IsChecked ?? false,
             CheckForUpdates = CheckUpdatesBox.IsChecked ?? true,
+            RefreshChecksForUpdates = RefreshChecksUpdatesBox.IsChecked ?? true,
             WarningThreshold = warning,
             CriticalThreshold = critical,
             Language = language.Code,

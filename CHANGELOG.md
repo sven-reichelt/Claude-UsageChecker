@@ -10,8 +10,16 @@ the versioning [Semantic Versioning](https://semver.org/).
 
 ## [0.7.1] – 2026-08-20
 
+### Added
+- **The refresh button looks for a new version on the way.** One press instead
+  of two. It can be switched off in the settings, for whoever would rather the
+  network was not touched more than necessary.
+- **The settings sit in two columns.** In a single column the window grew tall
+  and narrow, which meant scrolling on a laptop screen for settings that fit
+  side by side comfortably.
+
 ### Changed
-- Service release. Groundwork for test builds; nothing changes in everyday use.
+- Groundwork for test builds. Nothing of it is visible in everyday use.
 
 ### Fixed
 - **Translation corrections.** Six languages still called the extra usage

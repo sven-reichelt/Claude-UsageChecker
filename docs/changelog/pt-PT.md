@@ -10,9 +10,16 @@ numeração [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [0.7.1] – 2026-08-20
 
+### Adicionado
+- **O botão de atualizar procura de passagem uma versão nova.** Um clique em
+  vez de dois. Pode ser desativado nas definições, para quem prefere não usar a
+  rede mais do que o necessário.
+- **As definições ficam em duas colunas.** Numa só, a janela ficava alta e
+  estreita — no ecrã de um portátil era preciso deslocar-se por definições que
+  cabem confortavelmente lado a lado.
+
 ### Alterado
-- Versão de manutenção. Preparação para versões de teste; no dia a dia nada
-  muda.
+- Preparação para as versões de teste. No dia a dia nada disso aparece.
 
 ### Corrigido
 - **Correções de tradução.** Seis idiomas ainda chamavam «créditos» ao uso

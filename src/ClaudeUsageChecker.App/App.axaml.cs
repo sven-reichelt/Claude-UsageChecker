@@ -366,7 +366,7 @@ public partial class App : Application, IDisposable
     private DetailsWindow CreateDetailsWindow()
     {
         var window = new DetailsWindow();
-        window.RefreshRequested += (_, _) => ErrorGuard.Forget("trigger a call", RefreshAsync);
+        window.RefreshRequested += (_, _) => ErrorGuard.Forget("trigger a call", RefreshAndCheckAsync);
         window.ReleasePageRequested += (_, page) =>
             ErrorGuard.Run("open the release page", () => OpenReleasePage(page));
         window.InstallRequested += (_, _) =>
@@ -428,6 +428,26 @@ public partial class App : Application, IDisposable
         if (_monitor is not null)
         {
             await _monitor.RefreshNowAsync().ConfigureAwait(false);
+        }
+    }
+
+    /// <summary>
+    /// The refresh button of the details window: the figures first, and where
+    /// the setting allows it, a look for a new version afterwards.
+    /// </summary>
+    /// <remarks>
+    /// In that order deliberately. The figures are what the button is for and
+    /// what the user is waiting for; the version is the errand it runs on the
+    /// way. A failed update check must not hold the figures back either - hence
+    /// its own guard rather than one try around both.
+    /// </remarks>
+    private async Task RefreshAndCheckAsync()
+    {
+        await RefreshAsync().ConfigureAwait(false);
+
+        if (_settings.RefreshChecksForUpdates)
+        {
+            await CheckForUpdatesAsync(announceUpToDate: true).ConfigureAwait(false);
         }
     }
 

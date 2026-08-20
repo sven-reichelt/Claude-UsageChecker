@@ -131,6 +131,7 @@ public static class T
     public static string SettingsInterval => L["settings.interval"];
     public static string SettingsLaunchAtLogin => L["settings.launchAtLogin"];
     public static string SettingsCheckForUpdates => L["settings.checkUpdates"];
+    public static string SettingsRefreshChecksForUpdates => L["settings.refreshChecksUpdates"];
     public static string SettingsLanguageSection => L["settings.languageSection"];
     public static string SettingsLanguageHint => L["settings.languageHint"];
     public static string SettingsLanguageLabel => L["settings.languageLabel"];

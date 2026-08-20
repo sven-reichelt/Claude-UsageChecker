@@ -10,9 +10,16 @@ versionado [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [0.7.1] – 2026-08-20
 
+### Añadido
+- **El botón de actualizar busca de paso una versión nueva.** Una pulsación en
+  lugar de dos. Se puede desactivar en la configuración, para quien prefiera no
+  tocar la red más de lo necesario.
+- **La configuración se presenta en dos columnas.** En una sola columna la
+  ventana quedaba alta y estrecha, lo que obligaba a desplazarse en la pantalla
+  de un portátil por ajustes que caben cómodamente uno al lado del otro.
+
 ### Cambiado
-- Versión de mantenimiento. Base para versiones de prueba; en el uso diario no
-  cambia nada.
+- Base para las versiones de prueba. En el uso diario no se nota nada de ello.
 
 ### Corregido
 - **Correcciones de traducción.** Seis idiomas seguían llamando «créditos» al

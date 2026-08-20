@@ -1,7 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="ClaudeUsageChecker.App.Views.SettingsWindow"
-        Width="460" SizeToContent="Height"
+        Width="720" SizeToContent="Height"
         CanResize="False"
         WindowStartupLocation="CenterScreen">
 
@@ -10,7 +10,11 @@
        with it. Hence two safeguards: the button row is docked at the bottom and
        stays outside the scroll area, so that it remains reachable however low
        the screen; and the content above it is capped to the working area when
-       the window opens. The value here applies until a screen is known. -->
+       the window opens. The value here applies until a screen is known.
+
+       The settings sit in two columns rather than one strip: in a single column
+       the window grew tall and narrow, which meant scrolling on a laptop screen
+       for settings that fit side by side comfortably. -->
   <DockPanel LastChildFill="True">
 
     <StackPanel DockPanel.Dock="Bottom" Margin="20,0,20,20" Spacing="18">
@@ -28,87 +32,111 @@
     <ScrollViewer x:Name="ContentScroller" MaxHeight="760"
                   HorizontalScrollBarVisibility="Disabled"
                   VerticalScrollBarVisibility="Auto">
-      <StackPanel Margin="20" Spacing="18">
+      <Grid Margin="20" ColumnDefinitions="*,Auto,*" ColumnSpacing="20">
 
-        <StackPanel Spacing="8">
-          <TextBlock x:Name="SignInHeading" FontWeight="SemiBold" />
-          <TextBlock x:Name="SignInStatus" TextWrapping="Wrap" FontSize="12" Opacity="0.8" />
-          <StackPanel Orientation="Horizontal" Spacing="8">
-            <Button x:Name="SignInButton" />
-            <Button x:Name="SignOutButton" />
+        <!-- Left: who the application signs in as, and how it behaves. -->
+        <StackPanel Grid.Column="0" Spacing="18">
+
+          <StackPanel Spacing="8">
+            <TextBlock x:Name="SignInHeading" FontWeight="SemiBold" />
+            <TextBlock x:Name="SignInStatus" TextWrapping="Wrap" FontSize="12" Opacity="0.8" />
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <Button x:Name="SignInButton" />
+              <Button x:Name="SignOutButton" />
+            </StackPanel>
           </StackPanel>
-        </StackPanel>
 
-        <Separator />
-
-        <StackPanel Spacing="10">
-          <TextBlock x:Name="BehaviourHeading" FontWeight="SemiBold" />
-
-          <Grid ColumnDefinitions="*,Auto" >
-            <TextBlock x:Name="IntervalLabel" VerticalAlignment="Center" FontSize="12" />
-            <NumericUpDown Grid.Column="1" x:Name="IntervalBox"
-                           Minimum="180" Maximum="3600" Increment="60" Width="120" />
-          </Grid>
-
-          <CheckBox x:Name="LaunchAtLoginBox" />
-          <TextBlock x:Name="RelocationHint" IsVisible="False" TextWrapping="Wrap"
-                     FontSize="11" Opacity="0.75" Margin="24,-4,0,0" />
-          <CheckBox x:Name="CheckUpdatesBox" />
-        </StackPanel>
-
-        <Separator />
-
-        <StackPanel Spacing="10">
-          <TextBlock x:Name="LanguageHeading" FontWeight="SemiBold" />
-          <TextBlock x:Name="LanguageHint" TextWrapping="Wrap" FontSize="12" Opacity="0.8" />
-
-          <Grid ColumnDefinitions="*,Auto">
-            <TextBlock x:Name="LanguageLabel" VerticalAlignment="Center" FontSize="12" />
-            <!-- The language names are each written in their own language and are
-                 therefore not translated - someone who switched the interface to
-                 Russian by accident will recognise "Deutsch". -->
-            <ComboBox Grid.Column="1" x:Name="LanguageBox" Width="200" />
-          </Grid>
-        </StackPanel>
-
-        <Separator />
-
-        <StackPanel Spacing="10">
-          <TextBlock x:Name="ThresholdHeading" FontWeight="SemiBold" />
-          <TextBlock x:Name="ThresholdIntro" TextWrapping="Wrap" FontSize="12" Opacity="0.8" />
-
-          <Grid ColumnDefinitions="*,Auto">
-            <TextBlock x:Name="WarningLabel" VerticalAlignment="Center" FontSize="12" />
-            <NumericUpDown Grid.Column="1" x:Name="WarningThresholdBox"
-                           Minimum="5" Maximum="100" Increment="5" Width="120" />
-          </Grid>
-
-          <Grid ColumnDefinitions="*,Auto">
-            <TextBlock x:Name="CriticalLabel" VerticalAlignment="Center" FontSize="12" />
-            <NumericUpDown Grid.Column="1" x:Name="CriticalThresholdBox"
-                           Minimum="5" Maximum="100" Increment="5" Width="120" />
-          </Grid>
-
-          <TextBlock x:Name="ThresholdHint" IsVisible="False" TextWrapping="Wrap"
-                     FontSize="11" Foreground="{DynamicResource CriticalBrush}" />
-        </StackPanel>
-
-        <!-- Hidden until the version number at the bottom has been clicked five
-             times. Not a secret worth keeping, but not a choice to stumble into
-             either: a pre-release is meant for whoever agreed to test one. It
-             stays visible while one is selected, so there is always a way back;
-             on the published releases it is gone again at the next opening. -->
-        <StackPanel x:Name="ChannelSection" Spacing="10" IsVisible="False">
           <Separator />
-          <TextBlock x:Name="ChannelHeading" FontWeight="SemiBold" />
-          <TextBlock x:Name="ChannelHint" TextWrapping="Wrap" FontSize="12" Opacity="0.8" />
 
-          <Grid ColumnDefinitions="*,Auto">
-            <TextBlock x:Name="ChannelLabel" VerticalAlignment="Center" FontSize="12" />
-            <ComboBox Grid.Column="1" x:Name="ChannelBox" Width="200" />
-          </Grid>
+          <StackPanel Spacing="10">
+            <TextBlock x:Name="BehaviourHeading" FontWeight="SemiBold" />
+
+            <Grid ColumnDefinitions="*,Auto" >
+              <TextBlock x:Name="IntervalLabel" VerticalAlignment="Center" FontSize="12"
+                         TextWrapping="Wrap" Margin="0,0,8,0" />
+              <NumericUpDown Grid.Column="1" x:Name="IntervalBox"
+                             Minimum="180" Maximum="3600" Increment="60" Width="120" />
+            </Grid>
+
+            <CheckBox x:Name="LaunchAtLoginBox" />
+            <TextBlock x:Name="RelocationHint" IsVisible="False" TextWrapping="Wrap"
+                       FontSize="11" Opacity="0.75" Margin="24,-4,0,0" />
+            <CheckBox x:Name="CheckUpdatesBox" />
+            <!-- The refresh button in the details window fetches the figures.
+                 With this it looks for a new version on the way - one press
+                 instead of two, and switched off for whoever would rather the
+                 network was not touched more than necessary. -->
+            <CheckBox x:Name="RefreshChecksUpdatesBox" />
+          </StackPanel>
+
         </StackPanel>
-      </StackPanel>
+
+        <!-- A hairline between the columns: without it the two halves read as
+             one wide, muddled block. -->
+        <Rectangle Grid.Column="1" Width="1" VerticalAlignment="Stretch"
+                   Fill="{DynamicResource SystemControlBackgroundBaseLowBrush}" />
+
+        <!-- Right: what it shows and when it changes colour. -->
+        <StackPanel Grid.Column="2" Spacing="18">
+
+          <StackPanel Spacing="10">
+            <TextBlock x:Name="LanguageHeading" FontWeight="SemiBold" />
+            <TextBlock x:Name="LanguageHint" TextWrapping="Wrap" FontSize="12" Opacity="0.8" />
+
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock x:Name="LanguageLabel" VerticalAlignment="Center" FontSize="12"
+                         TextWrapping="Wrap" Margin="0,0,8,0" />
+              <!-- The language names are each written in their own language and are
+                   therefore not translated - someone who switched the interface to
+                   Russian by accident will recognise "Deutsch". -->
+              <ComboBox Grid.Column="1" x:Name="LanguageBox" Width="160" />
+            </Grid>
+          </StackPanel>
+
+          <Separator />
+
+          <StackPanel Spacing="10">
+            <TextBlock x:Name="ThresholdHeading" FontWeight="SemiBold" />
+            <TextBlock x:Name="ThresholdIntro" TextWrapping="Wrap" FontSize="12" Opacity="0.8" />
+
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock x:Name="WarningLabel" VerticalAlignment="Center" FontSize="12"
+                         TextWrapping="Wrap" Margin="0,0,8,0" />
+              <NumericUpDown Grid.Column="1" x:Name="WarningThresholdBox"
+                             Minimum="5" Maximum="100" Increment="5" Width="120" />
+            </Grid>
+
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock x:Name="CriticalLabel" VerticalAlignment="Center" FontSize="12"
+                         TextWrapping="Wrap" Margin="0,0,8,0" />
+              <NumericUpDown Grid.Column="1" x:Name="CriticalThresholdBox"
+                             Minimum="5" Maximum="100" Increment="5" Width="120" />
+            </Grid>
+
+            <TextBlock x:Name="ThresholdHint" IsVisible="False" TextWrapping="Wrap"
+                       FontSize="11" Foreground="{DynamicResource CriticalBrush}" />
+          </StackPanel>
+
+          <!-- Hidden until the version number at the bottom has been clicked five
+               times. Not a secret worth keeping, but not a choice to stumble into
+               either: a pre-release is meant for whoever agreed to test one. It
+               stays visible while one is selected, so there is always a way back;
+               on the published releases it is gone again at the next opening. -->
+          <StackPanel x:Name="ChannelSection" Spacing="10" IsVisible="False">
+            <Separator />
+            <TextBlock x:Name="ChannelHeading" FontWeight="SemiBold" />
+            <TextBlock x:Name="ChannelHint" TextWrapping="Wrap" FontSize="12" Opacity="0.8" />
+
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock x:Name="ChannelLabel" VerticalAlignment="Center" FontSize="12"
+                         TextWrapping="Wrap" Margin="0,0,8,0" />
+              <ComboBox Grid.Column="1" x:Name="ChannelBox" Width="160" />
+            </Grid>
+          </StackPanel>
+
+        </StackPanel>
+
+      </Grid>
     </ScrollViewer>
 
   </DockPanel>

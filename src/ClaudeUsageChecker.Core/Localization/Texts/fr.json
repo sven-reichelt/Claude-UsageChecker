@@ -82,6 +82,7 @@
   "settings.interval": "Intervalle de relevé (secondes, 180 au minimum)",
   "settings.launchAtLogin": "Démarrer avec Windows",
   "settings.checkUpdates": "Rechercher des mises à jour au démarrage",
+  "settings.refreshChecksUpdates": "Lors de l'actualisation, chercher aussi une nouvelle version",
   "settings.languageSection": "Langue",
   "settings.languageHint": "S'applique à l'interface et à la liste des nouveautés. Prend effet à l'enregistrement, sans redémarrage.",
   "settings.languageLabel": "Langue de l'application",

@@ -82,6 +82,7 @@
   "settings.interval": "Intervalo de consulta (segundos, mínimo 180)",
   "settings.launchAtLogin": "Iniciar con Windows",
   "settings.checkUpdates": "Buscar actualizaciones al arrancar",
+  "settings.refreshChecksUpdates": "Al actualizar, buscar también una versión nueva",
   "settings.languageSection": "Idioma",
   "settings.languageHint": "Se aplica a la interfaz y a la lista de novedades. Surte efecto al guardar; no hace falta reiniciar.",
   "settings.languageLabel": "Idioma de la aplicación",

@@ -30,6 +30,18 @@ public sealed class AppSettings
     [JsonPropertyName("checkForUpdates")]
     public bool CheckForUpdates { get; set; } = true;
 
+    /// <summary>
+    /// Whether the refresh button in the details window looks for a new version
+    /// along the way.
+    /// </summary>
+    /// <remarks>
+    /// On by default: whoever presses refresh wants to know where they stand,
+    /// and the version is part of that. It can be switched off, because it turns
+    /// one press into two calls - one to Anthropic and one to GitHub.
+    /// </remarks>
+    [JsonPropertyName("refreshChecksForUpdates")]
+    public bool RefreshChecksForUpdates { get; set; } = true;
+
     /// <summary>Warning threshold in percent.</summary>
     [JsonPropertyName("warningThreshold")]
     public double WarningThreshold { get; set; } = 75d;

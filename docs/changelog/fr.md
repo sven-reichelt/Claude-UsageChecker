@@ -10,9 +10,16 @@ numérotation [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [0.7.1] – 2026-08-20
 
+### Ajouté
+- **Le bouton d'actualisation cherche au passage une nouvelle version.** Un
+  clic au lieu de deux. Désactivable dans les paramètres, pour qui préfère ne
+  pas solliciter le réseau plus que nécessaire.
+- **Les paramètres se présentent sur deux colonnes.** Sur une seule, la fenêtre
+  devenait haute et étroite : il fallait défiler sur un écran de portable pour
+  des réglages qui tiennent confortablement côte à côte.
+
 ### Modifié
-- Version de maintenance. Préparation des versions d'essai ; rien ne change à
-  l'usage.
+- Préparation des versions d'essai. Rien n'en est visible à l'usage.
 
 ### Corrigé
 - **Corrections de traduction.** Six langues appelaient encore « crédits »

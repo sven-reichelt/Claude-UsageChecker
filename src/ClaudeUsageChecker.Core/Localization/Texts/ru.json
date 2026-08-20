@@ -82,6 +82,7 @@
   "settings.interval": "Интервал опроса (секунды, не менее 180)",
   "settings.launchAtLogin": "Запускать вместе с Windows",
   "settings.checkUpdates": "Проверять обновления при запуске",
+  "settings.refreshChecksUpdates": "При обновлении также искать новую версию",
   "settings.languageSection": "Язык",
   "settings.languageHint": "Действует для интерфейса и для списка изменений. Применяется при сохранении, перезапуск не нужен.",
   "settings.languageLabel": "Язык приложения",

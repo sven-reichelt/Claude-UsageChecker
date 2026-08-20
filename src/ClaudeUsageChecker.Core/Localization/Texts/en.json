@@ -82,6 +82,7 @@
   "settings.interval": "Polling interval (seconds, at least 180)",
   "settings.launchAtLogin": "Start with Windows",
   "settings.checkUpdates": "Check for updates at startup",
+  "settings.refreshChecksUpdates": "Also look for a new version when refreshing",
   "settings.languageSection": "Language",
   "settings.languageHint": "Applies to the interface and to the list of changes. Takes effect on saving - no restart needed.",
   "settings.languageLabel": "Application language",

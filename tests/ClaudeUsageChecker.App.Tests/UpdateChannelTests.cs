@@ -150,6 +150,81 @@ public class UpdateChannelTests
         Assert.Contains(expected, handler.Url ?? string.Empty, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// The way out of a pre-release: the finished version of the same number
+    /// supersedes it - on both channels.
+    /// </summary>
+    /// <remarks>
+    /// This is the question the whole pre-release idea stands or falls on. If it
+    /// were answered wrongly, whoever tested a build would be stranded on it:
+    /// the numbers are equal, so a plain comparison finds nothing to do, and the
+    /// finished version would never be offered. It is checked here against the
+    /// real shape of GitHub's answer rather than reasoned about.
+    /// </remarks>
+    [Theory]
+    [InlineData(UpdateChannel.PreRelease)]
+    [InlineData(UpdateChannel.Stable)]
+    public async Task TheFinishedVersionSupersedesThePreReleaseOfTheSameNumber(UpdateChannel channel)
+    {
+        // What GitHub answers once 0.7.1 has been published: the list for the
+        // pre-release channel, the single object for the published one.
+        const string list = """
+            [
+              { "tag_name": "v0.7.1", "draft": false, "prerelease": false },
+              { "tag_name": "v0.7.1-beta.5", "draft": false, "prerelease": true },
+              { "tag_name": "v0.7.0", "draft": false, "prerelease": false }
+            ]
+            """;
+        const string single = """{ "tag_name": "v0.7.1", "draft": false, "prerelease": false }""";
+
+        var handler = new AnsweringHandler(channel == UpdateChannel.PreRelease ? list : single);
+        using var client = new HttpClient(handler);
+        var installed = new ProgramVersion(new Version(0, 7, 1), "beta.5");
+        var service = new GitHubReleaseUpdateService(
+            client, "owner", "repository", installed, () => channel);
+
+        var result = await service.CheckAsync();
+
+        Assert.Equal(UpdateCheckStatus.UpdateAvailable, result.Status);
+        Assert.Equal("0.7.1", result.AvailableVersion?.ToString());
+        Assert.False(result.AvailableVersion?.IsPreRelease);
+    }
+
+    /// <summary>
+    /// And the other way round it stays quiet: a pre-release already installed
+    /// is not offered to itself.
+    /// </summary>
+    [Fact]
+    public async Task ThePreReleaseIsNotOfferedToItself()
+    {
+        const string list = """
+            [
+              { "tag_name": "v0.7.1-beta.5", "draft": false, "prerelease": true },
+              { "tag_name": "v0.7.0", "draft": false, "prerelease": false }
+            ]
+            """;
+
+        var handler = new AnsweringHandler(list);
+        using var client = new HttpClient(handler);
+        var service = new GitHubReleaseUpdateService(
+            client, "owner", "repository",
+            new ProgramVersion(new Version(0, 7, 1), "beta.5"), () => UpdateChannel.PreRelease);
+
+        var result = await service.CheckAsync();
+
+        Assert.Equal(UpdateCheckStatus.UpToDate, result.Status);
+    }
+
+    private sealed class AnsweringHandler(string body) : HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request, CancellationToken cancellationToken) =>
+            Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(body)
+            });
+    }
+
     private static JsonElement Newest(string json)
     {
         using var document = JsonDocument.Parse(json);

@@ -82,6 +82,7 @@
   "settings.interval": "Abrufintervall (Sekunden, mindestens 180)",
   "settings.launchAtLogin": "Mit Windows starten",
   "settings.checkUpdates": "Beim Start auf Aktualisierungen prüfen",
+  "settings.refreshChecksUpdates": "Beim Aktualisieren auch auf neue Fassungen prüfen",
   "settings.languageSection": "Sprache",
   "settings.languageHint": "Gilt für die Oberfläche und für die Übersicht der Neuerungen. Wirkt beim Speichern – ein Neustart ist nicht nötig.",
   "settings.languageLabel": "Sprache der Anwendung",
