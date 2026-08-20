@@ -125,6 +125,10 @@ public class MacOsSupportTests
     ///
     /// Only on macOS is it built at all; elsewhere nothing shows it and the
     /// property stays empty.
+    ///
+    /// The labels come out of the language file, which means the language has
+    /// to be settled before the menu is built. It was not, at first: the
+    /// application came up in German with an English menu beside the apple.
     /// </remarks>
     [AvaloniaFact]
     public void TheApplicationMenuIsInPlaceAfterInitialisation()
@@ -146,8 +150,12 @@ public class MacOsSupportTests
             .ToList();
 
         Assert.Contains(T.AboutTitle, headers);
-        Assert.Contains(T.TrayExit, headers);
+        Assert.Contains(T.TraySettings, headers);
         Assert.DoesNotContain(headers, h => h?.Contains("Avalonia", StringComparison.OrdinalIgnoreCase) == true);
+
+        // Nothing for leaving: macOS adds Quit to this menu by itself, and one
+        // of our own beside it was the same thing twice on the same shortcut.
+        Assert.DoesNotContain(T.TrayExit, headers);
     }
 
     /// <summary>The label is a reverse domain name, as launchd expects.</summary>

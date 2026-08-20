@@ -60,13 +60,24 @@ public partial class App : Application, IDisposable
         // the one string the language files deliberately leave untranslated.
         Name = T.AppName;
 
-        // Here and not later: the menu exporter reads this once, and if it
-        // finds nothing it builds its own and writes that in. See the remarks
-        // on the method.
-        if (OperatingSystem.IsMacOS())
+        if (!OperatingSystem.IsMacOS())
         {
-            ErrorGuard.Run("build the application menu", BuildMacOsApplicationMenu);
+            return;
         }
+
+        // Only here, and only on macOS. The menu below is built once and read
+        // once, before the lifetime callback settles the language for
+        // everything else - which is how the application came up in German with
+        // an English menu beside the apple. Everywhere else this stays out of
+        // the way: reading the settings this early would put the language of
+        // whoever runs the test suite into the test process.
+        ErrorGuard.Run("build the application menu", () =>
+        {
+            _settings = _settingsStore.Load();
+            Localizer.Use(Language.Find(_settings.Language) ?? Language.FromSystem());
+
+            BuildMacOsApplicationMenu();
+        });
     }
 
     public override void OnFrameworkInitializationCompleted()
@@ -77,6 +88,9 @@ public partial class App : Application, IDisposable
             desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
             desktop.Exit += (_, _) => Shutdown();
 
+            // Loaded a second time on macOS, where Initialize needed them for
+            // the application menu. Repeating it costs one file read and keeps
+            // the one place that settles the language for everything.
             _settings = _settingsStore.Load();
 
             // Before anything else: every window and every menu entry fetches
@@ -264,8 +278,13 @@ public partial class App : Application, IDisposable
     /// What macOS expects there is: what this program is, where to set it up,
     /// and how to leave. The entries are the ones the menu in the menu bar
     /// already offers - a Mac user looks for them here first, and finding them
-    /// missing is what would feel wrong. Their shortcuts are the ones every Mac
+    /// missing is what would feel wrong. The shortcut is the one every Mac
     /// application uses, because that is where the fingers go.
+    /// </para>
+    /// <para>
+    /// No entry for leaving: macOS adds Services, Hide and Quit to this menu by
+    /// itself. One of our own beside them was simply the same thing twice, on
+    /// the same shortcut.
     /// </para>
     /// <para>
     /// The timing decides whether any of it arrives. Avalonia's exporter reads
@@ -288,21 +307,13 @@ public partial class App : Application, IDisposable
         };
         settings.Click += (_, _) => ErrorGuard.Run("open settings", ShowSettings);
 
-        var quit = new NativeMenuItem(T.TrayExit)
-        {
-            Gesture = new KeyGesture(Key.Q, KeyModifiers.Meta)
-        };
-        quit.Click += (_, _) => ErrorGuard.Run("exit", RequestShutdown);
-
         var menu = new NativeMenu
         {
             Items =
             {
                 about,
                 new NativeMenuItemSeparator(),
-                settings,
-                new NativeMenuItemSeparator(),
-                quit
+                settings
             }
         };
 
