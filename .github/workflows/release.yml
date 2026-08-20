@@ -256,11 +256,33 @@ jobs:
           # Apple wants an archive, and the answer takes a few minutes.
           ditto -c -k --keepParent "$APP" "$RUNNER_TEMP/notarise.zip"
 
-          xcrun notarytool submit "$RUNNER_TEMP/notarise.zip" \
-            --key "$RUNNER_TEMP/api-key.p8" \
-            --key-id "$KEY_ID" \
-            --issuer "$ISSUER_ID" \
-            --wait --timeout 30m
+          # Submitted first, waited for second. "submit --wait" reports a
+          # timeout and nothing else - not the identifier, not what Apple
+          # thought - and a run that ends knowing nothing is a run wasted.
+          CREDENTIALS=(--key "$RUNNER_TEMP/api-key.p8" --key-id "$KEY_ID" --issuer "$ISSUER_ID")
+
+          SUBMISSION="$(xcrun notarytool submit "$RUNNER_TEMP/notarise.zip" \
+            "${CREDENTIALS[@]}" --output-format json | jq -r '.id')"
+          echo "Submission: $SUBMISSION"
+
+          # Apple is usually done in minutes; the first submission of a new
+          # account can take considerably longer. A generous limit costs
+          # nothing when it is quick, because waiting ends the moment the
+          # verdict arrives.
+          xcrun notarytool wait "$SUBMISSION" "${CREDENTIALS[@]}" --timeout 45m || true
+
+          STATUS="$(xcrun notarytool info "$SUBMISSION" "${CREDENTIALS[@]}" \
+            --output-format json | jq -r '.status')"
+          echo "Apple says: $STATUS"
+
+          if [ "$STATUS" != "Accepted" ]; then
+            # Whatever Apple objected to, in its own words. Without this the
+            # only thing to go on is a status word.
+            xcrun notarytool log "$SUBMISSION" "${CREDENTIALS[@]}" || true
+            rm -f "$RUNNER_TEMP/api-key.p8" "$RUNNER_TEMP/notarise.zip"
+            echo "::error::Notarisation ended as $STATUS. Submission $SUBMISSION."
+            exit 1
+          fi
 
           rm -f "$RUNNER_TEMP/api-key.p8" "$RUNNER_TEMP/notarise.zip"
 
