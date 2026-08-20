@@ -76,8 +76,7 @@ Builds into `artifacts/` (centrally through `ArtifactsPath` in
 
 ## Status
 
-Version 0.7.2 released and 0.8.0 in test builds; the repository is public and
-written in English.
+Version 0.8.0 released, the repository is public and written in English.
 Finished among other things: the application's own sign-in through OAuth with
 PKCE including refresh, update at the push of a button with checksum
 verification, permanent setup with autostart, configurable thresholds, the
