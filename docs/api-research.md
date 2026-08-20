@@ -97,6 +97,21 @@ by `ExtraUsageMappingTests`.
 
 Not acted on:
 
+* **`spend.balance`, `spend.auto_reload` and `spend.cap.credits` stay empty even
+  where the account has all three.** Measured on 2026-08-20 against an account
+  whose own Claude Desktop showed, at the same minute, a balance of 58.38 EUR,
+  automatic top-up switched off, and promotional credit expiring on 19 September.
+  This endpoint reported `null` for every one of them, and `can_purchase_credits:
+  false` while the desktop offered a purchase button.
+
+  So the balance is not here to be had, and looking harder in this response is
+  wasted effort - the desktop takes it from somewhere else. `spend.cap.money`
+  does carry a figure, but the same one as `spend.limit`: the monthly cap. It
+  adds nothing that is not already shown.
+
+  Nothing is read from these fields. There is no point in mapping a field whose
+  value has never been seen: the shape of it would be a guess, and a guess in
+  code outlives the note that admits it.
 * **Code-name fields with no discernible meaning:** `seven_day_oauth_apps`,
   `seven_day_cowork`, `seven_day_omelette`, `tangelo`, `iguana_necktie`,
   `omelette_promotional`, `nimbus_quill`, `cinder_cove`, `amber_ladder`. All

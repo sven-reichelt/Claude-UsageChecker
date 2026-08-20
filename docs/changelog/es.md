@@ -8,6 +8,8 @@ versionado [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+## [0.6.4] – 2026-08-20
+
 ### Corregido
 - **Una ventana cuyo reinicio ya vencía no tenía una frase propia.** El bloque
   para una duración se insertaba en un hueco que espera una duración, y salía

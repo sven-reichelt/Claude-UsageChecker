@@ -8,6 +8,8 @@ the versioning [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.6.4] – 2026-08-20
+
 ### Fixed
 - **A window whose reset had fallen due was described in no sentence at all.**
   The building block for a duration was pushed into a slot that expects one,

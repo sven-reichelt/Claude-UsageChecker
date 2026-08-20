@@ -8,6 +8,8 @@ numérotation [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+## [0.6.4] – 2026-08-20
+
 ### Corrigé
 - **Une fenêtre dont la réinitialisation était échue n'avait aucune phrase
   correcte.** Le bloc prévu pour une durée était inséré dans un emplacement

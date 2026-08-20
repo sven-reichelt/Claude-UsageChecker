@@ -8,6 +8,8 @@ numerazione [Semantic Versioning](https://semver.org/lang/it/).
 
 ## [Non pubblicato]
 
+## [0.6.4] – 2026-08-20
+
 ### Corretto
 - **Per una finestra il cui reset era già dovuto non esisteva una frase
   corretta.** Il blocco per una durata veniva inserito in uno spazio che ne

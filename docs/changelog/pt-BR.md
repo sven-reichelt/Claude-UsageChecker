@@ -8,6 +8,8 @@ versionamento [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+## [0.6.4] – 2026-08-20
+
 ### Corrigido
 - **Uma janela cujo reinício já havia vencido não tinha uma frase própria.** O
   bloco de duração era inserido num espaço que espera uma duração, resultando

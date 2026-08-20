@@ -8,6 +8,8 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unveröffentlicht]
 
+## [0.6.4] – 2026-08-20
+
 ### Behoben
 - **Für ein Fenster, dessen Reset fällig war, gab es gar keinen richtigen
   Satz.** Der Baustein für eine Dauer wurde in eine Lücke gesetzt, die eine
