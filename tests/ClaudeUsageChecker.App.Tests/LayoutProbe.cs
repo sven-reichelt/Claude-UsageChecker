@@ -10,8 +10,12 @@ namespace ClaudeUsageChecker.App.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// Do not measure the window: its width is fixed, so it always reports the
-/// specified value, no matter how much overflows inside it.
+/// Do not measure the window content against the window content: where the width
+/// is fixed the window always reports the specified value, no matter how much
+/// overflows inside it. Where it grows with its content there is no specified
+/// value at all - Width stays NaN, and every comparison against it is false,
+/// which would quietly turn the whole check into a formality. Hence the actual
+/// width once the window stands.
 /// </para>
 /// <para>
 /// And do not measure without a constraint: wrapping text blocks then report
@@ -24,6 +28,13 @@ internal static class LayoutProbe
 {
     /// <summary>Rounding leeway of the layout, in pixels.</summary>
     private const double Tolerance = 0.5;
+
+    /// <summary>
+    /// The width the content has to live within: the specified one, or the one
+    /// the window actually took where it sizes itself to its content.
+    /// </summary>
+    private static double Available(Window window) =>
+        double.IsNaN(window.Width) ? window.Bounds.Width : window.Width;
 
     public static bool FitsTheWidth(Window window, out double width)
     {
@@ -46,7 +57,7 @@ internal static class LayoutProbe
             }
 
             width = Math.Max(width, right.X);
-            if (right.X > window.Width + Tolerance)
+            if (right.X > Available(window) + Tolerance)
             {
                 fits = false;
             }

@@ -1,7 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="ClaudeUsageChecker.App.Views.TrayMenuWindow"
-        Width="300" SizeToContent="Height"
+        SizeToContent="WidthAndHeight" MinWidth="300" MaxWidth="460"
         CanResize="False"
         ShowInTaskbar="False"
         SystemDecorations="None"

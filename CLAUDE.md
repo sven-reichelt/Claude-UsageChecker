@@ -23,7 +23,7 @@ and a second one would break every clone that exists by then.
 
 ```powershell
 dotnet build                                      # the whole solution
-dotnet test                                       # 557 tests (Core.Tests + App.Tests)
+dotnet test                                       # 566 tests (Core.Tests + App.Tests)
 dotnet run --project src/ClaudeUsageChecker.App   # run the application
 node build/generate-icons.mjs                     # regenerate the icons
 ```

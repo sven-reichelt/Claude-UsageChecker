@@ -1,4 +1,6 @@
 using Avalonia.Controls;
+using Avalonia.LogicalTree;
+using Avalonia.Threading;
 using Avalonia.Headless.XUnit;
 using ClaudeUsageChecker.App.Services;
 using ClaudeUsageChecker.App.Settings;
@@ -159,6 +161,40 @@ public class LayoutInEveryLanguageTests : IDisposable
     }
 
     /// <summary>
+    /// No reported limit is broken across two lines in the menu.
+    /// </summary>
+    /// <remarks>
+    /// Fitting is not enough here: the lines wrap, so a line too long does not
+    /// overflow, it folds - and a folded line in a menu of one-line entries reads
+    /// like two limits where there is one. The extra usage line is the long one,
+    /// because it carries two amounts and a currency; it was missing from the
+    /// fixture entirely, which is why nobody noticed it folding.
+    /// </remarks>
+    [AvaloniaTheory]
+    [MemberData(nameof(Languages))]
+    public void TheTrayMenuKeepsEveryLimitOnOneLine(string code)
+    {
+        Localizer.Use(Language.Find(code)!);
+
+        var window = BuildTrayMenu();
+        window.Show();
+
+        // Without this the layout has not run and every block reports a height
+        // of zero - the check would pass on anything.
+        Dispatcher.UIThread.RunJobs();
+
+        var folded = window.GetLogicalDescendants().OfType<TextBlock>()
+            .Where(t => t.IsVisible && t.TextLayout.TextLines.Count > 1)
+            .Select(t => t.Text)
+            .ToList();
+
+        window.Hide();
+
+        Assert.True(folded.Count == 0,
+            $"In {code} the menu folds: {string.Join(" | ", folded)}");
+    }
+
+    /// <summary>
     /// The menu of the notification area, filled the way the application fills
     /// it: the reported limits above, the entries below.
     /// </summary>
@@ -166,8 +202,15 @@ public class LayoutInEveryLanguageTests : IDisposable
     {
         var window = new TrayMenuWindow();
 
+        // With the extra usage quota: it is the longest of the lines, carrying
+        // two amounts and a currency. The fixture left it out entirely, which is
+        // why nobody noticed it folding onto a second line.
+        var state = ReadyState(new ExtraUsage(
+            IsEnabled: true, Used: 1234.56m, Limit: 9999.99m, Utilization: 12.3d,
+            Currency: "EUR", Decimals: 2));
+
         window.Render(
-            TrayIconController.BuildStatusLines(ReadyState(), DateTimeOffset.UtcNow),
+            TrayIconController.BuildStatusLines(state, DateTimeOffset.UtcNow),
             [
                 (T.TrayRefreshNow, () => { }),
                 (T.TraySettings, () => { }),
