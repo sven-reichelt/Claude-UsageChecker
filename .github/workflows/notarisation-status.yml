@@ -1,0 +1,69 @@
+# Asks Apple what became of a submission that was handed over earlier.
+#
+# The release workflow waits for the verdict, and waiting costs: a macOS runner
+# bills at ten times the rate of a Linux one, so an hour spent watching a
+# progress bar is an hour of quota spent on nothing. When a submission outlives
+# its wait, this asks after it separately - a job that takes under a minute and
+# answers the only question that matters, which is whether Apple accepted the
+# bundle or objected to it.
+#
+# It notarises nothing and changes nothing. It only asks.
+name: Ask Apple about a submission
+
+on:
+  workflow_dispatch:
+    inputs:
+      submission:
+        description: The submission identifier from the release run
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  ask:
+    name: Ask Apple
+    runs-on: macos-15
+    steps:
+      - name: What does Apple say?
+        shell: bash
+        env:
+          API_KEY: ${{ secrets.APPLE_API_KEY }}
+          API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          API_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER_ID }}
+          SUBMISSION: ${{ inputs.submission }}
+        run: |
+          set -euo pipefail
+
+          # The identifier comes from a form field, so it is checked rather than
+          # trusted: anything but a UUID has no business on a command line.
+          if ! printf %s "$SUBMISSION" | grep -qE \
+              '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'; then
+            echo "::error::That is not a submission identifier. It is the UUID the release run printed after \"Submission:\"."
+            exit 1
+          fi
+
+          echo "$API_KEY" | base64 --decode > "$RUNNER_TEMP/api-key.p8"
+          CREDENTIALS=(--key "$RUNNER_TEMP/api-key.p8" \
+            --key-id "$(printf %s "$API_KEY_ID" | tr -d '[:space:]')" \
+            --issuer "$(printf %s "$API_ISSUER_ID" | tr -d '[:space:]')")
+
+          STATUS="$(xcrun notarytool info "$SUBMISSION" "${CREDENTIALS[@]}" \
+            --output-format json | jq -r '.status')"
+          echo "Apple says: $STATUS"
+
+          # The log exists only once Apple is done. It names every objection in
+          # Apple's own words, which is the whole reason to ask.
+          if [ "$STATUS" != "In Progress" ]; then
+            xcrun notarytool log "$SUBMISSION" "${CREDENTIALS[@]}" || true
+          fi
+
+          rm -f "$RUNNER_TEMP/api-key.p8"
+
+          if [ "$STATUS" = "In Progress" ]; then
+            echo "::warning::Apple is still working on it. Ask again later - nothing is lost in the meantime."
+          elif [ "$STATUS" != "Accepted" ]; then
+            echo "::error::Apple ended this submission as $STATUS."
+            exit 1
+          fi
