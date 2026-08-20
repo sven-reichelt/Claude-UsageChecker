@@ -280,7 +280,23 @@ jobs:
             # only thing to go on is a status word.
             xcrun notarytool log "$SUBMISSION" "${CREDENTIALS[@]}" || true
             rm -f "$RUNNER_TEMP/api-key.p8" "$RUNNER_TEMP/notarise.zip"
-            echo "::error::Notarisation ended as $STATUS. Submission $SUBMISSION."
+
+            if [ "$STATUS" = "In Progress" ]; then
+              # Not a fault, and not something a rerun mends. Apple puts the
+              # first submissions of a new Developer ID through a deeper
+              # analysis while it builds a profile of the software; the
+              # developer forums put that at hours to a day or two, after which
+              # later submissions come back in minutes. Apple's own threshold
+              # for asking after one is a week.
+              #
+              # So: wait, follow it with the "Ask Apple about a submission"
+              # workflow, which costs seconds instead of the three quarters of
+              # an hour this job just spent, and start the release again once it
+              # has been accepted once.
+              echo "::error::Apple is still analysing $SUBMISSION after the wait. That is expected of the first submissions from a new Developer ID and needs no fix - follow it with the \"Ask Apple about a submission\" workflow and release again once one has been accepted."
+            else
+              echo "::error::Notarisation ended as $STATUS. Submission $SUBMISSION."
+            fi
             exit 1
           fi
 
