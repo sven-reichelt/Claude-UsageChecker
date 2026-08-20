@@ -129,7 +129,10 @@ public partial class SettingsWindow : Window
 
         BehaviourHeading.Text = T.SettingsBehaviourSection;
         IntervalLabel.Text = T.SettingsInterval;
-        LaunchAtLoginBox.Content = T.SettingsLaunchAtLogin;
+        // "Start with Windows" would be an odd promise on a Mac.
+        LaunchAtLoginBox.Content = OperatingSystem.IsMacOS()
+            ? T.SettingsLaunchAtLoginMac
+            : T.SettingsLaunchAtLogin;
         CheckUpdatesBox.Content = T.SettingsCheckForUpdates;
         RefreshChecksUpdatesBox.Content = T.SettingsRefreshChecksForUpdates;
 

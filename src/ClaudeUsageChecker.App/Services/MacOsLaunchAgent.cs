@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace ClaudeUsageChecker.App.Services;
@@ -67,6 +68,11 @@ internal static class MacOsLaunchAgent
 
             Directory.CreateDirectory(Path.GetDirectoryName(PlistPath)!);
             File.WriteAllText(PlistPath, BuildPlist(program), new UTF8Encoding(false));
+
+            // launchd reads the file at login; a change now would otherwise
+            // wait for the next one. Failure is not checked - the file is in
+            // place, which is what the next login needs.
+            TryBootstrap();
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
@@ -75,12 +81,91 @@ internal static class MacOsLaunchAgent
     }
 
     /// <summary>
-    /// The property list. <c>open -a</c> rather than the executable: it hands
-    /// the start to macOS, which then treats the program as the bundled
-    /// application it is.
+    /// What launchd is told to run.
     /// </summary>
-    internal static string BuildPlist(string program) =>
-        $"""
+    /// <remarks>
+    /// The caller hands over whatever it has - the settings window only knows
+    /// <c>Environment.ProcessPath</c>, which is the executable *inside* the
+    /// bundle. Registering that with <c>open -a</c> fails outright: open wants
+    /// an application, not a file in one. So the bundle is derived from the
+    /// path here, where the knowledge of what a bundle looks like belongs.
+    /// Without a bundle around the executable - a bare build - the executable
+    /// itself is started directly, which is the only thing that works then.
+    /// </remarks>
+    internal static string[] ProgramArguments(string program)
+    {
+        return BundleOf(program) is { } bundle
+            ? ["/usr/bin/open", "-a", bundle]
+            : [program];
+    }
+
+    /// <summary>
+    /// The .app the file lives in, or null where there is none.
+    /// </summary>
+    internal static string? BundleOf(string program)
+    {
+        // By text, not through Path: that class bends separators to the
+        // platform it runs on, and these are macOS paths whatever machine this
+        // code happens to execute on - the tests included.
+        for (var current = program; !string.IsNullOrEmpty(current);)
+        {
+            if (current.EndsWith(".app", StringComparison.OrdinalIgnoreCase))
+            {
+                return current;
+            }
+
+            var cut = current.LastIndexOf('/');
+            if (cut <= 0)
+            {
+                return null;
+            }
+
+            current = current[..cut];
+        }
+
+        return null;
+    }
+
+    /// <summary>Asks launchd to pick the agent up now rather than at the next login.</summary>
+    private static void TryBootstrap()
+    {
+        try
+        {
+            using var process = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("/bin/launchctl")
+            {
+                ArgumentList =
+                {
+                    "bootstrap",
+                    $"gui/{Native.getuid()}",
+                    PlistPath
+                },
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            });
+            process?.WaitForExit(5000);
+        }
+        catch (Exception ex) when (ex is not OutOfMemoryException)
+        {
+            // Already loaded, or an older launchctl - the file alone suffices
+            // at the next login either way.
+        }
+    }
+
+    private static class Native
+    {
+        [System.Runtime.InteropServices.DllImport("libc")]
+        internal static extern uint getuid();
+    }
+
+    /// <summary>The property list, built from <see cref="ProgramArguments"/>.</summary>
+    internal static string BuildPlist(string program)
+    {
+        var arguments = string.Join("\n", ProgramArguments(program)
+            .Select(a => $"        <string>{Escape(a)}</string>"));
+
+        return $"""
          <?xml version="1.0" encoding="UTF-8"?>
          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
          <plist version="1.0">
@@ -89,9 +174,7 @@ internal static class MacOsLaunchAgent
              <string>{Label}</string>
              <key>ProgramArguments</key>
              <array>
-                 <string>/usr/bin/open</string>
-                 <string>-a</string>
-                 <string>{Escape(program)}</string>
+         {arguments}
              </array>
              <key>RunAtLoad</key>
              <true/>
@@ -99,6 +182,7 @@ internal static class MacOsLaunchAgent
          </plist>
 
          """;
+    }
 
     /// <summary>
     /// A path is text inside XML. Applications folders are allowed ampersands

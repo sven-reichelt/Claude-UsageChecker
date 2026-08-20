@@ -61,6 +61,38 @@ public class MacOsSupportTests
             .Descendants("string")
             .Select(e => e.Value)];
 
+    /// <summary>
+    /// The executable inside a bundle registers the bundle, not itself.
+    /// </summary>
+    /// <remarks>
+    /// This is the path the settings window actually takes: it knows only
+    /// Environment.ProcessPath, which points at Contents/MacOS/… inside the
+    /// bundle. "open -a" with that file fails outright, and launchd does not
+    /// complain about an agent that fails - autostart would simply never
+    /// happen. Found in review, not on a machine.
+    /// </remarks>
+    [Fact]
+    public void TheLaunchAgentRegistersTheBundleWhenGivenTheExecutableInsideIt()
+    {
+        var values = Strings(
+            "/Applications/ClaudeUsageChecker.app/Contents/MacOS/ClaudeUsageChecker");
+
+        Assert.Contains("/usr/bin/open", values);
+        Assert.Contains("/Applications/ClaudeUsageChecker.app", values);
+        Assert.DoesNotContain(
+            "/Applications/ClaudeUsageChecker.app/Contents/MacOS/ClaudeUsageChecker", values);
+    }
+
+    /// <summary>A bare executable without a bundle is started directly.</summary>
+    [Fact]
+    public void TheLaunchAgentStartsABareExecutableDirectly()
+    {
+        var values = Strings("/Users/tester/bin/ClaudeUsageChecker");
+
+        Assert.DoesNotContain("/usr/bin/open", values);
+        Assert.Contains("/Users/tester/bin/ClaudeUsageChecker", values);
+    }
+
     /// <summary>The label is a reverse domain name, as launchd expects.</summary>
     [Fact]
     public void TheLabelIsAReverseDomainName()

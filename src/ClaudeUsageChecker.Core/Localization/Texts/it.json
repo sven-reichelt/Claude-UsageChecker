@@ -82,6 +82,7 @@
   "settings.behaviourSection": "Comportamento",
   "settings.interval": "Intervallo di lettura (secondi, almeno 180)",
   "settings.launchAtLogin": "Avvia con Windows",
+  "settings.launchAtLoginMac": "Avvia all'accesso",
   "settings.checkUpdates": "Cerca aggiornamenti all'avvio",
   "settings.refreshChecksUpdates": "Durante l'aggiornamento, cercare anche una nuova versione",
   "settings.languageSection": "Lingua",

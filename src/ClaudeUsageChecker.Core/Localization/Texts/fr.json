@@ -82,6 +82,7 @@
   "settings.behaviourSection": "Comportement",
   "settings.interval": "Intervalle de relevé (secondes, 180 au minimum)",
   "settings.launchAtLogin": "Démarrer avec Windows",
+  "settings.launchAtLoginMac": "Démarrer à l'ouverture de session",
   "settings.checkUpdates": "Rechercher des mises à jour au démarrage",
   "settings.refreshChecksUpdates": "Lors de l'actualisation, chercher aussi une nouvelle version",
   "settings.languageSection": "Langue",

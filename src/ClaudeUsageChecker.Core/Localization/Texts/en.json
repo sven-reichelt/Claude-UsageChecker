@@ -82,6 +82,7 @@
   "settings.behaviourSection": "Behaviour",
   "settings.interval": "Polling interval (seconds, at least 180)",
   "settings.launchAtLogin": "Start with Windows",
+  "settings.launchAtLoginMac": "Start at login",
   "settings.checkUpdates": "Check for updates at startup",
   "settings.refreshChecksUpdates": "Also look for a new version when refreshing",
   "settings.languageSection": "Language",

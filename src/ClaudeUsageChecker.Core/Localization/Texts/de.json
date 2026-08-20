@@ -82,6 +82,7 @@
   "settings.behaviourSection": "Verhalten",
   "settings.interval": "Abrufintervall (Sekunden, mindestens 180)",
   "settings.launchAtLogin": "Mit Windows starten",
+  "settings.launchAtLoginMac": "Bei der Anmeldung starten",
   "settings.checkUpdates": "Beim Start auf Aktualisierungen prüfen",
   "settings.refreshChecksUpdates": "Beim Aktualisieren auch auf neue Fassungen prüfen",
   "settings.languageSection": "Sprache",

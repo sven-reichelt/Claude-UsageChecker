@@ -82,6 +82,7 @@
   "settings.behaviourSection": "Поведение",
   "settings.interval": "Интервал опроса (секунды, не менее 180)",
   "settings.launchAtLogin": "Запускать вместе с Windows",
+  "settings.launchAtLoginMac": "Запускать при входе в систему",
   "settings.checkUpdates": "Проверять обновления при запуске",
   "settings.refreshChecksUpdates": "При обновлении также искать новую версию",
   "settings.languageSection": "Язык",
