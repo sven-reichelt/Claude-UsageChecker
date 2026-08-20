@@ -188,18 +188,14 @@ public class MacOsSupportTests
         try
         {
             Localizer.Use(Language.Find("de")!);
-            ((App)application).GetType()
-                .GetMethod("BuildMacOsApplicationMenu", BindingFlags.NonPublic | BindingFlags.Instance)!
-                .Invoke(application, null);
+            ApplyLanguage(application);
 
             var menu = Avalonia.Controls.NativeMenu.GetMenu(application);
             var german = Headers(application);
             Assert.Contains(T.AboutTitle, german);
 
             Localizer.Use(Language.Find("it")!);
-            ((App)application).GetType()
-                .GetMethod("BuildMacOsApplicationMenu", BindingFlags.NonPublic | BindingFlags.Instance)!
-                .Invoke(application, null);
+            ApplyLanguage(application);
 
             var italian = Headers(application);
 
@@ -216,6 +212,21 @@ public class MacOsSupportTests
             Localizer.Use(before);
         }
     }
+
+    /// <summary>
+    /// The route the application itself takes on a change of language - not the
+    /// menu building alone.
+    /// </summary>
+    /// <remarks>
+    /// Calling the builder directly would leave the wiring untested: whoever
+    /// removed the call from ApplyLanguage would still see this test pass, and
+    /// the menu would go back to standing in the old language. It is the wiring
+    /// that broke here, not the building.
+    /// </remarks>
+    private static void ApplyLanguage(Avalonia.Application application) =>
+        application.GetType()
+            .GetMethod("ApplyLanguage", BindingFlags.NonPublic | BindingFlags.Instance)!
+            .Invoke(application, null);
 
     private static List<string?> Headers(Avalonia.Application application) =>
         [.. Avalonia.Controls.NativeMenu.GetMenu(application)!.Items

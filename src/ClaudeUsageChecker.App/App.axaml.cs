@@ -259,10 +259,8 @@ public partial class App : Application, IDisposable
         _tray?.ApplyTexts();
 
         // The menu beside the apple is exported to the system and does not
-        // follow along by itself. A menu handed over a second time does get
-        // pushed through, though - Avalonia watches the property for that, once
-        // the exporter behind it exists. So it is rebuilt: a fresh menu, in the
-        // language of the moment.
+        // relabel itself. Rebuilding refills it in place - the same object,
+        // which is the only change the framework notices. See the method.
         if (OperatingSystem.IsMacOS())
         {
             BuildMacOsApplicationMenu();
