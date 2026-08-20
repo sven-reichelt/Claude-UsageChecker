@@ -309,11 +309,14 @@ public partial class App : Application, IDisposable
     /// callback, was too late and had no visible effect whatsoever.
     /// </para>
     /// <para>
-    /// Afterwards it is the other way round: once the exporter exists, handing
-    /// over a <em>different</em> menu does reach the system, because Avalonia
-    /// watches the property for exactly that. Which is why this can be called
-    /// again on a language change - and has to be, since a menu already
-    /// exported does not relabel itself.
+    /// Afterwards the way through is a different one, and only one works. The
+    /// property is not watched for the application - only a tray icon and a
+    /// window provide the exporter that would be told - so handing over a
+    /// second menu changes nothing at all. What is watched is the item
+    /// collection of the menu already exported: the bridge subscribes to it and
+    /// asks the exporter to run again. So the menu is emptied and refilled, and
+    /// stays the same object throughout. The same shape as the menu of the
+    /// notification area, for the same underlying reason.
     /// </para>
     /// </remarks>
     private void BuildMacOsApplicationMenu()
@@ -327,17 +330,21 @@ public partial class App : Application, IDisposable
         };
         settings.Click += (_, _) => ErrorGuard.Run("open settings", ShowSettings);
 
-        var menu = new NativeMenu
-        {
-            Items =
-            {
-                about,
-                new NativeMenuItemSeparator(),
-                settings
-            }
-        };
+        // The one already there, where there is one: replacing it would be
+        // ignored, refilling it is what reaches macOS.
+        var menu = NativeMenu.GetMenu(this);
+        var isNew = menu is null;
+        menu ??= new NativeMenu();
 
-        NativeMenu.SetMenu(this, menu);
+        menu.Items.Clear();
+        menu.Items.Add(about);
+        menu.Items.Add(new NativeMenuItemSeparator());
+        menu.Items.Add(settings);
+
+        if (isNew)
+        {
+            NativeMenu.SetMenu(this, menu);
+        }
     }
 
     private void ShowAbout()

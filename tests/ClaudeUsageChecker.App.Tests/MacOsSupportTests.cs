@@ -166,7 +166,9 @@ public class MacOsSupportTests
     /// A menu already handed to macOS does not relabel itself; the entries stay
     /// in the language they were built in, which is how the application ended
     /// up Italian with a German menu beside the apple. Handing over a fresh one
-    /// is what reaches the system.
+    /// does not help either - the property is watched only for tray icons and
+    /// windows. What is watched is the item collection of the menu already
+    /// exported, so it has to be the same menu, emptied and refilled.
     ///
     /// Only answerable where the menu exists at all, so this steps aside on
     /// Windows - the macOS build in CI runs the same suite and does answer it.
@@ -189,6 +191,7 @@ public class MacOsSupportTests
                 .GetMethod("BuildMacOsApplicationMenu", BindingFlags.NonPublic | BindingFlags.Instance)!
                 .Invoke(application, null);
 
+            var menu = Avalonia.Controls.NativeMenu.GetMenu(application);
             var german = Headers(application);
             Assert.Contains(T.AboutTitle, german);
 
@@ -201,6 +204,11 @@ public class MacOsSupportTests
 
             Assert.Contains(T.AboutTitle, italian);
             Assert.NotEqual(german, italian);
+
+            // The same object throughout: only a change to the items of the
+            // menu already exported is noticed. A second menu would be ignored,
+            // however correct its labels.
+            Assert.Same(menu, Avalonia.Controls.NativeMenu.GetMenu(application));
         }
         finally
         {
