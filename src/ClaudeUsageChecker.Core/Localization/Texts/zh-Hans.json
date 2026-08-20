@@ -12,7 +12,7 @@
   "tray.refreshNow": "立即刷新",
   "tray.settings": "设置 ...",
   "tray.checkUpdates": "检查更新 ...",
-  "tray.about": "关于 Claude UsageChecker ...",
+  "tray.about": "关于 Claude UsageChecker {0} ...",
   "tray.exit": "退出",
   "tray.noData": "暂无数据",
   "tray.noLimits": "未报告任何限额",

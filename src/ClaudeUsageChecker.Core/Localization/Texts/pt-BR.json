@@ -12,7 +12,7 @@
   "tray.refreshNow": "Atualizar agora",
   "tray.settings": "Configurações ...",
   "tray.checkUpdates": "Verificar atualizações ...",
-  "tray.about": "Sobre o Claude UsageChecker ...",
+  "tray.about": "Sobre o Claude UsageChecker {0} ...",
   "tray.exit": "Sair",
   "tray.noData": "Sem dados",
   "tray.noLimits": "Nenhum limite informado",

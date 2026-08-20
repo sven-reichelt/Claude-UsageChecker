@@ -169,11 +169,11 @@ public class LayoutInEveryLanguageTests : IDisposable
         window.Render(
             TrayIconController.BuildStatusLines(ReadyState(), DateTimeOffset.UtcNow),
             [
-                (T.TrayRefreshNow, null, () => { }),
-                (T.TraySettings, null, () => { }),
-                (T.TrayCheckForUpdates, null, () => { }),
-                (T.TrayAbout, "0.7.0", () => { }),
-                (T.TrayExit, null, () => { })
+                (T.TrayRefreshNow, () => { }),
+                (T.TraySettings, () => { }),
+                (T.TrayCheckForUpdates, () => { }),
+                (T.TrayAbout("0.7.0"), () => { }),
+                (T.TrayExit, () => { })
             ]);
 
         return window;

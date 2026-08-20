@@ -33,7 +33,7 @@ public static class T
     public static string TrayRefreshNow => L["tray.refreshNow"];
     public static string TraySettings => L["tray.settings"];
     public static string TrayCheckForUpdates => L["tray.checkUpdates"];
-    public static string TrayAbout => L["tray.about"];
+    public static string TrayAbout(string version) => L.Format("tray.about", version);
     public static string TrayExit => L["tray.exit"];
     public static string TrayNoData => L["tray.noData"];
     public static string TrayNoLimits => L["tray.noLimits"];

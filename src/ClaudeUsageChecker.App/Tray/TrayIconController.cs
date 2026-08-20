@@ -120,13 +120,14 @@ public sealed class TrayIconController : IDisposable
             // entry offering the same route again makes the menu longer without
             // adding anything.
             [
-                (T.TrayRefreshNow, null, () => RefreshRequested?.Invoke(this, EventArgs.Empty)),
-                (T.TraySettings, null, () => ShowSettings?.Invoke(this, EventArgs.Empty)),
-                (T.TrayCheckForUpdates, null, () => CheckForUpdatesRequested?.Invoke(this, EventArgs.Empty)),
-                // The version beside it: the entry leads to the window that
-                // states it, and anyone reporting a problem is asked for it.
-                (T.TrayAbout, Version(), () => ShowAboutRequested?.Invoke(this, EventArgs.Empty)),
-                (T.TrayExit, null, () => ExitRequested?.Invoke(this, EventArgs.Empty))
+                (T.TrayRefreshNow, () => RefreshRequested?.Invoke(this, EventArgs.Empty)),
+                (T.TraySettings, () => ShowSettings?.Invoke(this, EventArgs.Empty)),
+                (T.TrayCheckForUpdates, () => CheckForUpdatesRequested?.Invoke(this, EventArgs.Empty)),
+                // The version stands in the entry itself: it leads to the
+                // window that states it, and anyone reporting a problem is
+                // asked for it before anything else.
+                (T.TrayAbout(Version()), () => ShowAboutRequested?.Invoke(this, EventArgs.Empty)),
+                (T.TrayExit, () => ExitRequested?.Invoke(this, EventArgs.Empty))
             ]);
 
         _menu.ShowAt(cursor);
@@ -141,7 +142,7 @@ public sealed class TrayIconController : IDisposable
     /// costs nothing and saves the trip.
     /// </remarks>
     private static string Version() =>
-        System.Reflection.Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? string.Empty;
+        System.Reflection.Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? T.Unknown;
 
     private void OnStateChanged(object? sender, UsageState state) =>
         Dispatcher.UIThread.Post(() => Render(state));
