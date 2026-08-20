@@ -224,10 +224,10 @@ public partial class SettingsWindow : Window
     /// </remarks>
     private void UpdateRelocationHint()
     {
-        var noetig = (LaunchAtLoginBox.IsChecked ?? false) && _relocate is not null && SelfInstaller.ShouldOffer;
+        var needed = (LaunchAtLoginBox.IsChecked ?? false) && _relocate is not null && SelfInstaller.ShouldOffer;
 
-        RelocationHint.IsVisible = noetig;
-        RelocationHint.Text = noetig
+        RelocationHint.IsVisible = needed;
+        RelocationHint.Text = needed
             ? T.SettingsRelocationHint(SelfInstaller.TargetPath)
             : null;
     }

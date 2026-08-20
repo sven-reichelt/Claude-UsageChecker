@@ -58,9 +58,9 @@ public class ClaudeCliTokenProviderTests
     [Fact]
     public void ToString_DoesNotGiveAwayTheTokenValue()
     {
-        var token = new AccessToken("streng-geheim", TokenSource.SecretStore);
+        var token = new AccessToken("top-secret", TokenSource.SecretStore);
 
-        Assert.DoesNotContain("streng-geheim", token.ToString(), StringComparison.Ordinal);
+        Assert.DoesNotContain("top-secret", token.ToString(), StringComparison.Ordinal);
     }
 
     [Theory]

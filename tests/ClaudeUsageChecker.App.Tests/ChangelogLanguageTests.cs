@@ -84,8 +84,8 @@ public class ChangelogLanguageTests : IDisposable
     {
         Localizer.Use(Language.Find(code)!);
 
-        var laufende = App.CurrentVersion.Number;
+        var running = App.CurrentVersion.Number;
 
-        Assert.Contains(ChangelogResource.All(), r => r.Version == laufende);
+        Assert.Contains(ChangelogResource.All(), r => r.Version == running);
     }
 }

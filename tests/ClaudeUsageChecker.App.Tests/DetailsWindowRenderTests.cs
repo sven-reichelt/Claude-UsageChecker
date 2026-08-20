@@ -75,7 +75,7 @@ public class DetailsWindowRenderTests
     {
         var window = new DetailsWindow();
 
-        window.SetUpdateNotice("Version 0.1.0 ist aktuell.");
+        window.SetUpdateNotice("Version 0.1.0 is up to date.");
 
         Assert.True(window.FindControl<Border>("UpdateBorder")!.IsVisible);
         Assert.False(window.FindControl<Button>("UpdateButton")!.IsVisible);

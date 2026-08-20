@@ -156,10 +156,10 @@ public class OAuthTokenProviderTests
     [Fact]
     public void TheRepresentationGivesAwayNoSecret()
     {
-        var text = new OAuthTokens { AccessToken = "streng-geheim", RefreshToken = "auch-geheim" }.ToString();
+        var text = new OAuthTokens { AccessToken = "top-secret", RefreshToken = "also-secret" }.ToString();
 
-        Assert.DoesNotContain("streng-geheim", text, StringComparison.Ordinal);
-        Assert.DoesNotContain("auch-geheim", text, StringComparison.Ordinal);
+        Assert.DoesNotContain("top-secret", text, StringComparison.Ordinal);
+        Assert.DoesNotContain("also-secret", text, StringComparison.Ordinal);
     }
 
     private static OAuthTokenProvider CreateProvider(

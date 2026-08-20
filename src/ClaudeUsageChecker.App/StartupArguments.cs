@@ -33,8 +33,8 @@ internal static class StartupArguments
 
         try
         {
-            using var vorgaenger = Process.GetProcessById(processId);
-            vorgaenger.WaitForExit((int)MaxWait.TotalMilliseconds);
+            using var predecessor = Process.GetProcessById(processId);
+            predecessor.WaitForExit((int)MaxWait.TotalMilliseconds);
         }
         catch (ArgumentException)
         {

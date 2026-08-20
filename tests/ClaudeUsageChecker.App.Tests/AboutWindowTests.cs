@@ -11,12 +11,12 @@ namespace ClaudeUsageChecker.App.Tests;
 /// </summary>
 public class AboutWindowTests
 {
-    private static readonly Uri Projektseite = new("https://github.com/sven-reichelt/Claude-UsageChecker");
+    private static readonly Uri ProjectPage = new("https://github.com/sven-reichelt/Claude-UsageChecker");
 
     [AvaloniaFact]
     public void CanBeCreated()
     {
-        var window = new AboutWindow(Projektseite, new ProgramVersion(new Version(0, 6, 0, 0)));
+        var window = new AboutWindow(ProjectPage, new ProgramVersion(new Version(0, 6, 0, 0)));
 
         Assert.NotNull(window.FindControl<Image>("LogoImage"));
         Assert.NotNull(window.FindControl<Button>("RepositoryButton"));
@@ -26,7 +26,7 @@ public class AboutWindowTests
     [AvaloniaFact]
     public void ShowsTheVersionWithThreeParts()
     {
-        var window = new AboutWindow(Projektseite, new ProgramVersion(new Version(0, 6, 0, 0)));
+        var window = new AboutWindow(ProjectPage, new ProgramVersion(new Version(0, 6, 0, 0)));
 
         Assert.Equal("Version 0.6.0", window.FindControl<TextBlock>("VersionText")!.Text);
     }
@@ -39,7 +39,7 @@ public class AboutWindowTests
     public void NamesAPreReleaseAsOne()
     {
         var window = new AboutWindow(
-            Projektseite, new ProgramVersion(new Version(0, 7, 1), "beta.1"));
+            ProjectPage, new ProgramVersion(new Version(0, 7, 1), "beta.1"));
 
         Assert.Equal("Version 0.7.1-beta.1 (pre-release)",
             window.FindControl<TextBlock>("VersionText")!.Text);
@@ -50,7 +50,7 @@ public class AboutWindowTests
     {
         // A missing image shows up nowhere else: the window opens, only the area
         // at the top would stay blank.
-        var window = new AboutWindow(Projektseite, new ProgramVersion(new Version(0, 6, 0)));
+        var window = new AboutWindow(ProjectPage, new ProgramVersion(new Version(0, 6, 0)));
 
         Assert.NotNull(window.FindControl<Image>("LogoImage")!.Source);
     }
@@ -58,7 +58,7 @@ public class AboutWindowTests
     [AvaloniaFact]
     public void NamesTheProjectPage()
     {
-        var window = new AboutWindow(Projektseite, new ProgramVersion(new Version(0, 6, 0)));
+        var window = new AboutWindow(ProjectPage, new ProgramVersion(new Version(0, 6, 0)));
 
         Assert.Contains("github.com/sven-reichelt/Claude-UsageChecker",
             window.FindControl<TextBlock>("RepositoryText")!.Text!, StringComparison.Ordinal);
@@ -71,19 +71,19 @@ public class AboutWindowTests
     [AvaloniaFact]
     public void ReportsTheWishForTheProjectPageInsteadOfOpeningItItself()
     {
-        var window = new AboutWindow(Projektseite, new ProgramVersion(new Version(0, 6, 0)));
+        var window = new AboutWindow(ProjectPage, new ProgramVersion(new Version(0, 6, 0)));
         Uri? reported = null;
         window.RepositoryRequested += (_, adresse) => reported = adresse;
 
         Click(window, "RepositoryButton");
 
-        Assert.Equal(Projektseite, reported);
+        Assert.Equal(ProjectPage, reported);
     }
 
     [AvaloniaFact]
     public void ReportsTheWishForTheChangelog()
     {
-        var window = new AboutWindow(Projektseite, new ProgramVersion(new Version(0, 6, 0)));
+        var window = new AboutWindow(ProjectPage, new ProgramVersion(new Version(0, 6, 0)));
         var reported = false;
         window.ReleaseNotesRequested += (_, _) => reported = true;
 
@@ -95,7 +95,7 @@ public class AboutWindowTests
     [AvaloniaFact]
     public void TheContentFitsTheWindow()
     {
-        var window = new AboutWindow(Projektseite, new ProgramVersion(new Version(0, 6, 0)));
+        var window = new AboutWindow(ProjectPage, new ProgramVersion(new Version(0, 6, 0)));
 
         Assert.True(LayoutProbe.FitsTheWidth(window, out var width),
             $"The content needs {width:0} pixels, the window is {window.Width:0} wide.");

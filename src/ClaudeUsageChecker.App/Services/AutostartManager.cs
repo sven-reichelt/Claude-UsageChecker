@@ -43,10 +43,10 @@ internal static class AutostartManager
 
             if (enabled)
             {
-                var ziel = path ?? Environment.ProcessPath;
-                if (!string.IsNullOrEmpty(ziel))
+                var target = path ?? Environment.ProcessPath;
+                if (!string.IsNullOrEmpty(target))
                 {
-                    key.SetValue(ValueName, $"\"{ziel}\"");
+                    key.SetValue(ValueName, $"\"{target}\"");
                 }
             }
             else

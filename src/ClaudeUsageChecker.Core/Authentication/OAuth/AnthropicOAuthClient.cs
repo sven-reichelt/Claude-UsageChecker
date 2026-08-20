@@ -101,7 +101,7 @@ public sealed class AnthropicOAuthClient(HttpClient httpClient, OAuthOptions? op
     }
 
     private async Task<OAuthTokens> PostAsync(
-        TokenRequestDto payload, string fehlertext, CancellationToken cancellationToken)
+        TokenRequestDto payload, string errorText, CancellationToken cancellationToken)
     {
         using var request = new HttpRequestMessage(HttpMethod.Post, _options.TokenEndpoint)
         {
@@ -117,7 +117,7 @@ public sealed class AnthropicOAuthClient(HttpClient httpClient, OAuthOptions? op
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
-            throw new OAuthException(T.OAuthUnreachable(fehlertext), ex);
+            throw new OAuthException(T.OAuthUnreachable(errorText), ex);
         }
 
         using (response)
@@ -128,12 +128,12 @@ public sealed class AnthropicOAuthClient(HttpClient httpClient, OAuthOptions? op
             {
                 // 400/401 means the server discarded the credentials themselves.
                 // Everything else (404, 5xx, throttling) says nothing about them.
-                var abgewiesen = response.StatusCode is System.Net.HttpStatusCode.BadRequest
+                var rejected = response.StatusCode is System.Net.HttpStatusCode.BadRequest
                     or System.Net.HttpStatusCode.Unauthorized;
 
                 throw new OAuthException(
-                    $"{fehlertext} (HTTP {(int)response.StatusCode}). {Beschreibe(body)}",
-                    isCredentialRejected: abgewiesen);
+                    $"{errorText} (HTTP {(int)response.StatusCode}). {Describe(body)}",
+                    isCredentialRejected: rejected);
             }
 
             TokenResponseDto? dto;
@@ -143,12 +143,12 @@ public sealed class AnthropicOAuthClient(HttpClient httpClient, OAuthOptions? op
             }
             catch (JsonException ex)
             {
-                throw new OAuthException(T.OAuthUnreadable(fehlertext), ex);
+                throw new OAuthException(T.OAuthUnreadable(errorText), ex);
             }
 
             if (dto?.AccessToken is not { Length: > 0 })
             {
-                throw new OAuthException(T.OAuthNoToken(fehlertext));
+                throw new OAuthException(T.OAuthNoToken(errorText));
             }
 
             return new OAuthTokens
@@ -174,14 +174,14 @@ public sealed class AnthropicOAuthClient(HttpClient httpClient, OAuthOptions? op
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(pasted);
 
-        var teile = pasted.Trim().Split('#', 2);
-        return teile.Length == 2 && teile[1].Length > 0
-            ? (teile[0], teile[1])
-            : (teile[0], null);
+        var parts = pasted.Trim().Split('#', 2);
+        return parts.Length == 2 && parts[1].Length > 0
+            ? (parts[0], parts[1])
+            : (parts[0], null);
     }
 
     /// <summary>Extracts the message from an error response without passing it through unfiltered.</summary>
-    private static string Beschreibe(string body)
+    private static string Describe(string body)
     {
         if (string.IsNullOrWhiteSpace(body))
         {
@@ -205,7 +205,7 @@ public sealed class AnthropicOAuthClient(HttpClient httpClient, OAuthOptions? op
         }
         catch (JsonException)
         {
-            // Kein JSON - dann eben nichts Genaueres.
+            // Not JSON - then nothing more precise.
         }
 
         return string.Empty;
