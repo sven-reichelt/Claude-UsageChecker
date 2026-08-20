@@ -2,9 +2,11 @@ using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using ClaudeUsageChecker.App.Services;
 using ClaudeUsageChecker.App.Settings;
+using ClaudeUsageChecker.App.Tray;
 using ClaudeUsageChecker.App.Views;
 using ClaudeUsageChecker.Core.Authentication;
 using ClaudeUsageChecker.Core.Localization;
+using T = ClaudeUsageChecker.Core.Localization.T;
 using ClaudeUsageChecker.Core.Models;
 using ClaudeUsageChecker.Core.Services;
 
@@ -145,6 +147,36 @@ public class LayoutInEveryLanguageTests : IDisposable
         window.Render(state);
 
         AssertFits(window, code);
+    }
+
+    [AvaloniaTheory]
+    [MemberData(nameof(Languages))]
+    public void TheTrayMenuFitsInEveryLanguage(string code)
+    {
+        Localizer.Use(Language.Find(code)!);
+
+        AssertFits(BuildTrayMenu(), code);
+    }
+
+    /// <summary>
+    /// The menu of the notification area, filled the way the application fills
+    /// it: the reported limits above, the entries below.
+    /// </summary>
+    internal static TrayMenuWindow BuildTrayMenu()
+    {
+        var window = new TrayMenuWindow();
+
+        window.Render(
+            TrayIconController.BuildStatusLines(ReadyState(), DateTimeOffset.UtcNow),
+            [
+                (T.TrayRefreshNow, null, () => { }),
+                (T.TraySettings, null, () => { }),
+                (T.TrayCheckForUpdates, null, () => { }),
+                (T.TrayAbout, "0.7.0", () => { }),
+                (T.TrayExit, null, () => { })
+            ]);
+
+        return window;
     }
 
     private static void AssertFits(Window window, string code)

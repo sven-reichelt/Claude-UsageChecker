@@ -1,0 +1,50 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="ClaudeUsageChecker.App.Views.TrayMenuWindow"
+        Width="300" SizeToContent="Height"
+        CanResize="False"
+        ShowInTaskbar="False"
+        SystemDecorations="None"
+        Topmost="True"
+        Background="Transparent">
+
+  <!-- The same frame as the other windows. That is the whole point of this
+       window existing: Windows draws its own context menus in the system font
+       without a border of its own, and beside the details window that looked
+       like a different program. -->
+  <Border Padding="6"
+          Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+          BorderBrush="{DynamicResource AccentBrush}"
+          BorderThickness="1"
+          CornerRadius="6">
+    <StackPanel Spacing="2">
+
+      <!-- The reported limits, one line each. Read-only, as in the old menu -
+       they say something, they do not do anything. -->
+      <StackPanel x:Name="StatusPanel" Margin="8,6,8,6" Spacing="4" />
+
+      <Separator x:Name="StatusSeparator" Margin="4,2,4,4" />
+
+      <StackPanel x:Name="CommandPanel" Spacing="1" />
+
+    </StackPanel>
+  </Border>
+
+  <Window.Styles>
+    <!-- The entries look like menu items rather than buttons: no border, the
+         full width, and a background only under the pointer. -->
+    <Style Selector="Button.menu">
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Left" />
+      <Setter Property="Padding" Value="8,7" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="CornerRadius" Value="4" />
+      <Setter Property="FontSize" Value="13" />
+    </Style>
+    <Style Selector="Button.menu:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundBaseLowBrush}" />
+    </Style>
+  </Window.Styles>
+
+</Window>

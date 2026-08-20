@@ -159,6 +159,41 @@ internal static class ScreenFit
             DispatcherPriority.Loaded);
     }
 
+    /// <summary>
+    /// Puts a window at the cursor, the way a context menu opens.
+    /// </summary>
+    /// <remarks>
+    /// Upwards and to the left, because the notification area sits in the corner
+    /// of the screen and a menu opening downwards from there would leave the
+    /// screen at once. Whatever still hangs over an edge afterwards is pulled
+    /// back in - on a taskbar at the top or the side the corner is elsewhere.
+    ///
+    /// The size is only known after the layout has run, which is why this is
+    /// queued rather than worked out at the moment of showing.
+    /// </remarks>
+    public static void PlaceAtPointer(Window window, PixelPoint cursor)
+    {
+        ArgumentNullException.ThrowIfNull(window);
+
+        PostWhenStillOpen(window, () =>
+        {
+            if (window.Screens.ScreenFromPoint(cursor) is not { } screen)
+            {
+                return;
+            }
+
+            var frame = window.FrameSize ?? window.Bounds.Size;
+            var width = (int)Math.Ceiling(frame.Width * screen.Scaling);
+            var height = (int)Math.Ceiling(frame.Height * screen.Scaling);
+            var area = screen.WorkingArea;
+
+            var left = Math.Clamp(cursor.X - width, area.X, Math.Max(area.X, area.Right - width));
+            var top = Math.Clamp(cursor.Y - height, area.Y, Math.Max(area.Y, area.Bottom - height));
+
+            window.Position = new PixelPoint(left, top);
+        });
+    }
+
     /// <summary>Puts the window where it belongs: centred, or at least on screen.</summary>
     private static void Place(Window window, bool keepCentred)
     {

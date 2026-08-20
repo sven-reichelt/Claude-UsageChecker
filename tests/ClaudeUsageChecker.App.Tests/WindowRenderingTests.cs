@@ -68,6 +68,7 @@ public class WindowRenderingTests : IDisposable
             new AboutWindow(new Uri("https://example.invalid/repo"), new Version(0, 6, 1)),
             $"about-{code}");
         Capture(BuildReleaseNotes(), $"notes-{code}");
+        Capture(LayoutInEveryLanguageTests.BuildTrayMenu(), $"menu-{code}");
     }
 
     /// <summary>
