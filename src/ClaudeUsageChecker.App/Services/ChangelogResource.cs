@@ -50,8 +50,16 @@ public static class ChangelogResource
     /// <summary>
     /// The changes between the version that ran last and the current one.
     /// </summary>
-    public static IReadOnlyList<ReleaseNotes> Between(Version? lastRun, Version current) =>
-        ChangelogParser.Between(Read().Text, lastRun, current);
+    public static IReadOnlyList<ReleaseNotes> Between(ProgramVersion? lastRun, ProgramVersion current)
+    {
+        ArgumentNullException.ThrowIfNull(current);
+
+        // Whoever ran a pre-release has not seen the entry of that version as a
+        // release - it belongs in the span rather than counting as read.
+        return ChangelogParser.Between(
+            Read().Text, lastRun?.Number, current.Number,
+            includeAfter: lastRun?.IsPreRelease == true);
+    }
 
     /// <summary>The whole changelog, newest version first.</summary>
     public static IReadOnlyList<ReleaseNotes> All() =>

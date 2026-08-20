@@ -8,6 +8,17 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unveröffentlicht]
 
+## [0.7.2] – 2026-08-20
+
+### Behoben
+- **Die Übersicht der Neuerungen blieb beim Verlassen einer Testfassung aus.**
+  Was zuletzt lief, wurde mit drei Zahlen und ohne Kennung notiert – 0.7.1-beta.5
+  und die fertige 0.7.1 hinterließen damit dieselbe Spur, der Schritt dazwischen
+  war unsichtbar und die Übersicht kam nie. Die Kennung wird jetzt mit
+  aufgeschrieben, und das Ankommen bei der fertigen Fassung zählt als Schritt
+  nach vorn, obwohl die Nummer stehen bleibt. Zwischen zwei Testfassungen
+  derselben Nummer bleibt es still: Der Changelog hat dort nichts Neues zu sagen.
+
 ## [0.7.1] – 2026-08-20
 
 ### Hinzugefügt

@@ -26,7 +26,7 @@ public class ReleaseNotesWindowTests
     {
         var window = new ReleaseNotesWindow();
 
-        window.Render([Release(0, 6, 0)], new Version(0, 5, 0));
+        window.Render([Release(0, 6, 0)], new ProgramVersion(new Version(0, 5, 0)));
 
         Assert.Equal("New in version 0.6.0", window.FindControl<TextBlock>("HeadlineText")!.Text);
         Assert.Contains("0.5.0", window.FindControl<TextBlock>("SubtitleText")!.Text!,
@@ -40,7 +40,7 @@ public class ReleaseNotesWindowTests
         // whatever the intermediate version said falls by the wayside.
         var window = new ReleaseNotesWindow();
 
-        window.Render([Release(0, 7, 0), Release(0, 6, 0)], new Version(0, 5, 0));
+        window.Render([Release(0, 7, 0), Release(0, 6, 0)], new ProgramVersion(new Version(0, 5, 0)));
 
         Assert.Contains("0.7.0", window.FindControl<TextBlock>("HeadlineText")!.Text!,
             StringComparison.Ordinal);
@@ -93,7 +93,7 @@ public class ReleaseNotesWindowTests
                     ]
                 }
             ]
-        }], new Version(0, 5, 0));
+        }], new ProgramVersion(new Version(0, 5, 0)));
 
         Assert.True(LayoutProbe.FitsTheWidth(window, out var width),
             $"The content needs {width:0} pixels, the window is {window.Width:0} wide.");

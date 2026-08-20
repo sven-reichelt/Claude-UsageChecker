@@ -157,9 +157,7 @@ public partial class App : Application, IDisposable
     /// </remarks>
     private void ShowReleaseNotesAfterUpdate()
     {
-        // Work in three parts throughout: the assembly reports four, while the
-        // recorded value and the changelog have three.
-        var current = CurrentVersion.Number;
+        var current = CurrentVersion;
         var previous = ReleaseHistory.Parse(_settings.LastRunVersion);
 
         // Whether the application has ever run is betrayed only by the settings
@@ -171,7 +169,7 @@ public partial class App : Application, IDisposable
             // Without a recorded version no span can be formed - then it stays
             // with the entry for the running version.
             var changes = previous is null
-                ? ChangelogResource.Only(current)
+                ? ChangelogResource.Only(current.Number)
                 : ChangelogResource.Between(previous, current);
 
             if (changes.Count > 0)
@@ -197,7 +195,7 @@ public partial class App : Application, IDisposable
     /// it topmost puts it in front; the flag is dropped again at once, so that
     /// the window does not sit above everything else afterwards.
     /// </remarks>
-    private static void ShowReleaseNotes(IReadOnlyList<ReleaseNotes> releases, Version? previous)
+    private static void ShowReleaseNotes(IReadOnlyList<ReleaseNotes> releases, ProgramVersion? previous)
     {
         var window = new ReleaseNotesWindow();
         window.Render(releases, previous, ChangelogResource.IsTranslated);

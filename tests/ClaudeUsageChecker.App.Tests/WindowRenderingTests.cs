@@ -123,7 +123,7 @@ public class WindowRenderingTests : IDisposable
     private static ReleaseNotesWindow BuildReleaseNotes()
     {
         var window = new ReleaseNotesWindow();
-        window.Render(ChangelogResource.All(), new Version(0, 5, 0), ChangelogResource.IsTranslated);
+        window.Render(ChangelogResource.All(), new ProgramVersion(new Version(0, 5, 0)), ChangelogResource.IsTranslated);
 
         return window;
     }

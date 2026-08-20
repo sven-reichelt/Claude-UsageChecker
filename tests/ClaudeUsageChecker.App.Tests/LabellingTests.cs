@@ -104,7 +104,7 @@ public class LabellingTests : IDisposable
         Localizer.Use(Language.Find(code)!);
 
         var window = new ReleaseNotesWindow();
-        window.Render([], new Version(0, 5, 0));
+        window.Render([], new ProgramVersion(new Version(0, 5, 0)));
 
         AssertFullyLabelled(window, code);
     }

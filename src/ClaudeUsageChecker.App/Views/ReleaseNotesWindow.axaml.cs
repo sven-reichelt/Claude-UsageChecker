@@ -4,6 +4,7 @@ using System.Globalization;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
+using ClaudeUsageChecker.App.Services;
 using ClaudeUsageChecker.Core.Localization;
 using ClaudeUsageChecker.Core.Release;
 
@@ -45,7 +46,8 @@ public partial class ReleaseNotesWindow : Window
     /// Whether the changelog exists in the language that is set. Otherwise it is
     /// shown in English, and the window says so.
     /// </param>
-    public void Render(IReadOnlyList<ReleaseNotes> releases, Version? previous = null, bool translated = true)
+    public void Render(
+        IReadOnlyList<ReleaseNotes> releases, ProgramVersion? previous = null, bool translated = true)
     {
         ArgumentNullException.ThrowIfNull(releases);
 
@@ -66,7 +68,9 @@ public partial class ReleaseNotesWindow : Window
             ? T.NotesHeading(Display(releases[0].Version))
             : T.NotesHeadingMultiple(Display(releases[0].Version), releases.Count - 1);
 
-        SubtitleText.Text = previous is null ? null : T.NotesPrevious(Display(previous));
+        // With its label, where there is one: "previously ran 0.7.1-beta.5"
+        // tells a tester something that "0.7.1" would hide.
+        SubtitleText.Text = previous is null ? null : T.NotesPrevious(previous.ToString());
         SubtitleText.IsVisible = SubtitleText.Text is not null;
 
         foreach (var release in releases)

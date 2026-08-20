@@ -59,7 +59,13 @@ public static class ChangelogParser
     /// The version that ran last. Without it nothing counts as seen, and the
     /// whole history comes back.
     /// </param>
-    public static IReadOnlyList<ReleaseNotes> Between(string markdown, Version? after, Version upTo)
+    /// <param name="includeAfter">
+    /// Whether the entry for <paramref name="after"/> itself still counts as
+    /// unseen. It does for whoever ran a pre-release of that version: the entry
+    /// describes the finished release, which they have not had.
+    /// </param>
+    public static IReadOnlyList<ReleaseNotes> Between(
+        string markdown, Version? after, Version upTo, bool includeAfter = false)
     {
         ArgumentNullException.ThrowIfNull(upTo);
 
@@ -70,7 +76,8 @@ public static class ChangelogParser
         // version that ran last. Both bounds work out on their own. Pinned down
         // in Between_TreatsTheFourPartAssemblyVersionAsTheSameRelease.
         return [.. Parse(markdown)
-            .Where(r => r.Version <= upTo && (after is null || r.Version > after))
+            .Where(r => r.Version <= upTo
+                        && (after is null || (includeAfter ? r.Version >= after : r.Version > after)))
             .OrderByDescending(r => r.Version)];
     }
 

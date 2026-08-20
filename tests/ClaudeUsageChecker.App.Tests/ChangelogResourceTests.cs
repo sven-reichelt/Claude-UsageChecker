@@ -58,7 +58,7 @@ public class ChangelogResourceTests
         var vorletzte = alle[1].Version;
         var neueste = alle[0].Version;
 
-        var changes = ChangelogResource.Between(vorletzte, neueste);
+        var changes = ChangelogResource.Between(new ProgramVersion(vorletzte), new ProgramVersion(neueste));
 
         Assert.Single(changes);
         Assert.Equal(neueste, changes[0].Version);

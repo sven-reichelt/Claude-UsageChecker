@@ -8,6 +8,17 @@ numeração [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+## [0.7.2] – 2026-08-20
+
+### Corrigido
+- **O resumo das novidades não aparecia ao sair de uma versão de teste.** O que
+  correu por último era anotado com três números e sem rótulo, pelo que a
+  0.7.1-beta.5 e a 0.7.1 final deixavam o mesmo rasto: o passo entre elas era
+  invisível e o resumo nunca surgia. Agora o rótulo é registado, e chegar à
+  versão final conta como um passo em frente ainda que o número não mude. Entre
+  duas versões de teste do mesmo número fica calado: aí o registo não tem
+  novidade nenhuma a dar.
+
 ## [0.7.1] – 2026-08-20
 
 ### Adicionado

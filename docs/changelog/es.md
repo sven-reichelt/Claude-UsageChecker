@@ -8,6 +8,17 @@ versionado [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+## [0.7.2] – 2026-08-20
+
+### Corregido
+- **El resumen de novedades no aparecía al salir de una versión de prueba.** Lo
+  que se ejecutó la última vez se anotaba con tres números y sin etiqueta, de
+  modo que 0.7.1-beta.5 y la 0.7.1 definitiva dejaban el mismo rastro: el paso
+  entre ambas era invisible y el resumen nunca llegaba. Ahora la etiqueta se
+  guarda, y llegar a la versión definitiva cuenta como un paso adelante aunque
+  el número no cambie. Entre dos versiones de prueba del mismo número no dice
+  nada: el historial no tiene novedades que contar ahí.
+
 ## [0.7.1] – 2026-08-20
 
 ### Añadido

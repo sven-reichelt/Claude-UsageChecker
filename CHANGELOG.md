@@ -8,6 +8,17 @@ the versioning [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.7.2] – 2026-08-20
+
+### Fixed
+- **The summary of changes stayed away on the way out of a test build.** What
+  ran last was written down with three numbers and no label, so 0.7.1-beta.5
+  and the finished 0.7.1 left the same trace - the step between them was
+  invisible and the summary never appeared. The label is recorded now, and
+  arriving at the finished version counts as a step forward even though the
+  number has not moved. Between two test builds of the same number it stays
+  quiet: the changelog has nothing new to say there.
+
 ## [0.7.1] – 2026-08-20
 
 ### Added

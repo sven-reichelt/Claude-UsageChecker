@@ -148,7 +148,7 @@ public class LayoutInEveryLanguageTests : IDisposable
         Localizer.Use(Language.Find(code)!);
 
         var window = new ReleaseNotesWindow();
-        window.Render(ChangelogResource.All(), new Version(0, 1, 0), ChangelogResource.IsTranslated);
+        window.Render(ChangelogResource.All(), new ProgramVersion(new Version(0, 1, 0)), ChangelogResource.IsTranslated);
 
         AssertFits(window, code);
     }

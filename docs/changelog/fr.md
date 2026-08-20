@@ -8,6 +8,18 @@ numérotation [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+## [0.7.2] – 2026-08-20
+
+### Corrigé
+- **Le résumé des nouveautés ne s'affichait pas à la sortie d'une version
+  d'essai.** La dernière version exécutée était notée avec trois nombres et sans
+  étiquette : 0.7.1-beta.5 et la 0.7.1 finale laissaient donc la même trace, le
+  pas entre les deux était invisible et le résumé ne venait jamais.
+  L'étiquette est désormais enregistrée, et atteindre la version finale compte
+  comme un pas en avant même si le numéro ne bouge pas. Entre deux versions
+  d'essai du même numéro, rien ne s'affiche : l'historique n'a rien de nouveau à
+  y dire.
+
 ## [0.7.1] – 2026-08-20
 
 ### Ajouté

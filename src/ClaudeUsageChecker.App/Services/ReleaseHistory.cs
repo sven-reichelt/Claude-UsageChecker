@@ -17,27 +17,26 @@ public static class ReleaseHistory
     /// Reads the remembered version. An unusable entry counts as none - a
     /// corrupted settings file must not disturb the start.
     /// </summary>
-    public static Version? Parse(string? stored) =>
-        Version.TryParse(stored, out var version) ? version : null;
+    /// <remarks>
+    /// Entries written by earlier versions carry three numbers and no label;
+    /// they read back unchanged, as a version without a pre-release.
+    /// </remarks>
+    public static ProgramVersion? Parse(string? stored) =>
+        ProgramVersion.TryParse(stored, out var version) ? version : null;
 
     /// <summary>
-    /// Cuts the version down to three parts.
+    /// Writes the version down, pre-release label and all.
     /// </summary>
     /// <remarks>
-    /// Indispensable before every comparison: Assembly.GetName().Version always
-    /// has four parts, while the remembered value and the changelog have three.
-    /// Version counts a missing part as -1, which makes "0.6.0" smaller than
-    /// "0.6.0.0" - without the cut the application would have considered itself
-    /// out of date and shown the changes again on every start.
+    /// The label has to be recorded, otherwise 0.7.1-beta.5 and the finished
+    /// 0.7.1 leave the same trace and the step between them is invisible - which
+    /// is exactly how the summary went missing on the way out of a test build.
     /// </remarks>
-    public static Version ThreePart(Version version)
+    public static string Format(ProgramVersion version)
     {
         ArgumentNullException.ThrowIfNull(version);
-        return new Version(version.Major, version.Minor, Math.Max(version.Build, 0));
+        return version.ToString();
     }
-
-    /// <summary>Writes the version with three parts; the fourth says nothing.</summary>
-    public static string Format(Version version) => ThreePart(version).ToString(3);
 
     /// <summary>
     /// Whether the summary should be shown.
@@ -61,8 +60,16 @@ public static class ReleaseHistory
     /// from a version predating this feature. Without this branch, the very
     /// version introducing the summary would show none.
     /// </para>
+    /// <para>
+    /// Arriving at the finished version counts as a step forward even though the
+    /// number has not moved: whoever tested 0.7.1-beta.5 and now runs 0.7.1 has
+    /// reached the release, and the entry describing it may well have grown
+    /// since the first test build. Between two test builds of the same number,
+    /// by contrast, it stays quiet - the changelog has nothing new to say there,
+    /// and repeating the same page at every hop is noise.
+    /// </para>
     /// </remarks>
-    public static bool ShouldShow(Version? previous, Version current, bool isFirstInstall)
+    public static bool ShouldShow(ProgramVersion? previous, ProgramVersion current, bool isFirstInstall)
     {
         ArgumentNullException.ThrowIfNull(current);
 
@@ -71,6 +78,11 @@ public static class ReleaseHistory
             return !isFirstInstall;
         }
 
-        return ThreePart(previous) < ThreePart(current);
+        if (previous.Number != current.Number)
+        {
+            return previous.Number < current.Number;
+        }
+
+        return previous.IsPreRelease && !current.IsPreRelease;
     }
 }
