@@ -23,7 +23,7 @@ and a second one would break every clone that exists by then.
 
 ```powershell
 dotnet build                                      # the whole solution
-dotnet test                                       # 512 tests (Core.Tests + App.Tests)
+dotnet test                                       # 545 tests (Core.Tests + App.Tests)
 dotnet run --project src/ClaudeUsageChecker.App   # run the application
 node build/generate-icons.mjs                     # regenerate the icons
 ```
@@ -69,7 +69,7 @@ Builds into `artifacts/` (centrally through `ArtifactsPath` in
 
 ## Status
 
-Version 0.6.4 released, the repository is public and written in English.
+Version 0.7.0 released, the repository is public and written in English.
 Finished among other things: the application's own sign-in through OAuth with
 PKCE including refresh, update at the push of a button with checksum
 verification, permanent setup with autostart, configurable thresholds, the

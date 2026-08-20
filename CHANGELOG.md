@@ -8,6 +8,24 @@ the versioning [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.7.0] – 2026-08-20
+
+### Changed
+- **The menu of the notification area is drawn by the application itself.**
+  Windows draws a context menu in the system font, with hairline separators
+  and no frame of its own; beside the windows of this application it looked
+  like a different program. It now carries the same frame, the same font and
+  the same spacing as everything else.
+
+  That took registering the icon with Windows directly. Avalonia's tray icon
+  offers only a native menu, which cannot be styled from inside the process,
+  and no right-click event to hang a window of our own on. What is drawn now
+  is an ordinary window - which also means it is measured and drawn by the
+  same tests as the others, in all nine languages.
+- **The menu names the version.** The entry reads "About Claude UsageChecker
+  0.7.0 ..." now. It is the first thing anyone reporting a problem is asked
+  for, and until now it could only be found by opening a window.
+
 ## [0.6.4] – 2026-08-20
 
 ### Fixed

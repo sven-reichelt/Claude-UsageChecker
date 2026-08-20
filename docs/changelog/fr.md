@@ -8,6 +8,18 @@ numérotation [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+## [0.7.0] – 2026-08-20
+
+### Modifié
+- **Le menu de la zone de notification est désormais dessiné par
+  l'application.** Windows dessine les menus contextuels dans la police du
+  système, sans cadre ; à côté des fenêtres de cette application, cela
+  ressemblait à un autre programme. Il porte maintenant le même cadre, la même
+  police et les mêmes espacements.
+- **Le menu indique la version.** L'entrée s'appelle désormais « À propos de
+  Claude UsageChecker 0.7.0 … ». C'est la première chose que l'on demande à
+  qui signale un problème.
+
 ## [0.6.4] – 2026-08-20
 
 ### Corrigé

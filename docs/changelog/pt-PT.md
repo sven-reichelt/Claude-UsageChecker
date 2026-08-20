@@ -8,6 +8,18 @@ numeração [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+## [0.7.0] – 2026-08-20
+
+### Alterado
+- **O menu da área de notificação passa a ser desenhado pela própria
+  aplicação.** O Windows desenha menus de contexto com o tipo de letra do
+  sistema e sem moldura própria; ao lado das janelas desta aplicação parecia
+  outro programa. Agora tem a mesma moldura, o mesmo tipo de letra e os mesmos
+  espaçamentos.
+- **O menu indica a versão.** A entrada passa a dizer «Acerca do Claude
+  UsageChecker 0.7.0 …». É a primeira coisa que se pergunta a quem comunica
+  um problema.
+
 ## [0.6.4] – 2026-08-20
 
 ### Corrigido

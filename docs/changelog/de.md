@@ -8,6 +8,25 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unveröffentlicht]
 
+## [0.7.0] – 2026-08-20
+
+### Geändert
+- **Das Menü im Infobereich zeichnet die Anwendung jetzt selbst.** Windows
+  zeichnet ein Kontextmenü in der Systemschrift, mit haarfeinen Trennlinien
+  und ohne eigenen Rahmen – neben den Fenstern dieser Anwendung sah das aus
+  wie ein fremdes Programm. Jetzt trägt es denselben Rahmen, dieselbe Schrift
+  und dieselben Abstände wie alles andere.
+
+  Dafür musste das Symbol direkt bei Windows angemeldet werden. Avalonias
+  Infobereich-Symbol bietet nur ein natives Menü, das sich aus dem Prozess
+  heraus nicht gestalten lässt, und kein Rechtsklick-Ereignis, an das man ein
+  eigenes Fenster hängen könnte. Was jetzt erscheint, ist ein gewöhnliches
+  Fenster – und wird damit von denselben Tests gemessen und gezeichnet wie
+  die übrigen, in allen neun Sprachen.
+- **Das Menü nennt die Version.** Der Eintrag heißt jetzt „Über Claude
+  UsageChecker 0.7.0 …“. Danach wird als Erstes gefragt, wer ein Problem
+  meldet, und bisher stand sie nur in einem Fenster.
+
 ## [0.6.4] – 2026-08-20
 
 ### Behoben

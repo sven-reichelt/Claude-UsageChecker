@@ -353,7 +353,8 @@ zurechtzurücken.
 | 0.4 | Dauerhafte Einrichtung mit Autostart ✅ |
 | 0.5 | Einrichtung nach %LOCALAPPDATA%\Programs, wo Windows sie erwartet ✅ |
 | 0.6 | Neun Sprachen, modellbezogene Limits, einstellbare Schwellenwerte, Übersicht der Neuerungen nach einem Update ✅ |
-| 0.7 | macOS-Menüleiste (Schlüsselbund-Anbindung ist bereits vorhanden) |
+| 0.7 | Eigenes Menü im Infobereich, im Stil der Fenster ✅ |
+| 0.8 | macOS-Menüleiste (Schlüsselbund-Anbindung ist bereits vorhanden) |
 
 ## Lizenz
 

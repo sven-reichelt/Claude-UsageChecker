@@ -344,7 +344,8 @@ effect, and the window says so instead of quietly correcting the input.
 | 0.4 | Permanent setup with autostart ✅ |
 | 0.5 | Installed into %LOCALAPPDATA%\Programs, where Windows wants it ✅ |
 | 0.6 | Nine languages, model-specific limits, configurable thresholds, summary of changes after an update ✅ |
-| 0.7 | macOS menu bar (the keychain reader already exists) |
+| 0.7 | Its own menu in the notification area, in the style of the windows ✅ |
+| 0.8 | macOS menu bar (the keychain reader already exists) |
 
 ## Contributing
 
