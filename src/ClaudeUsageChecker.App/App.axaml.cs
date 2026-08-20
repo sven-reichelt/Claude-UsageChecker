@@ -159,7 +159,7 @@ public partial class App : Application, IDisposable
     {
         // Work in three parts throughout: the assembly reports four, while the
         // recorded value and the changelog have three.
-        var current = ReleaseHistory.ThreePart(CurrentVersion);
+        var current = CurrentVersion.Number;
         var previous = ReleaseHistory.Parse(_settings.LastRunVersion);
 
         // Whether the application has ever run is betrayed only by the settings
@@ -546,6 +546,5 @@ public partial class App : Application, IDisposable
     }
 
     /// <summary>Current program version, as set at build time.</summary>
-    public static Version CurrentVersion { get; } =
-        Assembly.GetExecutingAssembly().GetName().Version ?? new Version(0, 0, 0);
+    public static ProgramVersion CurrentVersion => ProgramVersion.Current;
 }

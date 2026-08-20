@@ -65,7 +65,7 @@ public class WindowRenderingTests : IDisposable
         Capture(new SignInWindow(), $"signin-{code}");
         Capture(new InstallPromptWindow(), $"setup-{code}");
         Capture(
-            new AboutWindow(new Uri("https://example.invalid/repo"), new Version(0, 6, 1)),
+            new AboutWindow(new Uri("https://example.invalid/repo"), new ProgramVersion(new Version(0, 6, 1))),
             $"about-{code}");
         Capture(BuildReleaseNotes(), $"notes-{code}");
         Capture(LayoutInEveryLanguageTests.BuildTrayMenu(), $"menu-{code}");

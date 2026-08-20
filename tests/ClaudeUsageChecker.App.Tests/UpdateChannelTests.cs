@@ -57,14 +57,13 @@ public class UpdateChannelTests
         try
         {
             var store = new SettingsStore(path);
-            store.Save(new AppSettings { Channel = UpdateChannel.PreRelease, UpdateChannelShown = true });
+            store.Save(new AppSettings { Channel = UpdateChannel.PreRelease });
 
             var text = File.ReadAllText(path);
             var loaded = new SettingsStore(path).Load();
 
             Assert.Contains("\"updateChannel\": \"prerelease\"", text, StringComparison.Ordinal);
             Assert.Equal(UpdateChannel.PreRelease, loaded.Channel);
-            Assert.True(loaded.UpdateChannelShown);
         }
         finally
         {
@@ -144,7 +143,7 @@ public class UpdateChannelTests
         var handler = new RecordingHandler();
         using var client = new HttpClient(handler);
         var service = new GitHubReleaseUpdateService(
-            client, "owner", "repository", new Version(0, 6, 4), () => channel);
+            client, "owner", "repository", new ProgramVersion(new Version(0, 6, 4)), () => channel);
 
         await service.CheckAsync();
 

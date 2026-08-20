@@ -10,7 +10,7 @@ public sealed record UpdateCheckResult
     public required UpdateCheckStatus Status { get; init; }
 
     /// <summary>Version of the update that was found.</summary>
-    public Version? AvailableVersion { get; init; }
+    public ProgramVersion? AvailableVersion { get; init; }
 
     /// <summary>Release page for downloading by hand.</summary>
     public Uri? ReleasePage { get; init; }
@@ -31,21 +31,16 @@ public sealed record UpdateCheckResult
     public bool CanInstall =>
         Status == UpdateCheckStatus.UpdateAvailable && DownloadUrl is not null && ChecksumUrl is not null;
 
-    public static UpdateCheckResult UpToDate(Version current) => new()
+    public static UpdateCheckResult UpToDate(ProgramVersion current)
     {
-        Status = UpdateCheckStatus.UpToDate,
-        AvailableVersion = current,
-        Message = T.UpdateUpToDate(Display(current))
-    };
+        ArgumentNullException.ThrowIfNull(current);
 
-    /// <summary>
-    /// Cuts down to three parts. Assembly versions always have four, and the
-    /// last says nothing here - "0.2.0.0" is merely confusing.
-    /// </summary>
-    internal static string Display(Version version)
-    {
-        ArgumentNullException.ThrowIfNull(version);
-        return version.Build >= 0 ? version.ToString(3) : version.ToString();
+        return new UpdateCheckResult
+        {
+            Status = UpdateCheckStatus.UpToDate,
+            AvailableVersion = current,
+            Message = T.UpdateUpToDate(current.ToString())
+        };
     }
 
     /// <summary>There is no release (yet) to check against.</summary>

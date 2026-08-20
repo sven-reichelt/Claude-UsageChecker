@@ -13,13 +13,25 @@ public class UpdateVersionTests
     [InlineData("V1.2.3", "1.2.3")]
     [InlineData("1.2.3", "1.2.3")]
     [InlineData("v0.1.0", "0.1.0")]
-    [InlineData("v1.2.3-beta.1", "1.2.3")]
     [InlineData("v1.2.3+build7", "1.2.3")]
-    [InlineData("v1.2", "1.2")]
+    [InlineData("v1.2", "1.2.0")]
     public void TryParseTag_RecognisesTheUsualTagForms(string tag, string expected)
     {
         Assert.True(GitHubReleaseUpdateService.TryParseTag(tag, out var version));
-        Assert.Equal(Version.Parse(expected), version);
+        Assert.Equal(expected, version.ToString());
+    }
+
+    /// <summary>The label is kept - it is what tells a pre-release apart.</summary>
+    [Theory]
+    [InlineData("v1.2.3-beta.1", "1.2.3", "beta.1")]
+    [InlineData("v1.2.3-rc1+abc123", "1.2.3", "rc1")]
+    public void TryParseTag_KeepsThePreReleaseLabel(string tag, string number, string label)
+    {
+        Assert.True(GitHubReleaseUpdateService.TryParseTag(tag, out var version));
+
+        Assert.Equal(Version.Parse(number), version.Number);
+        Assert.Equal(label, version.PreRelease);
+        Assert.True(version.IsPreRelease);
     }
 
     [Theory]
@@ -37,6 +49,14 @@ public class UpdateVersionTests
     [InlineData("v0.1.0", "v0.1.0", false)]
     [InlineData("v0.1.1", "v0.1.0", true)]
     [InlineData("v1.0.0", "v0.9.9", true)]
+    // The finished version supersedes the pre-release of the same number. Without
+    // this, whoever tested a pre-release would stay on it for good.
+    [InlineData("v0.7.1", "v0.7.1-beta.1", true)]
+    [InlineData("v0.7.1-beta.2", "v0.7.1-beta.1", true)]
+    [InlineData("v0.7.1-beta.1", "v0.7.1", false)]
+    [InlineData("v0.7.1-beta.1", "v0.7.1-beta.1", false)]
+    // A pre-release of the next version is still newer than the current release.
+    [InlineData("v0.8.0-beta.1", "v0.7.1", true)]
     public void VersionComparison_ReportsOnlyRealUpdates(
         string published, string installed, bool isNewer)
     {
@@ -55,9 +75,31 @@ public class UpdateVersionTests
     public void VersionsAreShownWithThreeParts(int a, int b, int c, int d, string expected) =>
         // The fourth part comes from the assembly version and says nothing -
         // "Version 0.2.0.0 is up to date" is merely confusing.
-        Assert.Equal(expected, UpdateCheckResult.Display(new Version(a, b, c, d)));
+        Assert.Equal(expected, new ProgramVersion(new Version(a, b, c, d)).ToString());
 
     [Fact]
-    public void TwoPartVersionsStayUnchanged() =>
-        Assert.Equal("1.2", UpdateCheckResult.Display(new Version(1, 2)));
+    public void APreReleaseIsShownWithItsLabel() =>
+        Assert.Equal("0.7.1-beta.1", new ProgramVersion(new Version(0, 7, 1), "beta.1").ToString());
+
+    /// <summary>
+    /// The label comes out of the informational version - the only one that can
+    /// carry it.
+    /// </summary>
+    [Theory]
+    [InlineData("0.7.1-beta.1+9a8b7c6", "0.7.1-beta.1")]
+    [InlineData("0.7.1+9a8b7c6", "0.7.1")]
+    [InlineData("0.7.1", "0.7.1")]
+    public void TheInformationalVersionIsWhereTheLabelLives(string informational, string expected)
+    {
+        Assert.True(ProgramVersion.TryParse(informational, out var version));
+        Assert.Equal(expected, version.ToString());
+    }
+
+    /// <summary>
+    /// The running program knows its own version - and it is the one the build
+    /// stamped in, not a default.
+    /// </summary>
+    [Fact]
+    public void TheRunningVersionIsTheOneThatWasBuilt() =>
+        Assert.NotEqual(new Version(0, 0, 0), ProgramVersion.Current.Number);
 }

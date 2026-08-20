@@ -3,6 +3,7 @@ using System.Reflection;
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using ClaudeUsageChecker.App.Services;
 using ClaudeUsageChecker.Core.Localization;
 
 namespace ClaudeUsageChecker.App.Views;
@@ -23,7 +24,7 @@ public partial class AboutWindow : Window
     {
     }
 
-    public AboutWindow(Uri repository, Version version)
+    public AboutWindow(Uri repository, ProgramVersion version)
     {
         ArgumentNullException.ThrowIfNull(repository);
         ArgumentNullException.ThrowIfNull(version);
@@ -46,10 +47,10 @@ public partial class AboutWindow : Window
     }
 
     /// <summary>Sets every fixed label from the language file.</summary>
-    private void ApplyTexts(Version version)
+    private void ApplyTexts(ProgramVersion version)
     {
         Title = T.AboutTitle;
-        VersionText.Text = T.Version(version.Build >= 0 ? version.ToString(3) : version.ToString());
+        VersionText.Text = T.Version(version.ToString());
         DescriptionText.Text = T.AboutDescription;
         RepositoryButton.Content = T.AboutRepository;
         ReleaseNotesButton.Content = T.AboutReleaseNotes;

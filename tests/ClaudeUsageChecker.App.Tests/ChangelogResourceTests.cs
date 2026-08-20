@@ -41,7 +41,7 @@ public class ChangelogResourceTests
     [AvaloniaFact]
     public void TheChangelogKnowsTheRunningVersion()
     {
-        var laufende = ReleaseHistory.ThreePart(App.CurrentVersion);
+        var laufende = App.CurrentVersion.Number;
 
         Assert.Contains(ChangelogResource.All(), r => r.Version == laufende);
     }

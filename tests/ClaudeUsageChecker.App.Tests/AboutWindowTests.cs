@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using ClaudeUsageChecker.App.Services;
 using ClaudeUsageChecker.App.Views;
 
 namespace ClaudeUsageChecker.App.Tests;
@@ -15,7 +16,7 @@ public class AboutWindowTests
     [AvaloniaFact]
     public void CanBeCreated()
     {
-        var window = new AboutWindow(Projektseite, new Version(0, 6, 0, 0));
+        var window = new AboutWindow(Projektseite, new ProgramVersion(new Version(0, 6, 0, 0)));
 
         Assert.NotNull(window.FindControl<Image>("LogoImage"));
         Assert.NotNull(window.FindControl<Button>("RepositoryButton"));
@@ -25,7 +26,7 @@ public class AboutWindowTests
     [AvaloniaFact]
     public void ShowsTheVersionWithThreeParts()
     {
-        var window = new AboutWindow(Projektseite, new Version(0, 6, 0, 0));
+        var window = new AboutWindow(Projektseite, new ProgramVersion(new Version(0, 6, 0, 0)));
 
         Assert.Equal("Version 0.6.0", window.FindControl<TextBlock>("VersionText")!.Text);
     }
@@ -35,7 +36,7 @@ public class AboutWindowTests
     {
         // A missing image shows up nowhere else: the window opens, only the area
         // at the top would stay blank.
-        var window = new AboutWindow(Projektseite, new Version(0, 6, 0));
+        var window = new AboutWindow(Projektseite, new ProgramVersion(new Version(0, 6, 0)));
 
         Assert.NotNull(window.FindControl<Image>("LogoImage")!.Source);
     }
@@ -43,7 +44,7 @@ public class AboutWindowTests
     [AvaloniaFact]
     public void NamesTheProjectPage()
     {
-        var window = new AboutWindow(Projektseite, new Version(0, 6, 0));
+        var window = new AboutWindow(Projektseite, new ProgramVersion(new Version(0, 6, 0)));
 
         Assert.Contains("github.com/sven-reichelt/Claude-UsageChecker",
             window.FindControl<TextBlock>("RepositoryText")!.Text!, StringComparison.Ordinal);
@@ -56,7 +57,7 @@ public class AboutWindowTests
     [AvaloniaFact]
     public void ReportsTheWishForTheProjectPageInsteadOfOpeningItItself()
     {
-        var window = new AboutWindow(Projektseite, new Version(0, 6, 0));
+        var window = new AboutWindow(Projektseite, new ProgramVersion(new Version(0, 6, 0)));
         Uri? reported = null;
         window.RepositoryRequested += (_, adresse) => reported = adresse;
 
@@ -68,7 +69,7 @@ public class AboutWindowTests
     [AvaloniaFact]
     public void ReportsTheWishForTheChangelog()
     {
-        var window = new AboutWindow(Projektseite, new Version(0, 6, 0));
+        var window = new AboutWindow(Projektseite, new ProgramVersion(new Version(0, 6, 0)));
         var reported = false;
         window.ReleaseNotesRequested += (_, _) => reported = true;
 
@@ -80,7 +81,7 @@ public class AboutWindowTests
     [AvaloniaFact]
     public void TheContentFitsTheWindow()
     {
-        var window = new AboutWindow(Projektseite, new Version(0, 6, 0));
+        var window = new AboutWindow(Projektseite, new ProgramVersion(new Version(0, 6, 0)));
 
         Assert.True(LayoutProbe.FitsTheWidth(window, out var width),
             $"The content needs {width:0} pixels, the window is {window.Width:0} wide.");

@@ -81,7 +81,7 @@ public class UpdateInstallerTests
     [Fact]
     public void WithoutAnAvailableUpdateNothingIsOffered()
     {
-        var aktuell = UpdateCheckResult.UpToDate(new Version(1, 0, 0)) with
+        var aktuell = UpdateCheckResult.UpToDate(new ProgramVersion(new Version(1, 0, 0))) with
         {
             DownloadUrl = new Uri("https://example.invalid/app.exe"),
             ChecksumUrl = new Uri("https://example.invalid/app.exe.sha256")

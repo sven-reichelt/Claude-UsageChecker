@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Threading;
+using ClaudeUsageChecker.App.Services;
 using ClaudeUsageChecker.App.Settings;
 using ClaudeUsageChecker.App.Views;
 using ClaudeUsageChecker.Core.Formatting;
@@ -141,8 +142,7 @@ public sealed class TrayIconController : IDisposable
     /// only be found by opening a window. Beside the entry that leads there it
     /// costs nothing and saves the trip.
     /// </remarks>
-    private static string Version() =>
-        System.Reflection.Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? T.Unknown;
+    private static string Version() => ProgramVersion.Current.ToString();
 
     private void OnStateChanged(object? sender, UsageState state) =>
         Dispatcher.UIThread.Post(() => Render(state));

@@ -38,13 +38,22 @@ jobs:
           else
             VERSION="${GITHUB_REF_NAME#v}"
           fi
-          # Four parts are mandatory for AssemblyVersion, three for the display.
-          if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
-            echo "::error::Unusable version '$VERSION'. Expected x.y.z."
+          # Three numbers, optionally a pre-release label: "0.7.1" or
+          # "0.7.1-beta.1". The label makes the release a pre-release below and
+          # travels into the informational version, where the application reads
+          # it - without it a pre-release and the finished version of the same
+          # number would be indistinguishable.
+          if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$'; then
+            echo "::error::Unusable version '$VERSION'. Expected x.y.z or x.y.z-label."
             exit 1
           fi
+          case "$VERSION" in
+            *-*) PRERELEASE=true ;;
+            *)   PRERELEASE=false ;;
+          esac
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "Version: $VERSION"
+          echo "prerelease=$PRERELEASE" >> "$GITHUB_OUTPUT"
+          echo "Version: $VERSION (pre-release: $PRERELEASE)"
 
       - name: Test
         run: dotnet test --configuration Release --verbosity normal
@@ -115,6 +124,9 @@ jobs:
           # Draft: the update check only sees it once it is published by hand.
           # That way nothing goes out unchecked.
           draft: true
+          # A version with a label reaches only whoever chose pre-releases.
+          # GitHub leaves it out of "latest" as well.
+          prerelease: ${{ steps.version.outputs.prerelease == 'true' }}
           generate_release_notes: true
           # LICENSE travels with the binary: the GPL wants its text to accompany
           # the program, and whoever downloads only the exe would otherwise never

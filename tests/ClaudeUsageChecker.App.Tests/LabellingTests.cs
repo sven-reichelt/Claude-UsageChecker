@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Headless.XUnit;
 using Avalonia.LogicalTree;
+using ClaudeUsageChecker.App.Services;
 using ClaudeUsageChecker.App.Settings;
 using ClaudeUsageChecker.App.Views;
 using ClaudeUsageChecker.Core.Localization;
@@ -91,7 +92,7 @@ public class LabellingTests : IDisposable
     {
         Localizer.Use(Language.Find(code)!);
 
-        var window = new AboutWindow(new Uri("https://example.invalid/repo"), new Version(0, 6, 0));
+        var window = new AboutWindow(new Uri("https://example.invalid/repo"), new ProgramVersion(new Version(0, 6, 0)));
 
         AssertFullyLabelled(window, code);
     }

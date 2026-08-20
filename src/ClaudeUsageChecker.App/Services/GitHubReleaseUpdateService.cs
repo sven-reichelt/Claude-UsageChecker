@@ -23,7 +23,7 @@ public sealed class GitHubReleaseUpdateService(
     HttpClient httpClient,
     string owner,
     string repository,
-    Version currentVersion,
+    ProgramVersion currentVersion,
     Func<UpdateChannel>? channel = null) : IUpdateService
 {
     public async Task<UpdateCheckResult> CheckAsync(CancellationToken cancellationToken = default)
@@ -39,7 +39,8 @@ public sealed class GitHubReleaseUpdateService(
         using var request = new HttpRequestMessage(HttpMethod.Get, url);
         request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
         request.Headers.TryAddWithoutValidation("X-GitHub-Api-Version", "2022-11-28");
-        request.Headers.UserAgent.Add(new ProductInfoHeaderValue("ClaudeUsageChecker", currentVersion.ToString()));
+        request.Headers.UserAgent.Add(new ProductInfoHeaderValue(
+            "ClaudeUsageChecker", currentVersion.Number.ToString(3)));
 
         try
         {
@@ -93,8 +94,7 @@ public sealed class GitHubReleaseUpdateService(
                 ReleasePage = page,
                 DownloadUrl = FindAsset(root, ".exe"),
                 ChecksumUrl = FindAsset(root, ".exe.sha256"),
-                Message = T.UpdateAvailable(
-                    UpdateCheckResult.Display(latest), UpdateCheckResult.Display(currentVersion))
+                Message = T.UpdateAvailable(latest.ToString(), currentVersion.ToString())
             };
         }
         catch (Exception ex) when (ex is HttpRequestException or JsonException or TaskCanceledException)
@@ -123,7 +123,7 @@ public sealed class GitHubReleaseUpdateService(
         }
 
         JsonElement? best = null;
-        Version? bestVersion = null;
+        ProgramVersion? bestVersion = null;
 
         foreach (var release in root.EnumerateArray())
         {
@@ -182,22 +182,14 @@ public sealed class GitHubReleaseUpdateService(
         return null;
     }
 
-    /// <summary>Accepts tags of the form "v1.2.3" as well as "1.2.3".</summary>
-    internal static bool TryParseTag(string? tag, out Version version)
-    {
-        version = new Version(0, 0);
-        if (string.IsNullOrWhiteSpace(tag))
-        {
-            return false;
-        }
-
-        var trimmed = tag.TrimStart('v', 'V');
-        var suffix = trimmed.IndexOfAny(['-', '+']);
-        if (suffix >= 0)
-        {
-            trimmed = trimmed[..suffix];
-        }
-
-        return Version.TryParse(trimmed, out version!);
-    }
+    /// <summary>
+    /// Accepts tags of the form "v1.2.3", "1.2.3" and "v1.2.3-beta.1".
+    /// </summary>
+    /// <remarks>
+    /// The label is kept rather than cut off: without it a pre-release and the
+    /// finished version of the same number would be indistinguishable, and
+    /// whoever tests one would never be offered the other.
+    /// </remarks>
+    internal static bool TryParseTag(string? tag, out ProgramVersion version) =>
+        ProgramVersion.TryParse(tag, out version);
 }

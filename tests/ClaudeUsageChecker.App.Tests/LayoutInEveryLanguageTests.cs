@@ -107,7 +107,7 @@ public class LayoutInEveryLanguageTests : IDisposable
     {
         Localizer.Use(Language.Find(code)!);
 
-        AssertFits(new AboutWindow(new Uri("https://example.invalid/repo"), new Version(0, 6, 1)), code);
+        AssertFits(new AboutWindow(new Uri("https://example.invalid/repo"), new ProgramVersion(new Version(0, 6, 1))), code);
     }
 
     /// <summary>
@@ -172,7 +172,7 @@ public class LayoutInEveryLanguageTests : IDisposable
                 (T.TrayRefreshNow, () => { }),
                 (T.TraySettings, () => { }),
                 (T.TrayCheckForUpdates, () => { }),
-                (T.TrayAbout("0.7.0"), () => { }),
+                (T.TrayAbout(ProgramVersion.Current.ToString()), () => { }),
                 (T.TrayExit, () => { })
             ]);
 
