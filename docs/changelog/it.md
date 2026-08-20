@@ -8,6 +8,8 @@ numerazione [Semantic Versioning](https://semver.org/lang/it/).
 
 ## [Non pubblicato]
 
+## [0.6.2] – 2026-08-20
+
 ### Modificato
 - **L'icona nell'area di notifica dice in che stato si trova.** Disconnessa:
   grigia. Connessa e tutto nei limiti: un segno di spunta verde; dalla soglia

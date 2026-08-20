@@ -8,6 +8,8 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unveröffentlicht]
 
+## [0.6.2] – 2026-08-20
+
 ### Geändert
 - **Das Symbol im Infobereich sagt, in welchem Zustand es ist.** Abgemeldet
   bleibt es schlicht grau. Angemeldet und alles im Rahmen, trägt es einen

@@ -8,6 +8,8 @@ versionado [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+## [0.6.2] – 2026-08-20
+
 ### Cambiado
 - **El icono del área de notificación indica su estado.** Sin sesión: gris. Con
   sesión y todo en orden: una marca verde; a partir del umbral de aviso, un

@@ -8,6 +8,8 @@ numérotation [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+## [0.6.2] – 2026-08-20
+
 ### Modifié
 - **L'icône de la zone de notification indique son état.** Déconnecté : gris.
   Connecté et tout va bien : une coche verte ; au seuil d'avertissement, un

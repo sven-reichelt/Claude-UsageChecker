@@ -8,6 +8,8 @@ versionamento [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+## [0.6.2] – 2026-08-20
+
 ### Alterado
 - **O ícone da área de notificação mostra em que estado está.** Sem login:
   cinza. Com login e tudo dentro do limite: um visto verde; a partir do limiar

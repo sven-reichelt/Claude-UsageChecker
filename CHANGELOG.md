@@ -8,6 +8,8 @@ the versioning [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.6.2] – 2026-08-20
+
 ### Changed
 - **The tray icon says which state it is in.** Signed out it stays plain grey.
   Signed in and everything within its limits, it carries a green tick; from the
