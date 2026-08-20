@@ -92,6 +92,24 @@ internal static class MacOsBundle
     }
 
     /// <summary>
+    /// A folder to unpack into that sits on the same volume as the bundle.
+    /// </summary>
+    /// <remarks>
+    /// Putting the new version in place is a rename, and a rename cannot cross
+    /// volumes. The temporary folder usually sits on the same disk as
+    /// /Applications, but an application started from an external one would
+    /// fail at the very last step, with everything downloaded and verified.
+    /// Beside the bundle it is always the same volume by definition.
+    ///
+    /// The leading dot keeps it out of the way in Finder for the seconds it
+    /// exists.
+    /// </remarks>
+    internal static string WorkspaceBeside(string bundle) =>
+        Path.Combine(
+            Path.GetDirectoryName(bundle) ?? Path.GetTempPath(),
+            $".ClaudeUsageChecker-update-{Guid.NewGuid():N}");
+
+    /// <summary>
     /// Unpacks the archive and hands back the bundle inside it.
     /// </summary>
     /// <remarks>

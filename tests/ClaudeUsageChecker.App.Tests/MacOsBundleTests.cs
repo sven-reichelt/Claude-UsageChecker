@@ -205,4 +205,30 @@ public class MacOsBundleTests
 
         Assert.False(await MacOsBundle.IsAcceptableAsync("/Applications/X.app", CancellationToken.None));
     }
+
+    /// <summary>
+    /// The new version is unpacked beside the old one, not somewhere else.
+    /// </summary>
+    /// <remarks>
+    /// Putting it in place is a rename, and a rename cannot cross volumes. The
+    /// temporary folder usually sits on the same disk as the applications
+    /// folder, so this would work almost everywhere and fail on an external
+    /// one - at the last step of all, with everything downloaded, verified and
+    /// the old version already set aside.
+    /// </remarks>
+    [Fact]
+    public void TheNewVersionIsUnpackedBesideTheOldOne()
+    {
+        var workspace = MacOsBundle.WorkspaceBeside("/Volumes/Extern/ClaudeUsageChecker.app");
+
+        Assert.Equal("/Volumes/Extern", AsMacOsPath(Path.GetDirectoryName(workspace)!));
+        Assert.StartsWith("/Volumes/Extern/", AsMacOsPath(workspace), StringComparison.Ordinal);
+    }
+
+    /// <summary>Two updates at once do not share a folder.</summary>
+    [Fact]
+    public void EachUpdateGetsAFolderOfItsOwn() =>
+        Assert.NotEqual(
+            MacOsBundle.WorkspaceBeside("/Applications/ClaudeUsageChecker.app"),
+            MacOsBundle.WorkspaceBeside("/Applications/ClaudeUsageChecker.app"));
 }

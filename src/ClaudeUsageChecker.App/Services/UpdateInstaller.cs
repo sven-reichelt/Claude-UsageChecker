@@ -160,7 +160,11 @@ public sealed class UpdateInstaller(HttpClient httpClient)
             return InstallResult.Failed(T.UpdaterNotSelfReplaceable);
         }
 
-        var workspace = Path.Combine(Path.GetTempPath(), $"ClaudeUsageChecker-{Guid.NewGuid():N}");
+        // Unpacked beside the bundle, not in the temporary folder: putting the
+        // new version in place is a rename, and a rename cannot cross volumes.
+        // An application on an external disk would otherwise fail at the last
+        // step of all, with everything already downloaded and verified.
+        var workspace = MacOsBundle.WorkspaceBeside(bundle);
 
         try
         {
