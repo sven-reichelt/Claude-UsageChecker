@@ -540,12 +540,17 @@ jobs:
             open -a /Applications/ClaudeUsageChecker.app
             ```
 
-            The same sequence installs and updates. The first two lines have
-            nothing to do on a fresh machine and say so harmlessly; on an
-            existing installation they are what makes the rest work at all,
-            because `mv` refuses to overwrite a bundle that is already there -
-            it moves the new one inside the old, and the application carries on
-            running from the version that was meant to be replaced.
+            That is the first installation. From 0.9.0 on, every later version
+            arrives through **Install now and restart** in the application
+            itself, the same way it has on Windows since 0.4.0 - the sequence
+            above is only needed once.
+
+            The first two lines have nothing to do on a fresh machine and say so
+            harmlessly; coming from an older version they are what makes the
+            rest work at all, because `mv` refuses to overwrite a bundle that is
+            already there - it moves the new one inside the old, and the
+            application carries on running from the version that was meant to be
+            replaced.
 
             The icon appears in the menu bar; the application has no dock icon
             and no window of its own on start.
