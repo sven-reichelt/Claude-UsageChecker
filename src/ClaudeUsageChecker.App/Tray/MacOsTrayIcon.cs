@@ -30,6 +30,19 @@ internal sealed class MacOsTrayIcon : ITrayPresenter
     private readonly TrayIcon _icon = new();
     private readonly TrayIcons _icons;
 
+    /// <summary>
+    /// One menu for the whole run, refilled rather than replaced.
+    /// </summary>
+    /// <remarks>
+    /// Handing the tray icon a different NativeMenu after the first one has
+    /// been exported throws: "The menu being updated does not match". The
+    /// exporter on macOS remembers the object it handed to the system and will
+    /// only be told about changes to that one. Found by starting the built
+    /// bundle in the release workflow, which is the only place this could show
+    /// up before the machine existed.
+    /// </remarks>
+    private readonly NativeMenu _menu = new();
+
     private TrayIconSeverity? _shown;
     private string? _rendered;
 
@@ -45,6 +58,7 @@ internal sealed class MacOsTrayIcon : ITrayPresenter
             TrayIcon.SetIcons(application, _icons);
         }
 
+        _icon.Menu = _menu;
         _icon.IsVisible = true;
     }
 
@@ -86,28 +100,27 @@ internal sealed class MacOsTrayIcon : ITrayPresenter
             return;
         }
 
-        var menu = new NativeMenu();
+        _menu.Items.Clear();
 
         foreach (var line in status)
         {
             // The reported limits say something and do nothing. Disabled is how
             // macOS shows exactly that.
-            menu.Add(new NativeMenuItem(line) { IsEnabled = false });
+            _menu.Items.Add(new NativeMenuItem(line) { IsEnabled = false });
         }
 
         if (status.Count > 0)
         {
-            menu.Add(new NativeMenuItemSeparator());
+            _menu.Items.Add(new NativeMenuItemSeparator());
         }
 
         foreach (var (text, run) in commands)
         {
             var item = new NativeMenuItem(text);
             item.Click += (_, _) => run();
-            menu.Add(item);
+            _menu.Items.Add(item);
         }
 
-        _icon.Menu = menu;
         _rendered = signature;
     }
 
