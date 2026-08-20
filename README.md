@@ -1,5 +1,8 @@
 # Claude UsageChecker
 
+[![Latest release](https://img.shields.io/github/v/release/sven-reichelt/Claude-UsageChecker?label=release)](https://github.com/sven-reichelt/Claude-UsageChecker/releases/latest)
+[![Pre-release](https://img.shields.io/github/v/release/sven-reichelt/Claude-UsageChecker?include_prereleases&label=pre-release)](https://github.com/sven-reichelt/Claude-UsageChecker/releases)
+
 *Deutsche Fassung: [docs/de/README.md](docs/de/README.md)*
 
 Shows the session and weekly limits of a Claude subscription permanently in the

@@ -1,5 +1,8 @@
 # Claude UsageChecker
 
+[![Neueste Fassung](https://img.shields.io/github/v/release/sven-reichelt/Claude-UsageChecker?label=Fassung)](https://github.com/sven-reichelt/Claude-UsageChecker/releases/latest)
+[![Vorabversion](https://img.shields.io/github/v/release/sven-reichelt/Claude-UsageChecker?include_prereleases&label=Vorabversion)](https://github.com/sven-reichelt/Claude-UsageChecker/releases)
+
 *English version: [README.md](../../README.md) – das ist die maßgebliche Fassung;
 weicht diese hier ab, gilt die englische.*
 

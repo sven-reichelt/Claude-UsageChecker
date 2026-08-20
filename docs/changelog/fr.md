@@ -8,6 +8,12 @@ numérotation [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+## [0.7.1] – 2026-08-20
+
+### Modifié
+- Version de maintenance. Préparation des versions d'essai ; rien ne change à
+  l'usage.
+
 ## [0.7.0] – 2026-08-20
 
 ### Modifié
