@@ -22,11 +22,24 @@ versionado [Semantic Versioning](https://semver.org/lang/es/).
 - Base para las versiones de prueba. En el uso diario no se nota nada de ello.
 
 ### Corregido
+- **El menú del área de notificación crece con su contenido.** Tenía un ancho
+  fijo y la línea del uso adicional no cabía: lleva dos importes y una moneda,
+  así que se partía en dos líneas. En un menú cuyas demás líneas son un límite
+  cada una, una línea partida parece dos.
 - **Correcciones de traducción.** Seis idiomas seguían llamando «créditos» al
   uso adicional aunque la cifra es dinero, y todos afirmaban que un historial
   de cambios sin traducir se muestra en alemán: se muestra en inglés. Los
   mensajes de error del almacén de credenciales de Windows estaban fijados en
   alemán; ahora siguen el idioma de la interfaz.
+
+### Seguridad
+- La página de publicación que devuelve GitHub se exige ahora con el mismo
+  criterio que las direcciones de descarga: solo https.
+- Las acciones de los flujos de trabajo se fijan por hash de confirmación en
+  lugar de por etiquetas móviles. Una etiqueta puede reapuntarla quien
+  administre el repositorio de la acción; un hash no. Importa sobre todo en la
+  acción de publicación ajena, que se ejecuta con permiso de escritura en el
+  flujo que compila el ejecutable publicado.
 
 ## [0.7.0] – 2026-08-20
 

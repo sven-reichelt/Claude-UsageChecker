@@ -22,11 +22,24 @@ versionamento [Semantic Versioning](https://semver.org/lang/pt-BR/).
 - Preparação para as versões de teste. No dia a dia nada disso aparece.
 
 ### Corrigido
+- **O menu da área de notificação cresce com o seu conteúdo.** Tinha largura
+  fixa e a linha do uso adicional não cabia: ela traz dois valores e uma
+  moeda, então quebrava em duas linhas. Num menu em que cada outra linha é um
+  limite, uma linha quebrada parece duas.
 - **Correções de tradução.** Seis idiomas ainda chamavam o uso adicional de
   «créditos» embora o número seja dinheiro, e todos afirmavam que um histórico
   de alterações sem tradução aparece em alemão – aparece em inglês. As
   mensagens de erro do repositório de credenciais do Windows estavam fixas em
   alemão; agora seguem o idioma da interface.
+
+### Segurança
+- A página de lançamento vinda da resposta do GitHub passa pelo mesmo
+  critério dos endereços de download: somente https.
+- As actions dos fluxos de trabalho estão fixadas em hashes de commit em vez
+  de tags móveis. Uma tag pode ser reapontada por quem administra o
+  repositório da action; um hash não. Isso pesa sobretudo na action de
+  lançamento de terceiros, que roda com permissão de escrita no fluxo que
+  compila o executável publicado.
 
 ## [0.7.0] – 2026-08-20
 

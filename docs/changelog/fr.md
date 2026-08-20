@@ -22,12 +22,26 @@ numérotation [Semantic Versioning](https://semver.org/lang/fr/).
 - Préparation des versions d'essai. Rien n'en est visible à l'usage.
 
 ### Corrigé
+- **Le menu de la zone de notification s'adapte à son contenu.** Sa largeur
+  était figée et la ligne de l'utilisation supplémentaire n'y tenait pas :
+  elle porte deux montants et une devise, elle passait donc à la ligne. Dans
+  un menu dont chaque autre ligne est une limite, une ligne repliée se lit
+  comme deux.
 - **Corrections de traduction.** Six langues appelaient encore « crédits »
   l'utilisation supplémentaire alors que le chiffre est de l'argent, et toutes
   affirmaient qu'un historique non traduit s'affiche en allemand – il
   s'affiche en anglais. Les messages d'erreur du gestionnaire d'informations
   d'identification de Windows étaient figés en allemand ; ils suivent
   désormais la langue de l'interface.
+
+### Sécurité
+- La page de publication issue de la réponse de GitHub est désormais soumise
+  aux mêmes exigences que les adresses de téléchargement : https uniquement.
+- Les actions des workflows sont épinglées à des empreintes de commit plutôt
+  qu'à des étiquettes mobiles. Une étiquette peut être redirigée par qui
+  administre le dépôt de l'action ; une empreinte non. Cela compte surtout
+  pour l'action de publication tierce, qui s'exécute avec droit d'écriture
+  dans le workflow qui compile l'exécutable publié.
 
 ## [0.7.0] – 2026-08-20
 

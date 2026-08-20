@@ -22,11 +22,25 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 - Vorarbeit für Testfassungen. Davon ist im Alltag nichts zu sehen.
 
 ### Behoben
+- **Das Menü im Infobereich wächst mit seinem Inhalt.** Es stand auf einer
+  festen Breite, und die Zeile für das Zusatzkontingent passte nicht hinein:
+  Sie trägt zwei Beträge und eine Währung und brach deshalb auf eine zweite
+  Zeile um. In einem Menü, dessen übrige Zeilen je ein Limit sind, liest sich
+  eine umgebrochene Zeile wie zwei.
 - **Übersetzungskorrekturen.** Sechs Sprachen nannten das Zusatzkontingent
   noch „Credits", obwohl die Zahl Geld ist, und alle Sprachen behaupteten,
   ein fehlender Changelog erscheine auf Deutsch – er erscheint auf Englisch.
   Fehlermeldungen des Windows-Anmeldespeichers waren fest auf Deutsch; sie
   folgen jetzt der Oberflächensprache.
+
+### Sicherheit
+- Die Release-Seite aus der GitHub-Antwort wird an derselben Latte gemessen
+  wie die Download-Adressen: nur https.
+- Die Actions der Abläufe sind auf Commit-Hashes festgenagelt statt auf
+  wandernde Marken. Eine Marke kann umhängen, wer das Repository der Action
+  verwaltet, ein Hash nicht. Das zählt vor allem bei der fremden
+  Release-Action, die mit Schreibrecht in dem Ablauf läuft, der die
+  veröffentlichte Programmdatei baut.
 
 ## [0.7.0] – 2026-08-20
 

@@ -22,11 +22,24 @@ numeração [Semantic Versioning](https://semver.org/lang/pt-BR/).
 - Preparação para as versões de teste. No dia a dia nada disso aparece.
 
 ### Corrigido
+- **O menu da área de notificação cresce com o seu conteúdo.** Tinha largura
+  fixa e a linha do uso adicional não cabia: traz dois valores e uma moeda,
+  pelo que passava para uma segunda linha. Num menu em que cada uma das outras
+  linhas é um limite, uma linha partida parece duas.
 - **Correções de tradução.** Seis idiomas ainda chamavam «créditos» ao uso
   adicional embora o número seja dinheiro, e todos afirmavam que um registo de
   alterações sem tradução é apresentado em alemão – é apresentado em inglês.
   As mensagens de erro do repositório de credenciais do Windows estavam fixas
   em alemão; agora seguem o idioma da interface.
+
+### Segurança
+- A página de lançamento vinda da resposta do GitHub passa pelo mesmo
+  critério dos endereços de transferência: apenas https.
+- As actions dos fluxos de trabalho estão fixadas em hashes de commit em vez
+  de etiquetas móveis. Uma etiqueta pode ser reapontada por quem administra o
+  repositório da action; um hash não. Isto pesa sobretudo na action de
+  lançamento de terceiros, que corre com permissão de escrita no fluxo que
+  compila o executável publicado.
 
 ## [0.7.0] – 2026-08-20
 

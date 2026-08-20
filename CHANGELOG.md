@@ -22,11 +22,23 @@ the versioning [Semantic Versioning](https://semver.org/).
 - Groundwork for test builds. Nothing of it is visible in everyday use.
 
 ### Fixed
+- **The menu of the notification area grows with its content.** It stood at a
+  fixed width, and the line for the extra usage quota did not fit: it carries
+  two amounts and a currency, so it folded onto a second line. In a menu whose
+  every other line is one limit, a folded line reads like two.
 - **Translation corrections.** Six languages still called the extra usage
   "credits" although the figure is money, and every language claimed that a
   missing changelog translation falls back to German - it falls back to
   English. Error messages of the Windows credential store were hard-coded in
   German; they now follow the interface language.
+
+### Security
+- The release page from GitHub's response is now held to the same bar as the
+  download addresses: https only.
+- The workflow actions are pinned to commit hashes instead of moving tags. A
+  tag can be re-pointed by whoever controls the action's repository; a hash
+  cannot. This matters most for the third-party release action, which runs
+  with write access in the workflow that builds the published executable.
 
 ## [0.7.0] – 2026-08-20
 

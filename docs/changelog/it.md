@@ -23,11 +23,24 @@ numerazione [Semantic Versioning](https://semver.org/lang/it/).
   nulla.
 
 ### Corretto
+- **Il menu dell'area di notifica cresce con il suo contenuto.** Aveva una
+  larghezza fissa e la riga dell'utilizzo aggiuntivo non ci stava: porta due
+  importi e una valuta, e andava a capo. In un menu in cui ogni altra riga è
+  un limite, una riga spezzata sembra due.
 - **Correzioni di traduzione.** Sei lingue chiamavano ancora «crediti»
   l'utilizzo aggiuntivo benché la cifra sia denaro, e tutte affermavano che un
   registro delle modifiche non tradotto viene mostrato in tedesco: viene
   mostrato in inglese. I messaggi di errore dell'archivio credenziali di
   Windows erano fissi in tedesco; ora seguono la lingua dell'interfaccia.
+
+### Sicurezza
+- La pagina della release ricavata dalla risposta di GitHub è ora sottoposta
+  allo stesso criterio degli indirizzi di download: solo https.
+- Le action dei workflow sono fissate agli hash dei commit anziché a tag
+  mobili. Un tag può essere spostato da chi amministra il repository
+  dell'action; un hash no. Conta soprattutto per l'action di pubblicazione di
+  terzi, che gira con permesso di scrittura nel workflow che compila
+  l'eseguibile pubblicato.
 
 ## [0.7.0] – 2026-08-20
 
