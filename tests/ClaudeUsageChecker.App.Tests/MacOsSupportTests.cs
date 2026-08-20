@@ -154,9 +154,10 @@ public class MacOsSupportTests
         Assert.Contains(T.TraySettings, headers);
         Assert.DoesNotContain(headers, h => h?.Contains("Avalonia", StringComparison.OrdinalIgnoreCase) == true);
 
-        // Nothing for leaving: macOS adds Quit to this menu by itself, and one
-        // of our own beside it was the same thing twice on the same shortcut.
-        Assert.DoesNotContain(T.TrayExit, headers);
+        // Leaving is ours. Avalonia appends its own only on the first export,
+        // so a menu refilled on a language change lost it - and losing the way
+        // out of a program is not a detail.
+        Assert.Contains(T.TrayExit, headers);
     }
 
     /// <summary>

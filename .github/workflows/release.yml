@@ -350,23 +350,6 @@ jobs:
             entirely:
 
             ```
-            curl -L -O https://github.com/${{ github.repository }}/releases/download/v${{ steps.version.outputs.version }}/${{ steps.macos.outputs.name }}
-            ditto -xk ${{ steps.macos.outputs.name }} .
-            mv ClaudeUsageChecker.app /Applications/
-            open -a /Applications/ClaudeUsageChecker.app
-            ```
-
-            The icon appears in the menu bar; the application has no dock icon
-            and no window of its own on start. If it was downloaded through a
-            browser after all: `xattr -dr com.apple.quarantine
-            /Applications/ClaudeUsageChecker.app`.
-
-            **Updating an existing installation** takes two steps more. `mv`
-            refuses to overwrite a bundle that is already there - it would move
-            the new one inside the old - and a running application should be
-            asked to stop first:
-
-            ```
             pkill -f ClaudeUsageChecker
             rm -rf /Applications/ClaudeUsageChecker.app
             curl -L -O https://github.com/${{ github.repository }}/releases/download/v${{ steps.version.outputs.version }}/${{ steps.macos.outputs.name }}
@@ -374,6 +357,18 @@ jobs:
             mv ClaudeUsageChecker.app /Applications/
             open -a /Applications/ClaudeUsageChecker.app
             ```
+
+            The same sequence installs and updates. The first two lines have
+            nothing to do on a fresh machine and say so harmlessly; on an
+            existing installation they are what makes the rest work at all,
+            because `mv` refuses to overwrite a bundle that is already there -
+            it moves the new one inside the old, and the application carries on
+            running from the version that was meant to be replaced.
+
+            The icon appears in the menu bar; the application has no dock icon
+            and no window of its own on start. If it was downloaded through a
+            browser rather than fetched here: `xattr -dr com.apple.quarantine
+            /Applications/ClaudeUsageChecker.app`.
 
             ### Checksums (SHA-256)
 

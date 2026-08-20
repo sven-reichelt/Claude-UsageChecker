@@ -56,6 +56,13 @@ internal static class Program
     public static AppBuilder BuildAvaloniaApp() =>
         AppBuilder.Configure<App>()
             .UsePlatformDetect()
+            // The application menu on macOS is supplied whole rather than
+            // added to. Avalonia appends its standard entries - Services,
+            // Hide, Quit - but only the first time the menu is exported, so a
+            // menu rebuilt later would silently lose them, Quit included. Ours
+            // now says the same thing at every moment. Read only by the macOS
+            // backend; elsewhere this changes nothing.
+            .With(new MacOSPlatformOptions { DisableDefaultApplicationMenuItems = true })
             .WithInterFont()
             .LogToTrace();
 }

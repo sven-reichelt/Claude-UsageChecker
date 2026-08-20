@@ -296,9 +296,12 @@ public partial class App : Application, IDisposable
     /// application uses, because that is where the fingers go.
     /// </para>
     /// <para>
-    /// No entry for leaving: macOS adds Services, Hide and Quit to this menu by
-    /// itself. One of our own beside them was simply the same thing twice, on
-    /// the same shortcut.
+    /// Leaving is ours as well. Avalonia appends its standard entries -
+    /// Services, Hide, Quit - but only on the first export, so a menu refilled
+    /// on a language change lost every one of them, Quit and its shortcut
+    /// included. Those additions are switched off in the builder now and the
+    /// menu says the same thing at every moment. What is gone with them is
+    /// Services and Hide, which a program without a window has no use for.
     /// </para>
     /// <para>
     /// The timing decides whether any of it arrives at startup. Avalonia's
@@ -336,10 +339,18 @@ public partial class App : Application, IDisposable
         var isNew = menu is null;
         menu ??= new NativeMenu();
 
+        var quit = new NativeMenuItem(T.TrayExit)
+        {
+            Gesture = new KeyGesture(Key.Q, KeyModifiers.Meta)
+        };
+        quit.Click += (_, _) => ErrorGuard.Run("exit", RequestShutdown);
+
         menu.Items.Clear();
         menu.Items.Add(about);
         menu.Items.Add(new NativeMenuItemSeparator());
         menu.Items.Add(settings);
+        menu.Items.Add(new NativeMenuItemSeparator());
+        menu.Items.Add(quit);
 
         if (isNew)
         {
