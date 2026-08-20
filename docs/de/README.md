@@ -142,9 +142,14 @@ sie in `Language.All` ein; ein Test meldet dann jeden Schlüssel, der noch fehlt
 
 ### Voraussetzungen
 
-* Windows 10/11
+* Windows 10/11, oder macOS 12 oder neuer auf Apple Silicon
 * [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0) zum Bauen
 * Ein aktives Claude-Abonnement (Pro oder Max)
+
+Die veröffentlichten Pakete brauchen weder das SDK noch eine .NET-Laufzeit. Unter
+macOS kommt die Anwendung als Bündel, ad hoc signiert statt von einem
+eingetragenen Entwickler; wer es im Terminal statt über den Browser holt,
+umgeht die Quarantäne. Die genauen Befehle stehen auf der Release-Seite.
 
 ### Bauen und starten
 
@@ -264,11 +269,21 @@ git tag v0.2.0
 git push origin v0.2.0
 ```
 
-Der Ablauf `.github/workflows/release.yml` testet, baut eine eigenständige
-Einzeldatei für Windows x64, prüft Größe und Startfähigkeit, bildet die
-SHA-256-Summe und legt einen **Entwurf** der Veröffentlichung an. Erst das
-Freigeben von Hand macht sie für die Aktualisierungsprüfung sichtbar – so geht
-nichts ungeprüft hinaus.
+Der Ablauf `.github/workflows/release.yml` baut beide Plattformen: eine
+eigenständige Einzeldatei für Windows x64 und ein Programmbündel für Apple
+Silicon, zusammengesetzt auf einem Mac, weil das Symbol `sips` und `iconutil`
+braucht. Beide werden auf Größe geprüft, einmal gestartet, um zu sehen, ob sie
+überhaupt hochkommen, und mit einer SHA-256-Summe versehen; heraus kommt ein
+**Entwurf** der Veröffentlichung. Erst das Freigeben von Hand macht sie für die
+Aktualisierungsprüfung sichtbar – so geht nichts ungeprüft hinaus.
+
+Das Starten des gebauten Pakets zählt vor allem bei der Plattform, die hier
+niemand öffnen kann: Es hat unter macOS einen Absturz gefangen, den die ganze
+grüne Testsuite übersehen hatte.
+
+Eine Marke darf eine Kennung tragen – `v0.9.0-beta.1` –, dann wird daraus eine
+Vorabversion. Die erreicht nur, wer danach gefragt hat, und GitHub lässt sie
+aus „Latest" heraus.
 
 Das Paket ist getrimmt und komprimiert. Gemessen gegen die unveränderte Fassung:
 

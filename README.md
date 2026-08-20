@@ -140,9 +140,14 @@ every key still missing.
 
 ### Requirements
 
-* Windows 10/11
+* Windows 10/11, or macOS 12 or later on Apple silicon
 * [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0) to build
 * An active Claude subscription (Pro or Max)
+
+The published packages need neither the SDK nor a .NET runtime. On macOS the
+application comes as a bundle signed ad hoc rather than by a registered
+developer; fetching it from the terminal rather than through a browser keeps it
+out of quarantine. The release page carries the exact commands.
 
 ### Build and run
 
@@ -262,10 +267,20 @@ git tag v0.2.0
 git push origin v0.2.0
 ```
 
-The workflow `.github/workflows/release.yml` tests, builds a self-contained
-single file for Windows x64, checks its size and whether it starts, computes the
-SHA-256 sum and creates a **draft** release. Only publishing it by hand makes it
-visible to the update check - that way nothing goes out unchecked.
+The workflow `.github/workflows/release.yml` builds both platforms: a
+self-contained single file for Windows x64, and an application bundle for Apple
+silicon, put together on a Mac because the icon needs `sips` and `iconutil`.
+Each is checked for size, started once to see that it comes up at all, and
+given a SHA-256 sum; the result is a **draft** release. Only publishing it by
+hand makes it visible to the update check - that way nothing goes out
+unchecked.
+
+Starting the built package matters most for the platform nobody here can open:
+it caught a crash on macOS that the whole green test suite had missed.
+
+A tag may carry a label - `v0.9.0-beta.1` - which makes the release a
+pre-release. Those reach only whoever asked for them, and GitHub leaves them
+out of "latest".
 
 The package is trimmed and compressed. Measured against the unmodified build:
 
