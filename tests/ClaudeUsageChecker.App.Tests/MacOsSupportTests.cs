@@ -1,5 +1,7 @@
+using Avalonia.Headless.XUnit;
 using System.Runtime.InteropServices;
 using ClaudeUsageChecker.App.Services;
+using ClaudeUsageChecker.Core.Localization;
 using ClaudeUsageChecker.Core.Platform;
 
 namespace ClaudeUsageChecker.App.Tests;
@@ -91,6 +93,23 @@ public class MacOsSupportTests
 
         Assert.DoesNotContain("/usr/bin/open", values);
         Assert.Contains("/Users/tester/bin/ClaudeUsageChecker", values);
+    }
+
+    /// <summary>
+    /// The application knows its own name.
+    /// </summary>
+    /// <remarks>
+    /// macOS shows it in the menu bar as soon as a window takes focus, and
+    /// builds "About …" and "Quit …" from it. Avalonia calls itself "Avalonia
+    /// Application" until told otherwise - which is what stood there.
+    /// </remarks>
+    [AvaloniaFact]
+    public void TheApplicationIsNamedAfterTheProduct()
+    {
+        var name = Avalonia.Application.Current?.Name;
+
+        Assert.Equal(T.AppName, name);
+        Assert.DoesNotContain("Avalonia", name ?? string.Empty, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>The label is a reverse domain name, as launchd expects.</summary>

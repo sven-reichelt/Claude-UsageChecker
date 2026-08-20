@@ -47,7 +47,18 @@ public partial class App : Application, IDisposable
     private OAuthTokenProvider? _oauthTokenProvider;
     private UpdateCheckResult? _pendingUpdate;
 
-    public override void Initialize() => AvaloniaXamlLoader.Load(this);
+    public override void Initialize()
+    {
+        AvaloniaXamlLoader.Load(this);
+
+        // macOS puts this in the menu bar the moment a window takes focus -
+        // the application menu beside the apple, with "About …" and "Quit …"
+        // built from it. Left unset, Avalonia calls itself "Avalonia
+        // Application" there. Set here rather than in the XAML because
+        // interface text does not belong in the source; the product name is
+        // the one string the language files deliberately leave untranslated.
+        Name = T.AppName;
+    }
 
     public override void OnFrameworkInitializationCompleted()
     {
