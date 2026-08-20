@@ -28,6 +28,11 @@ jobs:
     permissions:
       contents: read
 
+    # So that the notes can say what was actually done rather than what is
+    # usually done.
+    outputs:
+      signed: ${{ steps.signing.outputs.enabled }}
+
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
@@ -125,11 +130,125 @@ jobs:
 
           plutil -lint "$APP/Contents/Info.plist"
 
+      # Signing needs the certificate; without it the build still has to work,
+      # so that a fork or a checkout without secrets is not stopped by it. What
+      # comes out then is the ad-hoc signed bundle of before, which runs on the
+      # machine that built it and nowhere else.
+      - name: Is signing configured?
+        id: signing
+        shell: bash
+        env:
+          CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+        run: |
+          if [ -n "$CERTIFICATE" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+            echo "Signing with a Developer ID certificate."
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::No signing certificate configured - the bundle will be signed ad hoc."
+          fi
+
+      - name: Take the certificate into a keychain of its own
+        if: steps.signing.outputs.enabled == 'true'
+        shell: bash
+        env:
+          CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+          CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+        run: |
+          set -euo pipefail
+          # A keychain of its own, thrown away with the runner: the login
+          # keychain of a shared machine is no place for a signing key.
+          KEYCHAIN="$RUNNER_TEMP/signing.keychain-db"
+          KEYCHAIN_PASSWORD="$(openssl rand -base64 24)"
+          echo "KEYCHAIN=$KEYCHAIN" >> "$GITHUB_ENV"
+
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+
+          echo "$CERTIFICATE" | base64 --decode > "$RUNNER_TEMP/certificate.p12"
+          security import "$RUNNER_TEMP/certificate.p12" \
+            -k "$KEYCHAIN" -P "$CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+          rm -f "$RUNNER_TEMP/certificate.p12"
+
+          # Without this codesign asks for permission on every call, and nobody
+          # is there to answer.
+          security set-key-partition-list \
+            -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN" >/dev/null
+          security list-keychain -d user -s "$KEYCHAIN" login.keychain-db
+
+          security find-identity -v -p codesigning "$KEYCHAIN"
+
+      - name: Sign the bundle
+        if: steps.signing.outputs.enabled == 'true'
+        shell: bash
+        env:
+          IDENTITY: ${{ secrets.MACOS_SIGNING_IDENTITY }}
+        run: |
+          set -euo pipefail
+          APP="ClaudeUsageChecker.app"
+
+          # Inside out: every library first, the bundle last. A signature made
+          # over a bundle whose contents change afterwards is broken, and
+          # --deep, which would do this in one call, is deprecated by Apple and
+          # known to miss things.
+          find "$APP/Contents/MacOS" -name "*.dylib" -print0 \
+            | xargs -0 -n1 codesign --force --timestamp --options runtime \
+                --keychain "$KEYCHAIN" --sign "$IDENTITY"
+
+          codesign --force --timestamp --options runtime \
+            --entitlements build/macos/entitlements.plist \
+            --keychain "$KEYCHAIN" --sign "$IDENTITY" "$APP"
+
+          codesign --verify --strict --verbose=2 "$APP"
+
+      - name: Have it notarised
+        if: steps.signing.outputs.enabled == 'true'
+        shell: bash
+        env:
+          API_KEY: ${{ secrets.APPLE_API_KEY }}
+          API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          API_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER_ID }}
+        run: |
+          set -euo pipefail
+          APP="ClaudeUsageChecker.app"
+
+          echo "$API_KEY" | base64 --decode > "$RUNNER_TEMP/api-key.p8"
+
+          # Apple wants an archive, and the answer takes a few minutes.
+          ditto -c -k --keepParent "$APP" "$RUNNER_TEMP/notarise.zip"
+
+          xcrun notarytool submit "$RUNNER_TEMP/notarise.zip" \
+            --key "$RUNNER_TEMP/api-key.p8" \
+            --key-id "$API_KEY_ID" \
+            --issuer "$API_ISSUER_ID" \
+            --wait --timeout 30m
+
+          rm -f "$RUNNER_TEMP/api-key.p8" "$RUNNER_TEMP/notarise.zip"
+
+          # Stapling writes the ticket into the bundle. Without it macOS asks
+          # Apple at first launch, which fails on a machine that is offline -
+          # and looks exactly like a program that was never notarised.
+          xcrun stapler staple "$APP"
+          xcrun stapler validate "$APP"
+
+      - name: Would macOS let it run?
+        if: steps.signing.outputs.enabled == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          # The question Gatekeeper will be asked on someone else's machine,
+          # asked here instead. Anything but "accepted" means whoever downloads
+          # this gets a refusal rather than a program.
+          spctl --assess --type install --verbose=4 ClaudeUsageChecker.app
+          codesign --display --verbose=4 ClaudeUsageChecker.app 2>&1 | grep -E "Authority|TeamIdentifier|flags"
+
       # Ad-hoc, not a developer certificate. It gives the bundle a stable
       # identity on the machine it runs on, which is what the keychain hangs the
       # right of access on - without it every start would look like a different
       # program and ask again.
       - name: Sign the bundle ad hoc
+        if: steps.signing.outputs.enabled != 'true'
         run: codesign --force --deep --sign - ClaudeUsageChecker.app
 
       - name: Does the bundle start at all?
@@ -348,10 +467,9 @@ jobs:
 
             ### Installation on macOS
 
-            The bundle is signed ad hoc, not by a registered developer.
-            Downloading it through a browser therefore puts it in quarantine and
-            macOS refuses to open it. Fetching it from the terminal avoids that
-            entirely:
+            ${{ needs.macos.outputs.signed == 'true' && 'Signed with a Developer ID and notarised by Apple, with the ticket stapled to the bundle: it opens on any Mac, straight from the browser, without asking anything of you.' || 'Signed ad hoc rather than by a registered developer, so macOS refuses it unless it is fetched from the terminal rather than through a browser.' }}
+
+            Either way the terminal is the shortest route:
 
             ```
             pkill -f ClaudeUsageChecker
@@ -370,9 +488,9 @@ jobs:
             running from the version that was meant to be replaced.
 
             The icon appears in the menu bar; the application has no dock icon
-            and no window of its own on start. If it was downloaded through a
-            browser rather than fetched here: `xattr -dr com.apple.quarantine
-            /Applications/ClaudeUsageChecker.app`.
+            and no window of its own on start.
+
+            ${{ needs.macos.outputs.signed == 'true' && ' ' || 'Downloaded through a browser after all? `xattr -dr com.apple.quarantine /Applications/ClaudeUsageChecker.app` takes it out of quarantine.' }}
 
             ### Checksums (SHA-256)
 

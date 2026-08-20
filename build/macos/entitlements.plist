@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+    What the hardened runtime has to allow for a .NET application to run at all.
+
+    Signing with "--options runtime" is what Apple requires before it will
+    notarise anything, and the hardened runtime forbids by default exactly what
+    a just-in-time compiler does: write machine code into memory and then
+    execute it. Without these two the application is signed, notarised, and
+    dies on startup.
+
+    Deliberately only these two. Every entitlement is a rule switched off, and
+    the ones that are missing here - disabling library validation, allowing
+    dyld environment variables - are ones this program has no need of: every
+    library inside the bundle is signed with the same identity as the bundle,
+    which is what library validation asks for.
+-->
+<plist version="1.0">
+<dict>
+    <key>com.apple.security.cs.allow-jit</key>
+    <true/>
+    <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
+    <true/>
+</dict>
+</plist>
