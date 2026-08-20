@@ -18,7 +18,10 @@ the versioning [Semantic Versioning](https://semver.org/).
   arriving at the finished version counts as a step forward even though the
   number has not moved. Between two test builds of the same number it stays
   quiet: the changelog has nothing new to say there.
-
+- **The summary says when a test build is running.** The heading names the
+  version of the changelog entry, and the changelog knows no test builds - so
+  0.7.2-beta.1 read "New in version 0.7.2" with nothing anywhere to say that
+  the finished version had not been reached yet.
 ## [0.7.1] – 2026-08-20
 
 ### Added

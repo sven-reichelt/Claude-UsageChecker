@@ -145,6 +145,7 @@
   "notes.headingSingle": "Novidades da versão {0}",
   "notes.headingMultiple": "Novidades da versão {0} e de mais {1} versões",
   "notes.previous": "Anteriormente estava em execução a versão {0}.",
+  "notes.preRelease": "Está a utilizar a versão prévia {0}.",
   "notes.none": "Sem novidades",
   "notes.noneHint": "O registo de alterações não tem qualquer entrada para esta versão.",
   "notes.releaseHeading": "Versão {0}",

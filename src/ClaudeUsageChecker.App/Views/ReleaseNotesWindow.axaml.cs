@@ -46,8 +46,18 @@ public partial class ReleaseNotesWindow : Window
     /// Whether the changelog exists in the language that is set. Otherwise it is
     /// shown in English, and the window says so.
     /// </param>
+    /// <param name="running">
+    /// The version now running. Only of interest when it is a pre-release: the
+    /// heading names the version of the changelog entry, and the changelog knows
+    /// no test builds - so someone on 0.7.2-beta.1 would read "New in version
+    /// 0.7.2" and have no way of telling from this window that they are not on
+    /// it yet.
+    /// </param>
     public void Render(
-        IReadOnlyList<ReleaseNotes> releases, ProgramVersion? previous = null, bool translated = true)
+        IReadOnlyList<ReleaseNotes> releases,
+        ProgramVersion? previous = null,
+        bool translated = true,
+        ProgramVersion? running = null)
     {
         ArgumentNullException.ThrowIfNull(releases);
 
@@ -70,7 +80,18 @@ public partial class ReleaseNotesWindow : Window
 
         // With its label, where there is one: "previously ran 0.7.1-beta.5"
         // tells a tester something that "0.7.1" would hide.
-        SubtitleText.Text = previous is null ? null : T.NotesPrevious(previous.ToString());
+        var subtitle = new List<string>(2);
+        if (previous is not null)
+        {
+            subtitle.Add(T.NotesPrevious(previous.ToString()));
+        }
+
+        if (running is { IsPreRelease: true })
+        {
+            subtitle.Add(T.NotesPreRelease(running.ToString()));
+        }
+
+        SubtitleText.Text = subtitle.Count == 0 ? null : string.Join(" ", subtitle);
         SubtitleText.IsVisible = SubtitleText.Text is not null;
 
         foreach (var release in releases)

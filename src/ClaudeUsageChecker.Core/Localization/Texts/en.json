@@ -145,6 +145,7 @@
   "notes.headingSingle": "New in version {0}",
   "notes.headingMultiple": "New in version {0} and {1} earlier versions",
   "notes.previous": "Previously running version {0}.",
+  "notes.preRelease": "You are running the pre-release {0}.",
   "notes.none": "No changes",
   "notes.noneHint": "The changelog has no entry for this version.",
   "notes.releaseHeading": "Version {0}",

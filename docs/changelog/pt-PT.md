@@ -18,7 +18,10 @@ numeração [Semantic Versioning](https://semver.org/lang/pt-BR/).
   versão final conta como um passo em frente ainda que o número não mude. Entre
   duas versões de teste do mesmo número fica calado: aí o registo não tem
   novidade nenhuma a dar.
-
+- **O resumo avisa quando está a correr uma versão de teste.** O título nomeia
+  a versão da entrada do registo, e o registo não conhece versões de teste:
+  0.7.2-beta.1 aparecia como «Novidades da versão 0.7.2» sem que em lado
+  nenhum constasse que a versão final ainda não tinha sido alcançada.
 ## [0.7.1] – 2026-08-20
 
 ### Adicionado

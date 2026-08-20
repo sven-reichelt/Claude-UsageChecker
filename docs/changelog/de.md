@@ -18,7 +18,10 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
   aufgeschrieben, und das Ankommen bei der fertigen Fassung zählt als Schritt
   nach vorn, obwohl die Nummer stehen bleibt. Zwischen zwei Testfassungen
   derselben Nummer bleibt es still: Der Changelog hat dort nichts Neues zu sagen.
-
+- **Die Übersicht sagt jetzt, wenn eine Testfassung läuft.** Die Überschrift
+  nennt die Version des Changelog-Eintrags, und der Changelog kennt keine
+  Testfassungen – 0.7.2-beta.1 las sich daher als „Neu in Version 0.7.2", ohne
+  dass irgendwo stand, dass die fertige Fassung noch gar nicht erreicht ist.
 ## [0.7.1] – 2026-08-20
 
 ### Hinzugefügt

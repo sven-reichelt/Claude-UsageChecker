@@ -200,6 +200,7 @@ public static class T
     public static string NotesHeadingMultiple(string version, int others) =>
         L.Format("notes.headingMultiple", version, others);
     public static string NotesPrevious(string version) => L.Format("notes.previous", version);
+    public static string NotesPreRelease(string version) => L.Format("notes.preRelease", version);
     public static string NotesNone => L["notes.none"];
     public static string NotesNoneHint => L["notes.noneHint"];
     public static string NotesRelease(string version) => L.Format("notes.releaseHeading", version);

@@ -19,7 +19,11 @@ numérotation [Semantic Versioning](https://semver.org/lang/fr/).
   comme un pas en avant même si le numéro ne bouge pas. Entre deux versions
   d'essai du même numéro, rien ne s'affiche : l'historique n'a rien de nouveau à
   y dire.
-
+- **Le résumé indique qu'une version d'essai est en cours.** Le titre nomme la
+  version de l'entrée de l'historique, et l'historique ne connaît pas les
+  versions d'essai : 0.7.2-beta.1 se lisait donc « Nouveautés de la version
+  0.7.2 » sans que rien n'indique que la version finale n'était pas encore
+  atteinte.
 ## [0.7.1] – 2026-08-20
 
 ### Ajouté

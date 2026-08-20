@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using ClaudeUsageChecker.App.Services;
 using ClaudeUsageChecker.App.Views;
+using ClaudeUsageChecker.Core.Localization;
 using ClaudeUsageChecker.Core.Release;
 
 namespace ClaudeUsageChecker.App.Tests;
@@ -31,6 +32,50 @@ public class ReleaseNotesWindowTests
         Assert.Equal("New in version 0.6.0", window.FindControl<TextBlock>("HeadlineText")!.Text);
         Assert.Contains("0.5.0", window.FindControl<TextBlock>("SubtitleText")!.Text!,
             StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// On a test build the window says so.
+    /// </summary>
+    /// <remarks>
+    /// The heading names the version of the changelog entry, and the changelog
+    /// knows no test builds - so someone on 0.7.2-beta.1 reads "New in version
+    /// 0.7.2" and would have no way of telling from this window that they are
+    /// not on it yet.
+    /// </remarks>
+    [AvaloniaFact]
+    public void SaysSoWhenTheRunningVersionIsAPreRelease()
+    {
+        var window = new ReleaseNotesWindow();
+
+        window.Render(
+            [Release(0, 7, 2)],
+            new ProgramVersion(new Version(0, 7, 1)),
+            translated: true,
+            running: new ProgramVersion(new Version(0, 7, 2), "beta.1"));
+
+        var subtitle = window.FindControl<TextBlock>("SubtitleText")!.Text!;
+
+        Assert.Equal("New in version 0.7.2", window.FindControl<TextBlock>("HeadlineText")!.Text);
+        Assert.Contains("0.7.1", subtitle, StringComparison.Ordinal);
+        Assert.Contains("0.7.2-beta.1", subtitle, StringComparison.Ordinal);
+    }
+
+    /// <summary>And on a finished version it does not.</summary>
+    [AvaloniaFact]
+    public void SaysNothingAboutAPreReleaseOnAFinishedVersion()
+    {
+        var window = new ReleaseNotesWindow();
+
+        window.Render(
+            [Release(0, 7, 2)],
+            new ProgramVersion(new Version(0, 7, 1)),
+            translated: true,
+            running: new ProgramVersion(new Version(0, 7, 2)));
+
+        var subtitle = window.FindControl<TextBlock>("SubtitleText")!.Text!;
+
+        Assert.Equal(T.NotesPrevious("0.7.1"), subtitle);
     }
 
     [AvaloniaFact]

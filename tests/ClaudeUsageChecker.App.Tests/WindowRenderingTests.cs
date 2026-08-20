@@ -123,7 +123,13 @@ public class WindowRenderingTests : IDisposable
     private static ReleaseNotesWindow BuildReleaseNotes()
     {
         var window = new ReleaseNotesWindow();
-        window.Render(ChangelogResource.All(), new ProgramVersion(new Version(0, 5, 0)), ChangelogResource.IsTranslated);
+        // As a tester sees it: coming from a finished version, now on a test
+        // build. That is the state in which the window has the most to say.
+        window.Render(
+            ChangelogResource.All(),
+            new ProgramVersion(new Version(0, 5, 0)),
+            ChangelogResource.IsTranslated,
+            new ProgramVersion(new Version(0, 7, 2), "beta.1"));
 
         return window;
     }

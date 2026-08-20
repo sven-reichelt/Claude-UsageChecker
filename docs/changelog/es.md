@@ -18,7 +18,11 @@ versionado [Semantic Versioning](https://semver.org/lang/es/).
   guarda, y llegar a la versión definitiva cuenta como un paso adelante aunque
   el número no cambie. Entre dos versiones de prueba del mismo número no dice
   nada: el historial no tiene novedades que contar ahí.
-
+- **El resumen indica cuando se ejecuta una versión de prueba.** El título
+  nombra la versión de la entrada del historial, y el historial no conoce
+  versiones de prueba: 0.7.2-beta.1 se leía como «Novedades de la versión
+  0.7.2» sin que en ninguna parte constara que aún no se había llegado a la
+  versión definitiva.
 ## [0.7.1] – 2026-08-20
 
 ### Añadido

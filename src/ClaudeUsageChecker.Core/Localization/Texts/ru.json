@@ -145,6 +145,7 @@
   "notes.headingSingle": "Новое в версии {0}",
   "notes.headingMultiple": "Новое в версии {0} и ещё в {1} версиях",
   "notes.previous": "Ранее работала версия {0}.",
+  "notes.preRelease": "У вас запущена предварительная версия {0}.",
   "notes.none": "Изменений нет",
   "notes.noneHint": "В списке изменений нет записи для этой версии.",
   "notes.releaseHeading": "Версия {0}",

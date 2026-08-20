@@ -145,6 +145,7 @@
   "notes.headingSingle": "版本 {0} 的新增内容",
   "notes.headingMultiple": "版本 {0} 及另外 {1} 个版本的新增内容",
   "notes.previous": "此前运行的是版本 {0}。",
+  "notes.preRelease": "您正在运行预发布版本 {0}。",
   "notes.none": "没有新增内容",
   "notes.noneHint": "更新日志中没有此版本的条目。",
   "notes.releaseHeading": "版本 {0}",

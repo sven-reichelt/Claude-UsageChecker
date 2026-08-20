@@ -18,7 +18,10 @@ versionamento [Semantic Versioning](https://semver.org/lang/pt-BR/).
   versão final conta como um passo adiante mesmo que o número não mude. Entre
   duas versões de teste do mesmo número ele fica quieto: ali o histórico não tem
   novidade alguma a contar.
-
+- **O resumo avisa quando uma versão de teste está em uso.** O título nomeia a
+  versão da entrada do histórico, e o histórico não conhece versões de teste:
+  0.7.2-beta.1 aparecia como «Novidades da versão 0.7.2» sem que em lugar
+  nenhum constasse que a versão final ainda não havia sido alcançada.
 ## [0.7.1] – 2026-08-20
 
 ### Adicionado

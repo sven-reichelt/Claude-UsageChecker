@@ -19,7 +19,11 @@ numerazione [Semantic Versioning](https://semver.org/lang/it/).
   definitiva conta come un passo avanti anche se il numero non cambia. Tra due
   versioni di prova dello stesso numero resta in silenzio: lì il registro non
   ha nulla di nuovo da dire.
-
+- **Il riepilogo dice quando è in esecuzione una versione di prova.** Il titolo
+  nomina la versione della voce del registro, e il registro non conosce
+  versioni di prova: 0.7.2-beta.1 si leggeva quindi come «Novità della
+  versione 0.7.2» senza che da nessuna parte risultasse che la versione
+  definitiva non era ancora stata raggiunta.
 ## [0.7.1] – 2026-08-20
 
 ### Aggiunto

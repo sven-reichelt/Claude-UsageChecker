@@ -198,7 +198,7 @@ public partial class App : Application, IDisposable
     private static void ShowReleaseNotes(IReadOnlyList<ReleaseNotes> releases, ProgramVersion? previous)
     {
         var window = new ReleaseNotesWindow();
-        window.Render(releases, previous, ChangelogResource.IsTranslated);
+        window.Render(releases, previous, ChangelogResource.IsTranslated, CurrentVersion);
 
         window.Topmost = true;
         window.Show();
