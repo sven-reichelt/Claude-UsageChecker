@@ -39,7 +39,9 @@ public sealed record UpdateCheckResult
         {
             Status = UpdateCheckStatus.UpToDate,
             AvailableVersion = current,
-            Message = T.UpdateUpToDate(current.ToString())
+            Message = current.IsPreRelease
+                ? T.UpdateUpToDatePreRelease(current.ToString())
+                : T.UpdateUpToDate(current.ToString())
         };
     }
 

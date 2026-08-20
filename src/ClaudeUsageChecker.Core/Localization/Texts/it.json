@@ -8,6 +8,7 @@
   "app.refresh": "Aggiorna",
   "app.unknown": "sconosciuto",
   "app.version": "Versione {0}",
+  "app.versionPreRelease": "Versione {0} (versione preliminare)",
 
   "tray.refreshNow": "Aggiorna adesso",
   "tray.settings": "Impostazioni ...",
@@ -150,7 +151,9 @@
   "notes.translationMissing": "Il registro delle modifiche non è ancora tradotto in questa lingua; viene mostrato in tedesco.",
 
   "update.upToDate": "La versione {0} è aggiornata.",
+  "update.upToDatePreRelease": "La versione {0} è aggiornata: è una versione preliminare.",
   "update.available": "La versione {0} è disponibile (installata: {1}).",
+  "update.availablePreRelease": "La versione {0} è disponibile come versione preliminare (installata: {1}).",
   "update.noRelease": "Non esiste ancora una versione pubblicata con cui confrontare.",
   "update.httpError": "GitHub ha risposto con HTTP {0}.",
   "update.incomplete": "La risposta di GitHub era incompleta.",

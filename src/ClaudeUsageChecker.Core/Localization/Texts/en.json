@@ -8,6 +8,7 @@
   "app.refresh": "Refresh",
   "app.unknown": "unknown",
   "app.version": "Version {0}",
+  "app.versionPreRelease": "Version {0} (pre-release)",
 
   "tray.refreshNow": "Refresh now",
   "tray.settings": "Settings ...",
@@ -150,7 +151,9 @@
   "notes.translationMissing": "The changelog is not yet translated into this language; it is shown in German.",
 
   "update.upToDate": "Version {0} is up to date.",
+  "update.upToDatePreRelease": "Version {0} is up to date - a pre-release.",
   "update.available": "Version {0} is available (installed: {1}).",
+  "update.availablePreRelease": "Version {0} is available as a pre-release (installed: {1}).",
   "update.noRelease": "There is no published version to compare against yet.",
   "update.httpError": "GitHub responded with HTTP {0}.",
   "update.incomplete": "The response from GitHub was incomplete.",

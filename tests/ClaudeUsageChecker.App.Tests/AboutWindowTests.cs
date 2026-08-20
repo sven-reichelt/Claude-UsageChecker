@@ -31,6 +31,20 @@ public class AboutWindowTests
         Assert.Equal("Version 0.6.0", window.FindControl<TextBlock>("VersionText")!.Text);
     }
 
+    /// <summary>
+    /// A test build says so here too - this is the window anyone opens to find
+    /// out what they are running.
+    /// </summary>
+    [AvaloniaFact]
+    public void NamesAPreReleaseAsOne()
+    {
+        var window = new AboutWindow(
+            Projektseite, new ProgramVersion(new Version(0, 7, 1), "beta.1"));
+
+        Assert.Equal("Version 0.7.1-beta.1 (pre-release)",
+            window.FindControl<TextBlock>("VersionText")!.Text);
+    }
+
     [AvaloniaFact]
     public void ShowsTheApplicationIcon()
     {

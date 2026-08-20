@@ -8,6 +8,7 @@
   "app.refresh": "刷新",
   "app.unknown": "未知",
   "app.version": "版本 {0}",
+  "app.versionPreRelease": "版本 {0}（预发布）",
 
   "tray.refreshNow": "立即刷新",
   "tray.settings": "设置 ...",
@@ -150,7 +151,9 @@
   "notes.translationMissing": "更新日志尚未译成此语言，将以德语显示。",
 
   "update.upToDate": "版本 {0} 已是最新。",
+  "update.upToDatePreRelease": "版本 {0} 已是最新——这是一个预发布版本。",
   "update.available": "版本 {0} 可用（已安装：{1}）。",
+  "update.availablePreRelease": "版本 {0} 以预发布形式提供（已安装：{1}）。",
   "update.noRelease": "尚无已发布的版本可供比较。",
   "update.httpError": "GitHub 返回 HTTP {0}。",
   "update.incomplete": "GitHub 的响应不完整。",

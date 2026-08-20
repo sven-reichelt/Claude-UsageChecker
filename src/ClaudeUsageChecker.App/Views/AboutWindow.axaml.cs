@@ -50,7 +50,9 @@ public partial class AboutWindow : Window
     private void ApplyTexts(ProgramVersion version)
     {
         Title = T.AboutTitle;
-        VersionText.Text = T.Version(version.ToString());
+        VersionText.Text = version.IsPreRelease
+            ? T.VersionPreRelease(version.ToString())
+            : T.Version(version.ToString());
         DescriptionText.Text = T.AboutDescription;
         RepositoryButton.Content = T.AboutRepository;
         ReleaseNotesButton.Content = T.AboutReleaseNotes;

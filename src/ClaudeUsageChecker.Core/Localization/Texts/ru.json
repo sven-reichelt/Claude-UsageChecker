@@ -8,6 +8,7 @@
   "app.refresh": "Обновить",
   "app.unknown": "неизвестно",
   "app.version": "Версия {0}",
+  "app.versionPreRelease": "Версия {0} (предварительная)",
 
   "tray.refreshNow": "Обновить сейчас",
   "tray.settings": "Настройки ...",
@@ -150,7 +151,9 @@
   "notes.translationMissing": "Список изменений ещё не переведён на этот язык; он показан на немецком.",
 
   "update.upToDate": "Версия {0} актуальна.",
+  "update.upToDatePreRelease": "Версия {0} актуальна — это предварительная версия.",
   "update.available": "Доступна версия {0} (установлена: {1}).",
+  "update.availablePreRelease": "Доступна предварительная версия {0} (установлена: {1}).",
   "update.noRelease": "Опубликованной версии для сравнения пока нет.",
   "update.httpError": "GitHub ответил HTTP {0}.",
   "update.incomplete": "Ответ GitHub был неполным.",

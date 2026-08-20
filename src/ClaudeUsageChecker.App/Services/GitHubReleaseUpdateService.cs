@@ -94,7 +94,11 @@ public sealed class GitHubReleaseUpdateService(
                 ReleasePage = page,
                 DownloadUrl = FindAsset(root, ".exe"),
                 ChecksumUrl = FindAsset(root, ".exe.sha256"),
-                Message = T.UpdateAvailable(latest.ToString(), currentVersion.ToString())
+                // Said in words, not only in the label: whoever is offered a
+                // test build should know that is what it is.
+                Message = latest.IsPreRelease
+                    ? T.UpdateAvailablePreRelease(latest.ToString(), currentVersion.ToString())
+                    : T.UpdateAvailable(latest.ToString(), currentVersion.ToString())
             };
         }
         catch (Exception ex) when (ex is HttpRequestException or JsonException or TaskCanceledException)

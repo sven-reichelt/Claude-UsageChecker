@@ -64,7 +64,9 @@ public partial class SettingsWindow : Window
         WarningThresholdBox.Value = (decimal)settings.WarningThreshold;
         CriticalThresholdBox.Value = (decimal)settings.CriticalThreshold;
 
-        VersionText.Text = T.Version(ProgramVersion.Current.ToString());
+        VersionText.Text = ProgramVersion.Current.IsPreRelease
+            ? T.VersionPreRelease(ProgramVersion.Current.ToString())
+            : T.Version(ProgramVersion.Current.ToString());
 
         ChannelBox.ItemsSource = new List<string> { T.SettingsChannelStable, T.SettingsChannelPreRelease };
         ChannelBox.SelectedIndex = settings.Channel == UpdateChannel.PreRelease ? 1 : 0;

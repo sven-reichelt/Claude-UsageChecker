@@ -1,4 +1,5 @@
 using ClaudeUsageChecker.App.Services;
+using ClaudeUsageChecker.Core.Localization;
 
 namespace ClaudeUsageChecker.App.Tests;
 
@@ -102,4 +103,22 @@ public class UpdateVersionTests
     [Fact]
     public void TheRunningVersionIsTheOneThatWasBuilt() =>
         Assert.NotEqual(new Version(0, 0, 0), ProgramVersion.Current.Number);
+
+    /// <summary>
+    /// A test build says so in words, not only through its label.
+    /// </summary>
+    /// <remarks>
+    /// The label alone is easy to overlook, and whoever is offered a test build
+    /// should know that is what it is before installing it.
+    /// </remarks>
+    [Fact]
+    public void APreReleaseIsNamedAsOneWhenItIsUpToDate()
+    {
+        var beta = UpdateCheckResult.UpToDate(new ProgramVersion(new Version(0, 7, 1), "beta.1"));
+        var finished = UpdateCheckResult.UpToDate(new ProgramVersion(new Version(0, 7, 1)));
+
+        Assert.Equal(T.UpdateUpToDatePreRelease("0.7.1-beta.1"), beta.Message);
+        Assert.Equal(T.UpdateUpToDate("0.7.1"), finished.Message);
+        Assert.NotEqual(beta.Message, finished.Message);
+    }
 }

@@ -29,6 +29,10 @@ public static class T
     public static string Unknown => L["app.unknown"];
     public static string Version(string version) => L.Format("app.version", version);
 
+    /// <summary>The same, but saying plainly that this is a test build.</summary>
+    public static string VersionPreRelease(string version) =>
+        L.Format("app.versionPreRelease", version);
+
     // Tray
     public static string TrayRefreshNow => L["tray.refreshNow"];
     public static string TraySettings => L["tray.settings"];
@@ -204,8 +208,12 @@ public static class T
 
     // Updates
     public static string UpdateUpToDate(string version) => L.Format("update.upToDate", version);
+    public static string UpdateUpToDatePreRelease(string version) =>
+        L.Format("update.upToDatePreRelease", version);
     public static string UpdateAvailable(string available, string installed) =>
         L.Format("update.available", available, installed);
+    public static string UpdateAvailablePreRelease(string available, string installed) =>
+        L.Format("update.availablePreRelease", available, installed);
     public static string UpdateNoRelease => L["update.noRelease"];
     public static string UpdateHttpError(int status) => L.Format("update.httpError", status);
     public static string UpdateIncomplete => L["update.incomplete"];
