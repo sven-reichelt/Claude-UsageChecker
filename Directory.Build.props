@@ -6,6 +6,11 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- NU1900 says the vulnerability database could not be reached, not that a
+         package is vulnerable. Treating it as an error turns a hiccup on the
+         network into a failed build, which happened on the CI on 2026-08-20.
+         The findings themselves - NU1901 to NU1904 - stay errors. -->
+    <WarningsNotAsErrors>NU1900</WarningsNotAsErrors>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <InvariantGlobalization>false</InvariantGlobalization>
