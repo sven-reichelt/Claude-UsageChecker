@@ -23,6 +23,10 @@ jobs:
   macos:
     name: Build the macOS bundle
     runs-on: macos-15
+    # It builds and hands an artifact over; the write right of the workflow is
+    # for creating the release, which is the other job's business.
+    permissions:
+      contents: read
 
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4

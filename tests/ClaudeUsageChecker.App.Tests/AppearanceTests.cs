@@ -145,6 +145,74 @@ public class AppearanceTests
         }
     }
 
+    /// <summary>
+    /// Closing the window any other way undoes the preview as well.
+    /// </summary>
+    /// <remarks>
+    /// The first version hung the undo on the cancel button alone, and the
+    /// button is only one of the ways out - whoever closed the window through
+    /// its corner kept an appearance nobody had saved, until the next start
+    /// quietly took it back. The undo sits on the closing event now, which
+    /// every way out passes through.
+    /// </remarks>
+    [AvaloniaFact]
+    public void ClosingWithoutSavingRestoresTheAppearance()
+    {
+        var application = Avalonia.Application.Current!;
+        var before = application.RequestedThemeVariant;
+
+        try
+        {
+            using var file = new TemporaryFile();
+            var window = new SettingsWindow(
+                new SettingsStore(file.Path),
+                new AppSettings { AppearanceMode = AppearanceMode.Light },
+                applyAutostart: _ => { });
+
+            window.Show();
+            window.FindControl<ComboBox>("ThemeBox")!.SelectedIndex = (int)AppearanceMode.Dark;
+            Assert.Equal(ThemeVariant.Dark, application.RequestedThemeVariant);
+
+            // The way the window corner takes - no button involved.
+            window.Close();
+
+            Assert.Equal(ThemeVariant.Light, application.RequestedThemeVariant);
+        }
+        finally
+        {
+            application.RequestedThemeVariant = before;
+        }
+    }
+
+    /// <summary>And saving keeps what was chosen, whatever closes the window afterwards.</summary>
+    [AvaloniaFact]
+    public void SavingKeepsTheChosenAppearance()
+    {
+        var application = Avalonia.Application.Current!;
+        var before = application.RequestedThemeVariant;
+
+        try
+        {
+            using var file = new TemporaryFile();
+            var window = new SettingsWindow(
+                new SettingsStore(file.Path),
+                new AppSettings { AppearanceMode = AppearanceMode.Light },
+                applyAutostart: _ => { });
+
+            window.Show();
+            window.FindControl<ComboBox>("ThemeBox")!.SelectedIndex = (int)AppearanceMode.Dark;
+
+            window.FindControl<Button>("SaveButton")!.RaiseEvent(
+                new Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
+
+            Assert.Equal(ThemeVariant.Dark, application.RequestedThemeVariant);
+        }
+        finally
+        {
+            application.RequestedThemeVariant = before;
+        }
+    }
+
     private sealed class TemporaryFile : IDisposable
     {
         public string Path { get; } = System.IO.Path.Combine(

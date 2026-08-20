@@ -25,6 +25,9 @@ public partial class SettingsWindow : Window
     private AppSettings _settings;
     private int _versionClicks;
 
+    /// <summary>Whether saving happened - leaving any other way undoes the preview.</summary>
+    private bool _saved;
+
     /// <summary>How often the version number has to be clicked to reveal the channel.</summary>
     internal const int ClicksToRevealChannel = 5;
 
@@ -96,13 +99,21 @@ public partial class SettingsWindow : Window
         SignOutButton.Click += (_, _) => SignOut();
         SaveButton.Click += (_, _) => SaveAndClose();
 
-        // The appearance was applied while it was being chosen, so cancelling
-        // has something to undo - unlike every other setting here, which only
-        // takes effect on saving.
-        CancelButton.Click += (_, _) =>
+        CancelButton.Click += (_, _) => Close();
+
+        // The appearance was applied while it was being chosen, so leaving
+        // without saving has something to undo - unlike every other setting
+        // here, which only takes effect on saving. On the closing event rather
+        // than on the cancel button, because the button is only one of the ways
+        // out: the first version hung this on the button alone, and whoever
+        // closed the window through its corner kept an appearance nobody had
+        // saved, until the next start quietly took it back.
+        Closing += (_, _) =>
         {
-            ApplyTheme(settings.AppearanceMode);
-            Close();
+            if (!_saved)
+            {
+                ApplyTheme(settings.AppearanceMode);
+            }
         };
 
         LaunchAtLoginBox.IsCheckedChanged += (_, _) => UpdateRelocationHint();
@@ -387,6 +398,7 @@ public partial class SettingsWindow : Window
         };
 
         _settingsStore.Save(_settings);
+        _saved = true;
 
         // Switch before reporting: whoever reacts to the change - the context
         // menu, say - should already find the new texts in place.
