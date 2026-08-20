@@ -148,7 +148,7 @@
   "notes.noneHint": "Il registro delle modifiche non contiene voci per questa versione.",
   "notes.releaseHeading": "Versione {0}",
   "notes.releaseHeadingDated": "Versione {0} – {1}",
-  "notes.translationMissing": "Il registro delle modifiche non è ancora tradotto in questa lingua; viene mostrato in tedesco.",
+  "notes.translationMissing": "Il registro delle modifiche non è ancora tradotto in questa lingua; viene mostrato in inglese.",
 
   "update.upToDate": "La versione {0} è aggiornata.",
   "update.upToDatePreRelease": "La versione {0} è aggiornata: è una versione preliminare.",
@@ -190,6 +190,9 @@
   "error.missingScope": "Al token manca il diritto «user:profile». I token di «claude setup-token» servono solo per l'inferenza, non per i dati di utilizzo.",
   "error.tokenRejected": "Il token è stato rifiutato. È scaduto oppure non è valido.",
   "error.noSecureStore": "Su questa piattaforma non è ancora disponibile alcun archivio sicuro.",
+  "secret.readFailed": "Non è stato possibile leggere la credenziale «{0}» (errore Win32 {1}).",
+  "secret.writeFailed": "Non è stato possibile salvare la credenziale «{0}» (errore Win32 {1}).",
+  "secret.deleteFailed": "Non è stato possibile rimuovere la credenziale «{0}» (errore Win32 {1}).",
 
   "oauth.wrongFlow": "Il codice incollato appartiene a un altro tentativo di accesso. Riavvia l'accesso.",
   "oauth.redeemFailed": "Non è stato possibile riscattare il codice",

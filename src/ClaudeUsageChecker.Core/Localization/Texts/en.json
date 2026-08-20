@@ -148,7 +148,7 @@
   "notes.noneHint": "The changelog has no entry for this version.",
   "notes.releaseHeading": "Version {0}",
   "notes.releaseHeadingDated": "Version {0} – {1}",
-  "notes.translationMissing": "The changelog is not yet translated into this language; it is shown in German.",
+  "notes.translationMissing": "The changelog is not yet translated into this language; it is shown in English.",
 
   "update.upToDate": "Version {0} is up to date.",
   "update.upToDatePreRelease": "Version {0} is up to date - a pre-release.",
@@ -190,6 +190,9 @@
   "error.missingScope": "The token lacks the \"user:profile\" scope. Tokens from \"claude setup-token\" are for inference only, not for usage data.",
   "error.tokenRejected": "The token was rejected. It has expired or is invalid.",
   "error.noSecureStore": "No secure storage is available on this platform yet.",
+  "secret.readFailed": "The credential \"{0}\" could not be read (Win32 error {1}).",
+  "secret.writeFailed": "The credential \"{0}\" could not be saved (Win32 error {1}).",
+  "secret.deleteFailed": "The credential \"{0}\" could not be removed (Win32 error {1}).",
 
   "oauth.wrongFlow": "The code you pasted belongs to a different sign-in attempt. Please start the sign-in again.",
   "oauth.redeemFailed": "The code could not be redeemed",

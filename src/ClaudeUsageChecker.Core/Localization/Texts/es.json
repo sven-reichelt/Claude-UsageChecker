@@ -148,7 +148,7 @@
   "notes.noneHint": "El historial de cambios no tiene ninguna entrada para esta versión.",
   "notes.releaseHeading": "Versión {0}",
   "notes.releaseHeadingDated": "Versión {0} – {1}",
-  "notes.translationMissing": "El historial de cambios todavía no está traducido a este idioma; se muestra en alemán.",
+  "notes.translationMissing": "El historial de cambios todavía no está traducido a este idioma; se muestra en inglés.",
 
   "update.upToDate": "La versión {0} está actualizada.",
   "update.upToDatePreRelease": "La versión {0} está actualizada: es una versión preliminar.",
@@ -190,6 +190,9 @@
   "error.missingScope": "Al token le falta el permiso «user:profile». Los tokens de «claude setup-token» solo sirven para inferencia, no para los datos de uso.",
   "error.tokenRejected": "El token ha sido rechazado. Ha caducado o no es válido.",
   "error.noSecureStore": "En esta plataforma todavía no hay almacenamiento seguro disponible.",
+  "secret.readFailed": "No se ha podido leer la credencial «{0}» (error Win32 {1}).",
+  "secret.writeFailed": "No se ha podido guardar la credencial «{0}» (error Win32 {1}).",
+  "secret.deleteFailed": "No se ha podido eliminar la credencial «{0}» (error Win32 {1}).",
 
   "oauth.wrongFlow": "El código pegado pertenece a otro intento de inicio de sesión. Vuelve a empezar.",
   "oauth.redeemFailed": "No se ha podido canjear el código",

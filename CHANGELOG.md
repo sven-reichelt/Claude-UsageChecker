@@ -13,6 +13,13 @@ the versioning [Semantic Versioning](https://semver.org/).
 ### Changed
 - Service release. Groundwork for test builds; nothing changes in everyday use.
 
+### Fixed
+- **Translation corrections.** Six languages still called the extra usage
+  "credits" although the figure is money, and every language claimed that a
+  missing changelog translation falls back to German - it falls back to
+  English. Error messages of the Windows credential store were hard-coded in
+  German; they now follow the interface language.
+
 ## [0.7.0] – 2026-08-20
 
 ### Changed

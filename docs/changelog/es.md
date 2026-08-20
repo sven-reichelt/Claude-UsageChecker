@@ -14,6 +14,13 @@ versionado [Semantic Versioning](https://semver.org/lang/es/).
 - Versión de mantenimiento. Base para versiones de prueba; en el uso diario no
   cambia nada.
 
+### Corregido
+- **Correcciones de traducción.** Seis idiomas seguían llamando «créditos» al
+  uso adicional aunque la cifra es dinero, y todos afirmaban que un historial
+  de cambios sin traducir se muestra en alemán: se muestra en inglés. Los
+  mensajes de error del almacén de credenciales de Windows estaban fijados en
+  alemán; ahora siguen el idioma de la interfaz.
+
 ## [0.7.0] – 2026-08-20
 
 ### Cambiado

@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Text;
+using ClaudeUsageChecker.Core.Localization;
 
 namespace ClaudeUsageChecker.Core.Platform;
 
@@ -30,8 +31,8 @@ public sealed class WindowsCredentialStore : ISecretStore
                 return null;
             }
 
-            throw new InvalidOperationException(
-                $"Anmeldeinformation '{key}' konnte nicht gelesen werden (Win32-Fehler {error}).");
+            // Localised: the message surfaces in the interface when signing out fails.
+            throw new InvalidOperationException(T.SecretReadFailed(key, error));
         }
 
         try
@@ -83,8 +84,7 @@ public sealed class WindowsCredentialStore : ISecretStore
             if (!NativeMethods.CredWrite(ref credential, 0))
             {
                 throw new InvalidOperationException(
-                    $"Anmeldeinformation '{key}' konnte nicht gespeichert werden " +
-                    $"(Win32-Fehler {Marshal.GetLastWin32Error()}).");
+                    T.SecretWriteFailed(key, Marshal.GetLastWin32Error()));
             }
         }
         finally
@@ -111,8 +111,7 @@ public sealed class WindowsCredentialStore : ISecretStore
         var error = Marshal.GetLastWin32Error();
         if (error != ErrorNotFound)
         {
-            throw new InvalidOperationException(
-                $"Anmeldeinformation '{key}' konnte nicht entfernt werden (Win32-Fehler {error}).");
+            throw new InvalidOperationException(T.SecretDeleteFailed(key, error));
         }
     }
 

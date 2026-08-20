@@ -14,6 +14,14 @@ numérotation [Semantic Versioning](https://semver.org/lang/fr/).
 - Version de maintenance. Préparation des versions d'essai ; rien ne change à
   l'usage.
 
+### Corrigé
+- **Corrections de traduction.** Six langues appelaient encore « crédits »
+  l'utilisation supplémentaire alors que le chiffre est de l'argent, et toutes
+  affirmaient qu'un historique non traduit s'affiche en allemand – il
+  s'affiche en anglais. Les messages d'erreur du gestionnaire d'informations
+  d'identification de Windows étaient figés en allemand ; ils suivent
+  désormais la langue de l'interface.
+
 ## [0.7.0] – 2026-08-20
 
 ### Modifié

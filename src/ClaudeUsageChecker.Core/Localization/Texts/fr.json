@@ -39,8 +39,8 @@
   "usage.resetIn": "Réinitialisation dans {0} - à {1}",
   "tooltip.lineDue": "{0} {1:0} % - réinit. attendue",
   "usage.menuLineDue": "{0} : {1:0.#} % - réinitialisation attendue",
-  "usage.detailLineDue": "{0} : {1:0.#} % utilisés - réinitialisation attendue (à {2})",
-  "usage.resetDue": "Réinitialisation attendue - à {0}",
+  "usage.detailLineDue": "{0} : {1:0.#} % utilisés - réinitialisation attendue (prévue à {2})",
+  "usage.resetDue": "Réinitialisation attendue - prévue à {0}",
 
   "extra.title": "Utilisation supplémentaire",
   "extra.active": "active",
@@ -148,7 +148,7 @@
   "notes.noneHint": "L'historique des modifications ne contient aucune entrée pour cette version.",
   "notes.releaseHeading": "Version {0}",
   "notes.releaseHeadingDated": "Version {0} – {1}",
-  "notes.translationMissing": "L'historique des modifications n'est pas encore traduit dans cette langue ; il s'affiche en allemand.",
+  "notes.translationMissing": "L'historique des modifications n'est pas encore traduit dans cette langue ; il s'affiche en anglais.",
 
   "update.upToDate": "La version {0} est à jour.",
   "update.upToDatePreRelease": "La version {0} est à jour – une préversion.",
@@ -190,6 +190,9 @@
   "error.missingScope": "Le jeton ne porte pas le droit « user:profile ». Les jetons issus de « claude setup-token » ne servent qu'à l'inférence, pas aux données d'utilisation.",
   "error.tokenRejected": "Le jeton a été refusé. Il a expiré ou n'est pas valide.",
   "error.noSecureStore": "Aucun stockage sécurisé n'est encore disponible sur cette plateforme.",
+  "secret.readFailed": "L'information d'identification « {0} » n'a pas pu être lue (erreur Win32 {1}).",
+  "secret.writeFailed": "L'information d'identification « {0} » n'a pas pu être enregistrée (erreur Win32 {1}).",
+  "secret.deleteFailed": "L'information d'identification « {0} » n'a pas pu être supprimée (erreur Win32 {1}).",
 
   "oauth.wrongFlow": "Le code collé appartient à une autre tentative de connexion. Veuillez relancer la connexion.",
   "oauth.redeemFailed": "Le code n'a pas pu être échangé",

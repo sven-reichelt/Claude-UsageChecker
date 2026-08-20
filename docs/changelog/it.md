@@ -14,6 +14,13 @@ numerazione [Semantic Versioning](https://semver.org/lang/it/).
 - Versione di manutenzione. Preparazione delle versioni di prova; nell'uso
   quotidiano non cambia nulla.
 
+### Corretto
+- **Correzioni di traduzione.** Sei lingue chiamavano ancora «crediti»
+  l'utilizzo aggiuntivo benché la cifra sia denaro, e tutte affermavano che un
+  registro delle modifiche non tradotto viene mostrato in tedesco: viene
+  mostrato in inglese. I messaggi di errore dell'archivio credenziali di
+  Windows erano fissi in tedesco; ora seguono la lingua dell'interfaccia.
+
 ## [0.7.0] – 2026-08-20
 
 ### Modificato

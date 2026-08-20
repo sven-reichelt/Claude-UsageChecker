@@ -14,6 +14,13 @@ versionamento [Semantic Versioning](https://semver.org/lang/pt-BR/).
 - Versão de manutenção. Preparação para versões de teste; no dia a dia nada
   muda.
 
+### Corrigido
+- **Correções de tradução.** Seis idiomas ainda chamavam o uso adicional de
+  «créditos» embora o número seja dinheiro, e todos afirmavam que um histórico
+  de alterações sem tradução aparece em alemão – aparece em inglês. As
+  mensagens de erro do repositório de credenciais do Windows estavam fixas em
+  alemão; agora seguem o idioma da interface.
+
 ## [0.7.0] – 2026-08-20
 
 ### Alterado

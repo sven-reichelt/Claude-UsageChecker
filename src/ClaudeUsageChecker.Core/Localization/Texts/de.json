@@ -1,5 +1,5 @@
 {
-  "_hinweis": "Deutsch ist die Quellsprache. Neue Schluessel kommen zuerst hierher; SprachdateienTests meldet, welche Uebersetzung noch fehlt.",
+  "_note": "Deutsch. Produktnamen bleiben unübersetzt: Claude UsageChecker, Claude Code, Anthropic, GitHub, Windows. Die Quellsprache ist Englisch (en.json).",
 
   "app.name": "Claude UsageChecker",
   "app.close": "Schließen",
@@ -148,7 +148,7 @@
   "notes.noneHint": "Zu dieser Fassung liegt kein Eintrag im Änderungsverlauf vor.",
   "notes.releaseHeading": "Version {0}",
   "notes.releaseHeadingDated": "Version {0} – {1}",
-  "notes.translationMissing": "Für diese Sprache liegt der Änderungsverlauf noch nicht übersetzt vor; er erscheint auf Deutsch.",
+  "notes.translationMissing": "Für diese Sprache liegt der Änderungsverlauf noch nicht übersetzt vor; er erscheint auf Englisch.",
 
   "update.upToDate": "Version {0} ist aktuell.",
   "update.upToDatePreRelease": "Version {0} ist aktuell – eine Vorabversion.",
@@ -190,6 +190,9 @@
   "error.missingScope": "Dem Token fehlt der Geltungsbereich \"user:profile\". Tokens aus \"claude setup-token\" taugen nur für Inferenz, nicht für den Nutzungsstand.",
   "error.tokenRejected": "Das Token wurde abgelehnt. Es ist abgelaufen oder ungültig.",
   "error.noSecureStore": "Auf dieser Plattform steht noch kein sicherer Speicher zur Verfügung.",
+  "secret.readFailed": "Die Anmeldeinformation \"{0}\" konnte nicht gelesen werden (Win32-Fehler {1}).",
+  "secret.writeFailed": "Die Anmeldeinformation \"{0}\" konnte nicht gespeichert werden (Win32-Fehler {1}).",
+  "secret.deleteFailed": "Die Anmeldeinformation \"{0}\" konnte nicht entfernt werden (Win32-Fehler {1}).",
 
   "oauth.wrongFlow": "Der eingefügte Code gehört zu einem anderen Anmeldevorgang. Bitte die Anmeldung erneut starten.",
   "oauth.redeemFailed": "Der Code konnte nicht eingelöst werden",

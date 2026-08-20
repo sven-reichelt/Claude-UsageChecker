@@ -148,7 +148,7 @@
   "notes.noneHint": "更新日志中没有此版本的条目。",
   "notes.releaseHeading": "版本 {0}",
   "notes.releaseHeadingDated": "版本 {0} – {1}",
-  "notes.translationMissing": "更新日志尚未译成此语言，将以德语显示。",
+  "notes.translationMissing": "更新日志尚未译成此语言，将以英语显示。",
 
   "update.upToDate": "版本 {0} 已是最新。",
   "update.upToDatePreRelease": "版本 {0} 已是最新——这是一个预发布版本。",
@@ -190,6 +190,9 @@
   "error.missingScope": "令牌缺少「user:profile」权限。「claude setup-token」生成的令牌仅用于推理，不适用于用量数据。",
   "error.tokenRejected": "令牌被拒绝。它已过期或无效。",
   "error.noSecureStore": "此平台上尚无可用的安全存储。",
+  "secret.readFailed": "无法读取凭据「{0}」（Win32 错误 {1}）。",
+  "secret.writeFailed": "无法保存凭据「{0}」（Win32 错误 {1}）。",
+  "secret.deleteFailed": "无法删除凭据「{0}」（Win32 错误 {1}）。",
 
   "oauth.wrongFlow": "粘贴的代码属于另一次登录尝试。请重新开始登录。",
   "oauth.redeemFailed": "无法兑换该代码",

@@ -13,6 +13,13 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 ### Geändert
 - Service-Release. Vorarbeit für Testfassungen; im Alltag ändert sich nichts.
 
+### Behoben
+- **Übersetzungskorrekturen.** Sechs Sprachen nannten das Zusatzkontingent
+  noch „Credits", obwohl die Zahl Geld ist, und alle Sprachen behaupteten,
+  ein fehlender Changelog erscheine auf Deutsch – er erscheint auf Englisch.
+  Fehlermeldungen des Windows-Anmeldespeichers waren fest auf Deutsch; sie
+  folgen jetzt der Oberflächensprache.
+
 ## [0.7.0] – 2026-08-20
 
 ### Geändert

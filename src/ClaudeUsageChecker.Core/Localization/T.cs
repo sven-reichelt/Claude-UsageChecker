@@ -252,6 +252,12 @@ public static class T
     public static string ErrorMissingScope => L["error.missingScope"];
     public static string ErrorTokenRejected => L["error.tokenRejected"];
     public static string ErrorNoSecureStore => L["error.noSecureStore"];
+    public static string SecretReadFailed(string key, int error) =>
+        L.Format("secret.readFailed", key, error);
+    public static string SecretWriteFailed(string key, int error) =>
+        L.Format("secret.writeFailed", key, error);
+    public static string SecretDeleteFailed(string key, int error) =>
+        L.Format("secret.deleteFailed", key, error);
 
     // OAuth flow
     public static string OAuthWrongFlow => L["oauth.wrongFlow"];
