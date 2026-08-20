@@ -129,7 +129,7 @@ public static class UsageFormatter
 
     /// <summary>
     /// The line for extra usage, for example
-    /// "Extra usage: 24 % - 12.00 of 50.00 credits".
+    /// "Extra usage: 46 % - 22,76 EUR of 50,00 EUR".
     /// Returns null when no extra usage is active.
     /// </summary>
     public static string? ToExtraUsageLine(ExtraUsage? extraUsage)
@@ -146,17 +146,29 @@ public static class UsageFormatter
             parts.Add(T.Percent(utilization));
         }
 
-        if (extraUsage is { UsedCredits: { } used, MonthlyLimit: { } limit })
+        if (extraUsage is { Used: { } used, Limit: { } limit })
         {
-            parts.Add(T.ExtraUsedOfLimit(used, limit));
+            parts.Add(T.ExtraUsedOfLimit(Money(used, extraUsage), Money(limit, extraUsage)));
         }
-        else if (extraUsage.UsedCredits is { } usedOnly)
+        else if (extraUsage.Used is { } usedOnly)
         {
-            parts.Add(T.ExtraUsedOnly(usedOnly));
+            parts.Add(T.ExtraUsedOnly(Money(usedOnly, extraUsage)));
         }
 
         // The API sometimes reports the quota as enabled without supplying figures.
         return parts.Count == 0 ? T.ExtraLineActive : T.ExtraLine(string.Join(" - ", parts));
+    }
+
+
+    /// <summary>
+    /// Writes an amount with the currency and the number of places the API named
+    /// for this account - EUR here, USD or BRL elsewhere.
+    /// </summary>
+    public static string Money(decimal amount, ExtraUsage extraUsage)
+    {
+        ArgumentNullException.ThrowIfNull(extraUsage);
+
+        return MoneyFormatter.Format(amount, extraUsage.Currency, extraUsage.Decimals);
     }
 
     /// <summary>The label of a single row in the details window.</summary>

@@ -8,6 +8,14 @@ numerazione [Semantic Versioning](https://semver.org/lang/it/).
 
 ## [Non pubblicato]
 
+### Corretto
+- **Il credito aggiuntivo veniva mostrato cento volte più grande e nell'unità
+  sbagliata.** L'API riporta `used_credits: 2276`, e non sono 2276 crediti ma
+  22,76 EUR: un importo nell'unità più piccola della sua valuta. **La valuta
+  viene dal conto** - USD, BRL, a seconda dei casi - così come il numero di
+  decimali, perché non tutte le valute ne hanno due. Ora viene letto il campo
+  `spend`, che dichiara che cosa significano le sue cifre.
+
 ## [0.6.1] – 2026-08-20
 
 ### Modificato

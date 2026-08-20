@@ -69,12 +69,14 @@ public static class T
     public static string ExtraActive => L["extra.active"];
     public static string ExtraLine(string content) => L.Format("extra.line", content);
     public static string ExtraLineActive => L["extra.lineActive"];
-    public static string ExtraUsedOfLimit(decimal used, decimal limit) =>
+    // The amounts arrive already written out, with the currency of the account -
+    // formatting them here would mean deciding on a currency the API named.
+    public static string ExtraUsedOfLimit(string used, string limit) =>
         L.Format("extra.usedOfLimit", used, limit);
-    public static string ExtraUsedOfLimitLong(decimal used, decimal limit) =>
+    public static string ExtraUsedOfLimitLong(string used, string limit) =>
         L.Format("extra.usedOfLimitLong", used, limit);
-    public static string ExtraUsedOnly(decimal used) => L.Format("extra.usedOnly", used);
-    public static string ExtraMonthlyLimit(decimal limit) => L.Format("extra.limitOnly", limit);
+    public static string ExtraUsedOnly(string used) => L.Format("extra.usedOnly", used);
+    public static string ExtraMonthlyLimit(string limit) => L.Format("extra.limitOnly", limit);
 
     // Durations
     public static string DurationNow => L["duration.now"];

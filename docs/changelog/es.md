@@ -8,6 +8,14 @@ versionado [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+### Corregido
+- **El saldo adicional se mostraba cien veces mayor y en la unidad equivocada.**
+  La API informa `used_credits: 2276`, y no son 2276 créditos sino 22,76 EUR:
+  un importe en la unidad más pequeña de su moneda. La aplicación tomaba el
+  número al pie de la letra. **La moneda procede de la cuenta** —USD, BRL, lo
+  que corresponda—, igual que el número de decimales, porque no toda moneda
+  tiene dos. Ahora se lee el campo `spend`, que dice qué significan sus cifras.
+
 ## [0.6.1] – 2026-08-20
 
 ### Cambiado

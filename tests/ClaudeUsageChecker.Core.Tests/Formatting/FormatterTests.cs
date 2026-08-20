@@ -201,32 +201,77 @@ public class FormatterTests
     public void ToExtraUsageLine_ReturnsNullWhenNotActive()
     {
         Assert.Null(UsageFormatter.ToExtraUsageLine(null));
-        Assert.Null(UsageFormatter.ToExtraUsageLine(new ExtraUsage(false, 50m, 12m, 24d)));
+        Assert.Null(UsageFormatter.ToExtraUsageLine(
+            new ExtraUsage(IsEnabled: false, Used: 12m, Limit: 50m, Utilization: 24d)));
     }
 
     [Fact]
-    public void ToExtraUsageLine_NamesUtilizationAndCredits()
+    public void ToExtraUsageLine_NamesUtilisationAndAmount()
     {
-        var line = UsageFormatter.ToExtraUsageLine(new ExtraUsage(true, 50m, 12m, 24d));
+        var line = InEnglish(() => UsageFormatter.ToExtraUsageLine(
+            new ExtraUsage(IsEnabled: true, Used: 22.76m, Limit: 50m, Utilization: 46d,
+                Currency: "EUR", Decimals: 2)));
 
-        Assert.Equal("Extra usage: 24 % - 12.00 of 50.00 credits", line);
+        Assert.Equal("Extra usage: 46 % - 22.76 EUR of 50.00 EUR", line);
+    }
+
+    /// <summary>
+    /// The currency comes from the account, not from the application.
+    /// </summary>
+    [Theory]
+    [InlineData("USD", "12.50 USD")]
+    [InlineData("BRL", "12.50 BRL")]
+    public void ToExtraUsageLine_UsesTheCurrencyOfTheAccount(string currency, string expected)
+    {
+        var line = InEnglish(() => UsageFormatter.ToExtraUsageLine(
+            new ExtraUsage(IsEnabled: true, Used: 12.5m, Limit: null, Utilization: null,
+                Currency: currency, Decimals: 2)));
+
+        Assert.Equal($"Extra usage: {expected} used", line);
     }
 
     [Fact]
     public void ToExtraUsageLine_CopesWithPartialFigures()
     {
-        var onlyUsed = UsageFormatter.ToExtraUsageLine(new ExtraUsage(true, null, 12m, null));
+        var onlyUsed = InEnglish(() => UsageFormatter.ToExtraUsageLine(
+            new ExtraUsage(IsEnabled: true, Used: 12m, Limit: null, Utilization: null,
+                Currency: "EUR", Decimals: 2)));
 
-        Assert.Equal("Extra usage: 12.00 credits used", onlyUsed);
+        Assert.Equal("Extra usage: 12.00 EUR used", onlyUsed);
     }
 
     [Fact]
     public void ToExtraUsageLine_ReportsActiveWithoutFigures()
     {
-        var line = UsageFormatter.ToExtraUsageLine(new ExtraUsage(true, null, null, null));
+        var line = UsageFormatter.ToExtraUsageLine(
+            new ExtraUsage(IsEnabled: true, Used: null, Limit: null, Utilization: null));
 
         Assert.Equal("Extra usage: active", line);
     }
+
+    /// <summary>
+    /// Runs a piece of formatting under a fixed culture.
+    /// </summary>
+    /// <remarks>
+    /// Amounts are written the way the interface language writes numbers, so a
+    /// test that compares against a literal has to say which language it means.
+    /// The machine here is German, the CI runner English; without this the same
+    /// test passes in one place and fails in the other.
+    /// </remarks>
+    private static string? InEnglish(Func<string?> format)
+    {
+        var before = CultureInfo.CurrentCulture;
+        CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
+        try
+        {
+            return format();
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = before;
+        }
+    }
+
 
     private static UsageState ReadyState(double session, double weekly) => new()
     {

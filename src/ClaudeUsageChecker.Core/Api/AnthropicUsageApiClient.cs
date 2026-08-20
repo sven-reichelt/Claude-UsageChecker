@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 using System.Text.Json;
 using ClaudeUsageChecker.Core.Authentication;
 using ClaudeUsageChecker.Core.Configuration;
+using ClaudeUsageChecker.Core.Formatting;
 using ClaudeUsageChecker.Core.Localization;
 using ClaudeUsageChecker.Core.Models;
 using ClaudeUsageChecker.Core.Models.Api;
@@ -222,12 +223,72 @@ public sealed class AnthropicUsageApiClient(
         Session = MapFromLimits(dto, "session") ?? MapWindow(dto.FiveHour),
         Weekly = MapFromLimits(dto, "weekly_all") ?? MapWindow(dto.SevenDay),
         ScopedWeekly = MapScopedWeekly(dto),
-        ExtraUsage = dto.ExtraUsage is { } extra
-            ? new ExtraUsage(extra.IsEnabled, extra.MonthlyLimit, extra.UsedCredits, extra.Utilization)
-            : null,
+        ExtraUsage = MapSpend(dto.Spend) ?? MapExtraUsage(dto.ExtraUsage),
         RetrievedAt = retrievedAt,
         TokenSource = tokenSource
     };
+
+    /// <summary>
+    /// Reads the extra usage quota from <c>spend</c>, the shape that says what
+    /// its figures mean.
+    /// </summary>
+    /// <remarks>
+    /// Amounts arrive in the smallest unit of the currency with the exponent
+    /// beside them, so 2276 with exponent 2 is 22.76. The currency comes along
+    /// as well: an account billed in euros reports EUR, one in Brazil BRL. Both
+    /// are carried into the model rather than assumed.
+    /// </remarks>
+    private static ExtraUsage? MapSpend(SpendDto? spend)
+    {
+        if (spend is null)
+        {
+            return null;
+        }
+
+        var used = spend.Used is { AmountMinor: { } usedMinor }
+            ? MoneyFormatter.FromMinorUnits(usedMinor, spend.Used.Exponent)
+            : (decimal?)null;
+
+        var limit = spend.Limit is { AmountMinor: { } limitMinor }
+            ? MoneyFormatter.FromMinorUnits(limitMinor, spend.Limit.Exponent)
+            : (decimal?)null;
+
+        return new ExtraUsage(
+            spend.Enabled,
+            used,
+            limit,
+            spend.Percent,
+            spend.Used?.Currency ?? spend.Limit?.Currency,
+            spend.Used?.Exponent ?? spend.Limit?.Exponent);
+    }
+
+    /// <summary>
+    /// Reads the same quota from the older <c>extra_usage</c>, for as long as it
+    /// keeps being delivered.
+    /// </summary>
+    /// <remarks>
+    /// Its numbers are in the smallest unit too, only with the scale in a
+    /// separate field. Where that field is missing - an older answer - the
+    /// numbers are taken as they stand: dividing a limit of 50 by a hundred
+    /// would understate what someone is allowed to spend.
+    /// </remarks>
+    private static ExtraUsage? MapExtraUsage(ExtraUsageDto? extra)
+    {
+        if (extra is null)
+        {
+            return null;
+        }
+
+        var scale = extra.DecimalPlaces;
+
+        return new ExtraUsage(
+            extra.IsEnabled,
+            extra.UsedCredits is { } used ? MoneyFormatter.FromMinorUnits(used, scale) : null,
+            extra.MonthlyLimit is { } limit ? MoneyFormatter.FromMinorUnits(limit, scale) : null,
+            extra.Utilization,
+            extra.Currency,
+            scale);
+    }
 
     /// <summary>Finds a limit of a given kind in the <c>limits</c> list.</summary>
     private static UsageWindow? MapFromLimits(UsageResponseDto dto, string kind) =>

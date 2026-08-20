@@ -8,6 +8,22 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unveröffentlicht]
 
+### Behoben
+- **Das Zusatzkontingent wurde hundertfach zu groß und in der falschen Einheit
+  angezeigt.** Die API meldet `used_credits: 2276`, und das sind keine 2276
+  Credits, sondern 22,76 € – ein Geldbetrag in der kleinsten Einheit seiner
+  Währung. Die Anwendung nahm die Zahl für bare Münze und behauptete „2276,00
+  von 5000,00 Credits". Es ist nichts fehlgeschlagen, es war schlicht falsch –
+  und unsichtbar, solange niemand das Kontingent aktiviert hatte.
+
+  Das neuere Feld `spend` sagt, was seine Zahlen bedeuten – Betrag, Währung und
+  Exponent nebeneinander – und wird jetzt bevorzugt gelesen; `extra_usage`
+  bleibt Rückfallebene und führt inzwischen selbst eine Währung. **Die Währung
+  stammt vom Konto**: Wer in Dollar abrechnet, sieht USD, wer in Brasilien
+  wohnt, BRL – und die Zahl der Nachkommastellen kommt mit, denn nicht jede
+  Währung hat zwei. Der Betrag wird so geschrieben, wie die Oberflächensprache
+  Zahlen schreibt.
+
 ## [0.6.1] – 2026-08-20
 
 ### Geändert

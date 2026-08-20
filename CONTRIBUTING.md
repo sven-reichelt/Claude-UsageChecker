@@ -67,7 +67,7 @@ back to English visibly.
 
 ```powershell
 dotnet build                                      # whole solution
-dotnet test                                       # 400 tests
+dotnet test                                       # 412 tests
 dotnet run --project src/ClaudeUsageChecker.App   # run it
 ```
 

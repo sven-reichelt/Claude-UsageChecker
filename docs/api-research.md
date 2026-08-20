@@ -58,15 +58,45 @@ future model appears without a code change.
 The list therefore takes precedence, and the individual fields remain a fallback.
 Covered by `ScopedLimitMappingTests`.
 
-Further findings from the same call, not yet acted on:
+### Addendum 2026-08-20: `spend` supersedes `extra_usage`
 
-* **`spend` supersedes `extra_usage`.** New shape:
-  `spend.used { amount_minor, currency, exponent }`, `spend.percent`,
-  `spend.enabled`, `spend.can_purchase_credits`. Amounts therefore in the
-  smallest unit with an exponent rather than as a decimal. As long as
-  `extra_usage` keeps being delivered, the evaluation stays there - without extra
-  usage enabled a rewrite could not be verified, and unverified code for a
-  hypothetical case is worse than this note.
+Measured against an account with the extra usage quota switched on - until then
+the field could not be checked at all, which is why it stayed a note here for a
+day.
+
+```json
+{
+  "extra_usage": {
+    "is_enabled": true, "monthly_limit": 5000, "used_credits": 2276.0,
+    "utilization": 45.52, "currency": "EUR", "decimal_places": 2
+  },
+  "spend": {
+    "used":  { "amount_minor": 2276, "currency": "EUR", "exponent": 2 },
+    "limit": { "amount_minor": 5000, "currency": "EUR", "exponent": 2 },
+    "percent": 46, "enabled": true
+  }
+}
+```
+
+**`used_credits` is not a count of credits.** It is an amount of money in the
+smallest unit of its currency: 2276 means 22.76 EUR. The name is misleading, and
+the application believed it - it showed "2276.00 of 5000.00 credits", wrong by a
+factor of a hundred and in the wrong unit. Nothing failed, which is precisely why
+it survived: without the quota switched on, `extra_usage` is empty and the
+mistake invisible.
+
+`spend` says what it means, with the amount, the currency and the exponent side
+by side. It is therefore read in preference, exactly as `limits` is preferred
+over the fixed window fields; `extra_usage` remains a fallback and has since
+gained `currency` and `decimal_places` of its own.
+
+**The currency belongs to the account.** EUR here, USD for an account billed in
+the United States, BRL in Brazil - and the number of decimal places comes with
+it, because not every currency has two. Both are read from the response. Covered
+by `ExtraUsageMappingTests`.
+
+Not acted on:
+
 * **Code-name fields with no discernible meaning:** `seven_day_oauth_apps`,
   `seven_day_cowork`, `seven_day_omelette`, `tangelo`, `iguana_necktie`,
   `omelette_promotional`, `nimbus_quill`, `cinder_cove`, `amber_ladder`. All

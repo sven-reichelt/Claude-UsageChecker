@@ -8,6 +8,14 @@ numeração [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Corrigido
+- **O crédito adicional era apresentado cem vezes maior e na unidade errada.** A
+  API indica `used_credits: 2276`, e não são 2276 créditos mas 22,76 EUR: um
+  valor na unidade mais pequena da moeda. **A moeda vem da conta** — USD, BRL,
+  consoante o caso —, tal como o número de casas decimais, porque nem todas as
+  moedas têm duas. Passa a ser lido o campo `spend`, que diz o que os seus
+  números significam.
+
 ## [0.6.1] – 2026-08-20
 
 ### Alterado

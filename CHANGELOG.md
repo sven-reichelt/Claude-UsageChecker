@@ -8,6 +8,22 @@ the versioning [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+- **The extra usage quota was shown a hundred times too large, in the wrong
+  unit.** The API reports `used_credits: 2276`, and those are not 2276 credits
+  but 22.76 EUR - an amount of money in the smallest unit of its currency. The
+  application took the number at face value and claimed "2276.00 of 5000.00
+  credits". Nothing failed; it was simply wrong, and invisible for as long as
+  nobody had the quota switched on.
+
+  The newer `spend` field says what its figures mean - amount, currency and
+  exponent side by side - and is now read in preference; `extra_usage` remains
+  a fallback and carries a currency of its own these days. **The currency comes
+  from the account**, so an account billed in dollars reads USD and one in
+  Brazil BRL, and the number of decimal places comes along with it, because not
+  every currency has two. The amount is written the way the interface language
+  writes numbers.
+
 ## [0.6.1] – 2026-08-20
 
 ### Changed

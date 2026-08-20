@@ -8,6 +8,15 @@ numérotation [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+### Corrigé
+- **Le crédit supplémentaire était affiché cent fois trop grand et dans la
+  mauvaise unité.** L'API indique `used_credits: 2276`, et ce ne sont pas 2276
+  crédits mais 22,76 EUR : un montant dans la plus petite unité de sa monnaie.
+  L'application prenait le nombre au pied de la lettre. **La monnaie vient du
+  compte** — USD, BRL, selon le cas —, tout comme le nombre de décimales, car
+  toutes les monnaies n'en ont pas deux. Le champ `spend`, qui dit ce que ses
+  chiffres signifient, est désormais lu en priorité.
+
 ## [0.6.1] – 2026-08-20
 
 ### Modifié

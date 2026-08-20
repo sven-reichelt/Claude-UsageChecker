@@ -174,9 +174,11 @@ public partial class DetailsWindow : Window
         // one is shown only where it is actually present.
         var detail = extraUsage switch
         {
-            { UsedCredits: { } used, MonthlyLimit: { } limit } => T.ExtraUsedOfLimitLong(used, limit),
-            { UsedCredits: { } usedOnly } => T.ExtraUsedOnly(usedOnly),
-            { MonthlyLimit: { } limitOnly } => T.ExtraMonthlyLimit(limitOnly),
+            { Used: { } used, Limit: { } limit } =>
+                T.ExtraUsedOfLimitLong(
+                    UsageFormatter.Money(used, extraUsage), UsageFormatter.Money(limit, extraUsage)),
+            { Used: { } usedOnly } => T.ExtraUsedOnly(UsageFormatter.Money(usedOnly, extraUsage)),
+            { Limit: { } limitOnly } => T.ExtraMonthlyLimit(UsageFormatter.Money(limitOnly, extraUsage)),
             _ => T.ExtraActive
         };
 
