@@ -252,6 +252,7 @@ public static class T
     public static string UpdaterMissingFileOrChecksum => L["updater.missingFileOrChecksum"];
     public static string UpdaterChecksumUnreadable => L["updater.checksumUnreadable"];
     public static string UpdaterChecksumMismatch => L["updater.checksumMismatch"];
+    public static string UpdaterSignatureRejected => L["updater.signatureRejected"];
     public static string UpdaterDownloadFailed(string reason) => L.Format("updater.downloadFailed", reason);
     public static string UpdaterSaveFailed(string reason) => L.Format("updater.saveFailed", reason);
     public static string UpdaterReplaceFailed(string reason) => L.Format("updater.replaceFailed", reason);

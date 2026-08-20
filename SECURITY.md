@@ -153,14 +153,26 @@ access. It does mean, though, that securing the GitHub account is part of the
 security chain - without two-factor authentication there, the protection here is
 moot.
 
-Anyone with stricter requirements signs the packages with a code-signing
-certificate and verifies the signature instead of the sum. For this hobby
-project the effort is out of all proportion.
+**On macOS a fourth condition applies since 0.9.0:** the signature. The bundle
+is signed with a Developer ID and notarised by Apple, and before anything is put
+in place the downloaded version is asked the same question Gatekeeper would ask
+- `codesign --verify` for whether it still matches its own signature, `spctl
+--assess` for whether the system accepts that signature at all. What macOS would
+refuse to run is not installed either.
 
-The replacement itself exploits the fact that Windows does not allow a running
-file to be overwritten but does allow it to be renamed: rename, put the new file
-in the old place, start the new version, end this one. If the second step fails,
-the first is undone - a working program always remains.
+That is what the sum cannot do. A checksum proves that the file is the one the
+server sent; a signature proves who built it. Both are checked, and neither
+replaces the other. The Windows package carries no signature - a certificate for
+it costs a few hundred euros a year, which for this hobby project is out of all
+proportion, whereas the Apple one came with a membership already paid for.
+
+The replacement itself follows what the system allows. Windows does not permit a
+running file to be overwritten but does permit it to be renamed: rename, put the
+new file in the old place, start the new version, end this one. macOS is
+friendlier - a running bundle may be moved aside, because the process holds its
+files by inode and does not care what the path says afterwards - so the same
+sequence applies to the whole `.app`. If the second step fails, the first is
+undone; a working program always remains.
 
 ### 7. Consideration for the API
 

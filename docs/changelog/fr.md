@@ -8,6 +8,26 @@ numérotation [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+## [0.9.0] – 2026-08-21
+
+### Ajouté
+- **Le paquet macOS est signé et notarisé.** Il portait jusqu'ici une signature
+  ad hoc, sans valeur pour quiconque hormis la machine qui l'avait produite :
+  macOS refusait de l'ouvrir, et y parvenir demandait de contredire le système
+  à la main. Il porte désormais un Developer ID et la notarisation d'Apple,
+  agrafée dans le paquet afin qu'elle vaille aussi hors ligne. Il s'ouvre d'un
+  double-clic, comme tout le reste.
+- **Remplacement automatique sur macOS.** Le bouton qui met à jour la version
+  Windows depuis la 0.4.0 fait maintenant de même ici. La différence tient à ce
+  qui est remplacé — un paquet entier plutôt qu'un fichier — et à ce qui est
+  vérifié auparavant : outre la somme SHA-256 publiée, la signature de la
+  version téléchargée, avec la question même que poserait Gatekeeper. Ce que
+  macOS refuserait d'exécuter n'est pas installé non plus.
+
+  Les deux ensemble, car aucune ne remplace l'autre. Une somme de contrôle
+  prouve que le fichier est celui qu'a envoyé le serveur ; une signature prouve
+  qui l'a construit.
+
 ## [0.8.0] – 2026-08-20
 
 ### Ajouté

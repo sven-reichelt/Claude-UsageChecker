@@ -189,6 +189,7 @@
   "updater.missingFileOrChecksum": "Zur neuen Version fehlt die Datei oder die Prüfsumme. Ohne beides wird nichts eingespielt.",
   "updater.checksumUnreadable": "Die Prüfsumme war nicht lesbar. Es wird nichts eingespielt.",
   "updater.checksumMismatch": "Die Prüfsumme der heruntergeladenen Datei stimmt nicht. Sie wird verworfen und nicht ausgeführt.",
+  "updater.signatureRejected": "Die Signatur der geladenen Fassung hat macOS nicht anerkannt. Es wird nichts eingespielt.",
   "updater.downloadFailed": "Die neue Fassung konnte nicht geladen werden: {0}",
   "updater.saveFailed": "Die neue Fassung konnte nicht gespeichert werden: {0}",
   "updater.replaceFailed": "Die neue Fassung ließ sich nicht einsetzen: {0}",

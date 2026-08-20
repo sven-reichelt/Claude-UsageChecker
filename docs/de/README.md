@@ -147,9 +147,10 @@ sie in `Language.All` ein; ein Test meldet dann jeden Schlüssel, der noch fehlt
 * Ein aktives Claude-Abonnement (Pro oder Max)
 
 Die veröffentlichten Pakete brauchen weder das SDK noch eine .NET-Laufzeit. Unter
-macOS kommt die Anwendung als Bündel, ad hoc signiert statt von einem
-eingetragenen Entwickler; wer es im Terminal statt über den Browser holt,
-umgeht die Quarantäne. Die genauen Befehle stehen auf der Release-Seite.
+macOS kommt die Anwendung als Bündel, signiert mit einer Developer-ID und von
+Apple beglaubigt, die Bestätigung fest eingeheftet – es startet per Doppelklick
+auf jedem Mac, auch ohne Netzverbindung. Ab 0.9.0 erneuert es sich auch dort
+auf Knopfdruck; von Hand geschieht nur die erste Einrichtung.
 
 ### Bauen und starten
 
@@ -375,7 +376,7 @@ zurechtzurücken.
 | 0.6 | Neun Sprachen, modellbezogene Limits, einstellbare Schwellenwerte, Übersicht der Neuerungen nach einem Update ✅ |
 | 0.7 | Eigenes Menü im Infobereich, im Stil der Fenster ✅ |
 | 0.8 | macOS-Menüleiste ✅ |
-| 0.9 | Selbstaustausch unter macOS, und ein signiertes Bündel |
+| 0.9 | Selbstaustausch unter macOS, und ein signiertes Bündel ✅ |
 
 ## Lizenz
 

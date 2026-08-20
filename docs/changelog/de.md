@@ -8,6 +8,26 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unveröffentlicht]
 
+## [0.9.0] – 2026-08-21
+
+### Hinzugefügt
+- **Das macOS-Paket ist signiert und von Apple beglaubigt.** Bisher trug es
+  eine Ad-hoc-Signatur, die für alle außer dem Rechner, der sie erzeugt hat,
+  wertlos ist: macOS verweigerte den Start, und ihn doch zu erreichen hieß,
+  dem System den Einwand von Hand auszureden. Nun trägt es eine Developer-ID
+  und Apples Beglaubigung, fest ins Paket geheftet, damit sie auch ohne
+  Netzverbindung gilt. Es startet per Doppelklick wie alles andere.
+- **Selbstaustausch unter macOS.** Die Schaltfläche, die seit 0.4.0 die
+  Windows-Fassung erneuert, tut hier nun dasselbe. Der Unterschied liegt darin,
+  was ersetzt wird – ein ganzes Paket statt einer Datei – und was zuvor geprüft
+  wird: neben der veröffentlichten SHA-256-Prüfsumme auch die Signatur der
+  geladenen Fassung, mit derselben Frage, die auch macOS stellen würde. Was
+  macOS nicht ausführen würde, wird auch nicht eingespielt.
+
+  Beides zusammen, weil keines das andere ersetzt. Eine Prüfsumme belegt, dass
+  die Datei die vom Server gesendete ist; eine Signatur belegt, wer sie gebaut
+  hat.
+
 ## [0.8.0] – 2026-08-20
 
 ### Hinzugefügt

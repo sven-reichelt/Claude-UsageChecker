@@ -189,6 +189,7 @@
   "updater.missingFileOrChecksum": "A la nueva versión le falta el archivo o la suma de verificación. Sin ambos no se instala nada.",
   "updater.checksumUnreadable": "No se ha podido leer la suma de verificación. No se instala nada.",
   "updater.checksumMismatch": "La suma de verificación del archivo descargado no coincide. Se descarta y no se ejecuta.",
+  "updater.signatureRejected": "macOS no ha aceptado la firma de la versión descargada. No se instala nada.",
   "updater.downloadFailed": "No se ha podido descargar la nueva versión: {0}",
   "updater.saveFailed": "No se ha podido guardar la nueva versión: {0}",
   "updater.replaceFailed": "No se ha podido colocar la nueva versión: {0}",

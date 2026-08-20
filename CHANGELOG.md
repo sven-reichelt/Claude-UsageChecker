@@ -8,6 +8,25 @@ the versioning [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.9.0] – 2026-08-21
+
+### Added
+- **The macOS bundle is signed and notarised.** Until now it carried an ad-hoc
+  signature, which is worth exactly nothing to anyone but the machine that
+  built it: macOS refused it, and getting it to start meant talking the system
+  out of its objection by hand. It now carries a Developer ID and Apple's
+  notarisation ticket, stapled into the bundle so that it is accepted offline
+  as well. It starts by double-clicking, like anything else.
+- **Self-replacement on macOS.** The button that has updated the Windows
+  version since 0.4.0 now does the same here. The difference is what is being
+  replaced - a whole bundle rather than one file - and what is checked before
+  it happens: besides the published SHA-256 sum, the signature of the
+  downloaded version is verified, with the same question Gatekeeper would ask.
+  Anything macOS would refuse to run is not installed either.
+
+  Both together, because neither replaces the other. A checksum proves that the
+  file is the one the server sent; a signature proves who built it.
+
 ## [0.8.0] – 2026-08-20
 
 ### Added

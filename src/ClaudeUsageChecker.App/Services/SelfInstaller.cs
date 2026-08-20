@@ -51,9 +51,18 @@ public static class SelfInstaller
 
     /// <summary>
     /// Whether offering the setup makes sense at all: only for a published
-    /// single file that is not at the target location yet.
+    /// single file under Windows that is not at the target location yet.
     /// </summary>
-    public static bool ShouldOffer => UpdateInstaller.IsSupported && !IsInstalled;
+    /// <remarks>
+    /// The whole class is about a Windows path, and the platform used to be
+    /// implied: nothing else could replace itself, so nothing else got here.
+    /// Since 0.9.0 macOS can, and the implication no longer holds - it would
+    /// offer to copy the program out of its bundle into a folder Windows
+    /// invented. macOS has its own answer to the same question, and it is the
+    /// applications folder.
+    /// </remarks>
+    public static bool ShouldOffer =>
+        OperatingSystem.IsWindows() && UpdateInstaller.IsSupported && !IsInstalled;
 
     /// <summary>
     /// Copies the running file to the target location, sets up autostart and

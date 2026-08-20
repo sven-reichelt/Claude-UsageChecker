@@ -189,6 +189,7 @@
   "updater.missingFileOrChecksum": "The new version is missing its file or its checksum. Without both, nothing is installed.",
   "updater.checksumUnreadable": "The checksum could not be read. Nothing is installed.",
   "updater.checksumMismatch": "The checksum of the downloaded file does not match. It is discarded and not executed.",
+  "updater.signatureRejected": "The signature of the downloaded version was not accepted by macOS. Nothing is installed.",
   "updater.downloadFailed": "The new version could not be downloaded: {0}",
   "updater.saveFailed": "The new version could not be saved: {0}",
   "updater.replaceFailed": "The new version could not be put in place: {0}",

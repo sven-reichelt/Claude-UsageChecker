@@ -23,7 +23,7 @@ and a second one would break every clone that exists by then.
 
 ```powershell
 dotnet build                                      # the whole solution
-dotnet test                                       # 619 tests (Core.Tests + App.Tests)
+dotnet test                                       # 629 tests (Core.Tests + App.Tests)
 dotnet run --project src/ClaudeUsageChecker.App   # run the application
 node build/generate-icons.mjs                     # regenerate the icons
 ```
@@ -76,7 +76,7 @@ Builds into `artifacts/` (centrally through `ArtifactsPath` in
 
 ## Status
 
-Version 0.8.0 released, the repository is public and written in English.
+Version 0.9.0 released, the repository is public and written in English.
 Finished among other things: the application's own sign-in through OAuth with
 PKCE including refresh, update at the push of a button with checksum
 verification, permanent setup with autostart, configurable thresholds, the
@@ -86,8 +86,9 @@ limits read from the `limits` list, and nine languages.
 macOS arrived with 0.8.0 and has been tried on a real machine (Apple silicon,
 Tahoe 26.5): menu bar, keychain, autostart, the token of a Claude Code
 installation, the sign-in through the browser and the update check all work.
-Two things stay off there on purpose - self-replacement, and a signature from a
-registered developer.
+0.9.0 added the two things that were missing there: the bundle is signed with a
+Developer ID and notarised by Apple, and it replaces itself the way the Windows
+version has since 0.4.0.
 
 0.8.0 also brought the choice of appearance (light, dark, or the system) and an
 overview of both sign-ins at the top of the settings.
@@ -229,6 +230,14 @@ happens to run.
 
 **The self-update is the most delicate path in the program.** It downloads an
 executable from the network and starts it. Three conditions secure that - a
-verified SHA-256 sum, an address from GitHub's response, an explicit click.
-Changing anything there loosens the only safeguard that exists. Reasoning in
-[SECURITY.md](SECURITY.md), tests in `UpdateInstallerTests`.
+verified SHA-256 sum, an address from GitHub's response, an explicit click - and
+on macOS a fourth, the signature of the downloaded bundle. Changing anything
+there loosens the only safeguard that exists. Reasoning in
+[SECURITY.md](SECURITY.md), tests in `UpdateInstallerTests` and
+`MacOsBundleTests`.
+
+**Unpack a macOS bundle with `ditto`, never with `unzip`.** The signature is
+made over the flags and extended attributes as well, and a tool that drops them
+hands back a bundle that fails its own signature check - which the update then
+refuses, correctly and inexplicably. The release workflow packs with `ditto -c
+-k --keepParent` for the same reason.

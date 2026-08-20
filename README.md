@@ -145,9 +145,10 @@ every key still missing.
 * An active Claude subscription (Pro or Max)
 
 The published packages need neither the SDK nor a .NET runtime. On macOS the
-application comes as a bundle signed ad hoc rather than by a registered
-developer; fetching it from the terminal rather than through a browser keeps it
-out of quarantine. The release page carries the exact commands.
+application comes as a bundle signed with a Developer ID and notarised by Apple,
+with the ticket stapled into it, so it opens by double-clicking on any Mac -
+offline as well. From 0.9.0 on, updates happen at the push of a button there
+too; only the first installation goes by hand.
 
 ### Build and run
 
@@ -366,7 +367,7 @@ effect, and the window says so instead of quietly correcting the input.
 | 0.6 | Nine languages, model-specific limits, configurable thresholds, summary of changes after an update ✅ |
 | 0.7 | Its own menu in the notification area, in the style of the windows ✅ |
 | 0.8 | macOS menu bar ✅ |
-| 0.9 | Self-replacement on macOS, and a signed bundle |
+| 0.9 | Self-replacement on macOS, and a signed bundle ✅ |
 
 ## Contributing
 

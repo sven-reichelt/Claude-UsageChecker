@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
+using System.Runtime.Versioning;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
@@ -43,26 +44,40 @@ public sealed class UpdateInstaller(HttpClient httpClient)
     public const string WaitArgument = "--nach-update";
 
     /// <summary>
-    /// Whether the running version can replace itself. That requires a release
-    /// as a single file - in a development build dozens of files sit side by
-    /// side, each of which would have to be swapped.
+    /// Whether the running version can replace itself.
     /// </summary>
     /// <remarks>
-    /// It is recognised from the absence of the like-named library next to the
-    /// executable. That answers precisely the question that matters: is swapping
-    /// this one file enough? <c>Assembly.Location</c> could tell as well, but its
-    /// behaviour in single files is rightly considered a pitfall.
+    /// <para>
+    /// Under Windows that means a release as a single file - in a development
+    /// build dozens of files sit side by side, each of which would have to be
+    /// swapped. It is recognised from the absence of the like-named library
+    /// next to the executable, which answers precisely the question that
+    /// matters: is swapping this one file enough? <c>Assembly.Location</c>
+    /// could tell as well, but its behaviour in single files is rightly
+    /// considered a pitfall.
+    /// </para>
+    /// <para>
+    /// On macOS the application is a bundle, so the question is whether it runs
+    /// out of one and whether the folder holding it can be written to. An
+    /// application in /Applications belongs to whoever installed it, and
+    /// another account may be able to read it and not to replace it.
+    /// </para>
     /// </remarks>
     public static bool IsSupported
     {
         get
         {
-            if (!OperatingSystem.IsWindows() || Environment.ProcessPath is not { Length: > 0 } path)
+            if (Environment.ProcessPath is not { Length: > 0 } path)
             {
                 return false;
             }
 
-            return !File.Exists(Path.ChangeExtension(path, ".dll"));
+            if (OperatingSystem.IsMacOS())
+            {
+                return MacOsBundle.CanReplace(path);
+            }
+
+            return OperatingSystem.IsWindows() && !File.Exists(Path.ChangeExtension(path, ".dll"));
         }
     }
 
@@ -89,7 +104,8 @@ public sealed class UpdateInstaller(HttpClient httpClient)
         }
 
         var ownPath = Environment.ProcessPath!;
-        var temp = Path.Combine(Path.GetTempPath(), $"ClaudeUsageChecker-{Guid.NewGuid():N}.exe");
+        var suffix = OperatingSystem.IsMacOS() ? ".zip" : ".exe";
+        var temp = Path.Combine(Path.GetTempPath(), $"ClaudeUsageChecker-{Guid.NewGuid():N}{suffix}");
 
         try
         {
@@ -108,7 +124,9 @@ public sealed class UpdateInstaller(HttpClient httpClient)
                     T.UpdaterChecksumMismatch);
             }
 
-            return PutInPlace(ownPath, temp);
+            return OperatingSystem.IsMacOS()
+                ? await ReplaceBundleAsync(ownPath, temp, cancellationToken).ConfigureAwait(false)
+                : PutInPlace(ownPath, temp);
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
@@ -121,6 +139,58 @@ public sealed class UpdateInstaller(HttpClient httpClient)
         finally
         {
             DeleteQuietly(temp);
+        }
+    }
+
+    /// <summary>
+    /// The macOS route: unpack, ask whether macOS would run it, then swap.
+    /// </summary>
+    /// <remarks>
+    /// The signature check is the part the Windows route has no counterpart
+    /// for, and it is worth more than the checksum beside it. A checksum proves
+    /// that the file is the one the server sent; a signature proves who built
+    /// it. Both are cheap, and neither replaces the other: a repository taken
+    /// over would serve a matching checksum for whatever it liked.
+    /// </remarks>
+    private static async Task<InstallResult> ReplaceBundleAsync(
+        string ownPath, string archive, CancellationToken cancellationToken)
+    {
+        if (MacOsBundle.Of(ownPath) is not { } bundle)
+        {
+            return InstallResult.Failed(T.UpdaterNotSelfReplaceable);
+        }
+
+        var workspace = Path.Combine(Path.GetTempPath(), $"ClaudeUsageChecker-{Guid.NewGuid():N}");
+
+        try
+        {
+            if (await MacOsBundle.ExtractAsync(archive, workspace, cancellationToken)
+                    .ConfigureAwait(false) is not { } unpacked)
+            {
+                return InstallResult.Failed(T.UpdaterSaveFailed(workspace));
+            }
+
+            if (!await MacOsBundle.IsAcceptableAsync(unpacked, cancellationToken).ConfigureAwait(false))
+            {
+                return InstallResult.Failed(T.UpdaterSignatureRejected);
+            }
+
+            return await MacOsBundle.ReplaceAsync(bundle, unpacked, cancellationToken)
+                .ConfigureAwait(false);
+        }
+        finally
+        {
+            try
+            {
+                if (Directory.Exists(workspace))
+                {
+                    Directory.Delete(workspace, recursive: true);
+                }
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                // Temporary files that outlive us are the smaller problem.
+            }
         }
     }
 
@@ -213,10 +283,18 @@ public sealed class UpdateInstaller(HttpClient httpClient)
     /// </summary>
     public static void RemovePreviousVersion()
     {
-        if (Environment.ProcessPath is { } path)
+        if (Environment.ProcessPath is not { } path)
         {
-            DeleteQuietly(path + BackupSuffix);
+            return;
         }
+
+        if (OperatingSystem.IsMacOS())
+        {
+            MacOsBundle.RemovePreviousVersion(path);
+            return;
+        }
+
+        DeleteQuietly(path + BackupSuffix);
     }
 
     private static void DeleteQuietly(string path)

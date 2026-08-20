@@ -189,6 +189,7 @@
   "updater.missingFileOrChecksum": "新版本缺少文件或校验和。二者缺一便不安装任何内容。",
   "updater.checksumUnreadable": "无法读取校验和。不安装任何内容。",
   "updater.checksumMismatch": "下载文件的校验和不符。该文件被丢弃，不予执行。",
+  "updater.signatureRejected": "macOS 未接受所下载版本的签名。不安装任何内容。",
   "updater.downloadFailed": "无法下载新版本：{0}",
   "updater.saveFailed": "无法保存新版本：{0}",
   "updater.replaceFailed": "无法将新版本放置到位：{0}",

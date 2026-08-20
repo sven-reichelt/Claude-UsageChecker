@@ -8,6 +8,26 @@ numerazione [Semantic Versioning](https://semver.org/lang/it/).
 
 ## [Non pubblicato]
 
+## [0.9.0] – 2026-08-21
+
+### Aggiunto
+- **Il pacchetto macOS è firmato e autenticato da Apple.** Finora portava una
+  firma ad hoc, che non vale nulla per nessuno tranne la macchina che l'ha
+  prodotta: macOS si rifiutava di avviarlo, e riuscirci significava smentire il
+  sistema a mano. Ora porta un Developer ID e l'autenticazione di Apple,
+  graffata nel pacchetto perché valga anche senza rete. Si avvia con un doppio
+  clic, come qualsiasi altra cosa.
+- **Sostituzione automatica su macOS.** Il pulsante che dalla 0.4.0 aggiorna la
+  versione per Windows fa ora lo stesso qui. La differenza sta in ciò che viene
+  sostituito — un intero pacchetto anziché un file — e in ciò che viene
+  verificato prima: oltre alla somma SHA-256 pubblicata, la firma della
+  versione scaricata, con la stessa domanda che porrebbe Gatekeeper. Ciò che
+  macOS non eseguirebbe non viene nemmeno installato.
+
+  Entrambe, perché nessuna sostituisce l'altra. Una somma di controllo dimostra
+  che il file è quello inviato dal server; una firma dimostra chi lo ha
+  costruito.
+
 ## [0.8.0] – 2026-08-20
 
 ### Aggiunto
