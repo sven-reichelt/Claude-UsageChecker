@@ -27,7 +27,7 @@ The token is only ever stored through the secret store of the operating system:
 | Platform | Storage | Protection |
 | --- | --- | --- |
 | Windows | Credential Manager (`CredWriteW`) | DPAPI, bound to the user account |
-| macOS | Keychain (planned) | Keychain Services |
+| macOS | Keychain (`SecItemAdd` through the Security framework) | Keychain Services, bound to the login keychain |
 
 Two separate entries:
 

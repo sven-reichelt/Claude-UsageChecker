@@ -29,7 +29,7 @@ abgelegt:
 | Plattform | Ablage | Schutz |
 | --- | --- | --- |
 | Windows | Anmeldeinformationsverwaltung (`CredWriteW`) | DPAPI, an das Benutzerkonto gebunden |
-| macOS | Schlüsselbund (geplant) | Keychain Services |
+| macOS | Schlüsselbund (`SecItemAdd` über das Security-Framework) | Keychain Services, an den Anmeldeschlüsselbund gebunden |
 
 Zwei getrennte Einträge:
 

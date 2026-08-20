@@ -13,8 +13,8 @@ Reset-Uhrzeit und Restzeit im Tooltip. Das Kontextmenü listet **alle** gemeldet
 Limits auf, ein Klick öffnet die Detailansicht mit Fortschrittsbalken.
 
 Mit eigener Anmeldung läuft sie unabhängig von Claude Code – bestätigt auf einem
-Rechner ohne Claude-Code-Installation. macOS (Menüleiste) ist vorbereitet, aber
-noch nicht umgesetzt – siehe [Roadmap](#roadmap).
+Rechner ohne Claude-Code-Installation. Sie läuft unter Windows und, seit 0.8.0,
+in der macOS-Menüleiste.
 
 ## Funktionsumfang
 
@@ -35,7 +35,7 @@ noch nicht umgesetzt – siehe [Roadmap](#roadmap).
 | Eigene Anmeldung per OAuth mit PKCE – unabhängig von Claude Code | ✅ |
 | Selbsttätige Erneuerung des eigenen Tokens | ✅ |
 | Aktualisierung auf Knopfdruck, mit Prüfsummenkontrolle | ✅ |
-| macOS-Menüleiste | 🚧 geplant |
+| macOS-Menüleiste, Schlüsselbund und Autostart | ✅ |
 
 ## Datenquelle
 

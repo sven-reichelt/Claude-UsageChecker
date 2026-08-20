@@ -157,8 +157,12 @@ jobs:
         run: |
           set -euo pipefail
           # ditto rather than zip: it keeps the symbolic links and the flags of
-          # the bundle, which a plain zip quietly flattens.
-          ditto -c -k --sequesterRsrc --keepParent \
+          # the bundle, which a plain zip quietly flattens. Without
+          # --sequesterRsrc: that option parks extended attributes in __MACOSX
+          # entries, which unzip then scatters as folders of that name beside
+          # the bundle. The signature lives in _CodeSignature and needs none of
+          # it.
+          ditto -c -k --keepParent \
             ClaudeUsageChecker.app ClaudeUsageChecker-macos-arm64.zip
           shasum -a 256 ClaudeUsageChecker-macos-arm64.zip \
             | sed 's/  .*/  ClaudeUsageChecker-macos-arm64.zip/' \
@@ -347,7 +351,7 @@ jobs:
 
             ```
             curl -L -O https://github.com/${{ github.repository }}/releases/download/v${{ steps.version.outputs.version }}/${{ steps.macos.outputs.name }}
-            unzip ${{ steps.macos.outputs.name }}
+            ditto -xk ${{ steps.macos.outputs.name }} .
             mv ClaudeUsageChecker.app /Applications/
             open -a /Applications/ClaudeUsageChecker.app
             ```
@@ -356,6 +360,20 @@ jobs:
             and no window of its own on start. If it was downloaded through a
             browser after all: `xattr -dr com.apple.quarantine
             /Applications/ClaudeUsageChecker.app`.
+
+            **Updating an existing installation** takes two steps more. `mv`
+            refuses to overwrite a bundle that is already there - it would move
+            the new one inside the old - and a running application should be
+            asked to stop first:
+
+            ```
+            pkill -f ClaudeUsageChecker
+            rm -rf /Applications/ClaudeUsageChecker.app
+            curl -L -O https://github.com/${{ github.repository }}/releases/download/v${{ steps.version.outputs.version }}/${{ steps.macos.outputs.name }}
+            ditto -xk ${{ steps.macos.outputs.name }} .
+            mv ClaudeUsageChecker.app /Applications/
+            open -a /Applications/ClaudeUsageChecker.app
+            ```
 
             ### Checksums (SHA-256)
 

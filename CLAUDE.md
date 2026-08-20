@@ -1,6 +1,6 @@
-﻿# Claude UsageChecker â€“ notes for Claude Code
+﻿# Claude UsageChecker – notes for Claude Code
 
-Tray application for Windows (macOS planned) that shows the session and weekly
+Tray application for Windows and macOS that shows the session and weekly
 limits of a Claude subscription in the notification area.
 
 ## Language
@@ -33,10 +33,10 @@ Builds into `artifacts/` (centrally through `ArtifactsPath` in
 
 ## Layout
 
-* **`ClaudeUsageChecker.Core`** â€“ platform independent, no UI dependency. API
+* **`ClaudeUsageChecker.Core`** – platform independent, no UI dependency. API
   access, token retrieval, state logic and text formatting belong here.
   Everything in it is testable, and everything in it is tested.
-* **`ClaudeUsageChecker.App`** â€“ Avalonia. The composition root is
+* **`ClaudeUsageChecker.App`** – Avalonia. The composition root is
   `App.axaml.cs`; there is deliberately no DI container and no MVVM framework,
   to keep the dependency list short.
 
@@ -76,18 +76,20 @@ verification, permanent setup with autostart, configurable thresholds, the
 summary of changes after an update, the about window, model-specific weekly
 limits read from the `limits` list, and nine languages.
 
-Open: **the macOS menu bar** - the only larger item. The core is platform
-independent and `MacOsKeychainCredentialReader` exists; what is missing is the
-connection to the menu bar, a counterpart to `WindowsCredentialStore`, and
-equivalents for autostart and self-installation. It is also unverified how long
-the sign-in survives a longer break, and whether the figures on the Pro
+macOS arrived with 0.8.0 and has been tried on a real machine: menu bar,
+keychain, autostart, the token of a Claude Code installation, and the sign-in
+through the browser all work. Two things stay off there on purpose -
+self-replacement, and a signature from a registered developer.
+
+Open: how long the sign-in survives a longer break (Anthropic does not document
+the lifetime of the refresh token), and whether the figures on the Pro
 subscription look the way the README describes. Details in
 [CHANGELOG.md](CHANGELOG.md).
 
 ## Pitfalls that have bitten before
 
 **Never write your own `InitializeComponent()` in a window's code-behind.**
-Avalonia generates a version `InitializeComponent(bool loadXaml = true, â€¦)` which
+Avalonia generates a version `InitializeComponent(bool loadXaml = true, …)` which
 writes the controls named with `x:Name` into their fields after loading. A
 hand-written parameterless variant wins overload resolution, loads only the XAML
 and leaves every field null - the constructor then fails with a
@@ -125,7 +127,7 @@ into the eight versions under `docs/changelog/`. The test checks that all of the
 know the same versions - a missing entry under *Unreleased* escapes it, though.
 
 **`Assembly.GetName().Version` always has four parts, the changelog three.**
-`Version` counts a missing part as âˆ’1, so `0.6.0` counts as **smaller** than
+`Version` counts a missing part as −1, so `0.6.0` counts as **smaller** than
 `0.6.0.0`. Comparing the two unguarded makes the application consider the
 running version out of date - the summary of changes would come back on every
 start. Use `ReleaseHistory.ThreePart` before every comparison;
@@ -151,8 +153,8 @@ afterwards, or build with `--no-incremental`.
 
 **Editing language files from the shell mangles the encoding.** `perl -i -CSD`
 decodes the file as UTF-8 but leaves the replacement text from the command line
-as raw bytes - and writes them out encoded a second time. Out of "PrÃ¼fsumme"
-comes "PrÃƒÂ¼fsumme". It struck 93 lines across eight languages, and nothing
+as raw bytes - and writes them out encoded a second time. Out of "Prüfsumme"
+comes "PrÃ¼fsumme". It struck 93 lines across eight languages, and nothing
 noticed: English is pure ASCII and stayed clean, so every test was green and the
 damage would have shown only to whoever ran the application in German. Use
 `-CSDA` (the `A` decodes the arguments) or a dedicated tool.

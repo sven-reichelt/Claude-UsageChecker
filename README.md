@@ -12,8 +12,8 @@ reset time and remaining time in the tooltip. The context menu lists **every**
 reported limit, and a click opens the details window with progress bars.
 
 With its own sign-in it runs independently of Claude Code - confirmed on a
-machine without a Claude Code installation. macOS (menu bar) is prepared for but
-not yet implemented - see the [roadmap](#roadmap).
+machine without a Claude Code installation. It runs on Windows and, since 0.8.0,
+in the macOS menu bar.
 
 ## Features
 
@@ -34,7 +34,7 @@ not yet implemented - see the [roadmap](#roadmap).
 | Own sign-in through OAuth with PKCE - independent of Claude Code | ✅ |
 | Automatic refresh of the application's own token | ✅ |
 | Update at the push of a button, with checksum verification | ✅ |
-| macOS menu bar | 🚧 planned |
+| macOS menu bar, keychain and autostart | ✅ |
 
 ## Data source
 

@@ -81,6 +81,28 @@ jobs:
           dotnet list package --vulnerable --include-transitive 2>&1 | Tee-Object -Variable output
           if ($output -match 'has the following vulnerable packages') { exit 1 }
 
+      # The same fault has now been found three times: in the language files,
+      # in the continuation notes, and in this repository's own documentation,
+      # where it had been sitting in public. It is invisible to every other test
+      # - the text is still valid UTF-8, only wrong - so it gets a sweep of its
+      # own.
+      - name: Check for doubly encoded text
+        shell: bash
+        run: |
+          # Three exceptions, all deliberate: this file carries the pattern it
+          # searches for, the pitfall about this very fault quotes the mangled
+          # word as an example, and one test asserts the absence of the
+          # character.
+          if git grep -nE 'Ã.|â€' \
+               -- '*.md' '*.cs' '*.json' '*.yml' '*.axaml' '*.props' \
+               ':(exclude).github/workflows/ci.yml' \
+             | grep -v 'Pr..*fsumme' \
+             | grep -v 'DoesNotContain'; then
+            echo "::error::Doubly encoded text found - UTF-8 read as Latin-1 and encoded again."
+            exit 1
+          fi
+          echo "No doubly encoded text found."
+
       - name: Check for accidentally committed secrets
         shell: bash
         run: |
