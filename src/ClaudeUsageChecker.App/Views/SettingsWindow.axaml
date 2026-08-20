@@ -95,8 +95,9 @@
 
         <!-- Hidden until the version number at the bottom has been clicked five
              times. Not a secret worth keeping, but not a choice to stumble into
-             either: a pre-release is meant for whoever agreed to test one. Once
-             found it stays, so nobody has to hunt for it twice. -->
+             either: a pre-release is meant for whoever agreed to test one. It
+             stays visible while one is selected, so there is always a way back;
+             on the published releases it is gone again at the next opening. -->
         <StackPanel x:Name="ChannelSection" Spacing="10" IsVisible="False">
           <Separator />
           <TextBlock x:Name="ChannelHeading" FontWeight="SemiBold" />

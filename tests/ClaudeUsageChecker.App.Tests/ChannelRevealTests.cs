@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using ClaudeUsageChecker.App.Services;
 using ClaudeUsageChecker.App.Settings;
 using ClaudeUsageChecker.App.Views;
 
@@ -56,18 +57,6 @@ public class ChannelRevealTests
     }
 
     /// <summary>
-    /// Where it has been found before it is there from the start.
-    /// </summary>
-    [AvaloniaFact]
-    public void OnceFoundItStaysVisible()
-    {
-        using var file = new TemporaryFile();
-        var window = Create(file, new AppSettings { UpdateChannelShown = true });
-
-        Assert.True(Section(window).IsVisible);
-    }
-
-    /// <summary>
     /// Whoever is on a pre-release sees the choice whether or not they remember
     /// the trick - otherwise there would be no way back.
     /// </summary>
@@ -79,6 +68,45 @@ public class ChannelRevealTests
 
         Assert.True(Section(window).IsVisible);
         Assert.Equal(1, window.FindControl<ComboBox>("ChannelBox")!.SelectedIndex);
+    }
+
+    /// <summary>
+    /// Back on the published releases the section is gone again the next time
+    /// the window opens.
+    /// </summary>
+    /// <remarks>
+    /// It used to stay once it had been found. But a switch that is only ever
+    /// set to one value does not belong in view for good - whoever wants it
+    /// again knows the way, and whoever does not is not missing anything.
+    /// </remarks>
+    [AvaloniaFact]
+    public void ChoosingThePublishedReleasesHidesItAgain()
+    {
+        using var file = new TemporaryFile();
+        var store = new SettingsStore(file.Path);
+
+        // Written first, so that the assertion below cannot pass merely because
+        // nothing was saved at all: without the save the file would still say
+        // "prerelease".
+        store.Save(new AppSettings { Channel = UpdateChannel.PreRelease });
+
+        var window = new SettingsWindow(store, store.Load(), applyAutostart: _ => { });
+
+        window.Show();
+        window.FindControl<ComboBox>("ChannelBox")!.SelectedIndex = 0;
+        Save(window);
+
+        var stored = store.Load();
+
+        Assert.Equal(UpdateChannel.Stable, stored.Channel);
+        Assert.False(Section(new SettingsWindow(store, stored, applyAutostart: _ => { })).IsVisible);
+    }
+
+    private static void Save(SettingsWindow window)
+    {
+        var save = window.FindControl<Button>("SaveButton")!;
+
+        save.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
     }
 
     private static void Click(SettingsWindow window, int times)

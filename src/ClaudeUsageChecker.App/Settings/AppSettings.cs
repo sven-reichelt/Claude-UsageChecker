@@ -57,13 +57,6 @@ public sealed class AppSettings
     [JsonPropertyName("updateChannel")]
     public string? UpdateChannel { get; set; }
 
-    /// <summary>
-    /// Whether the choice of channel has been found before. Once revealed it
-    /// stays revealed - hunting for the same trick twice helps nobody.
-    /// </summary>
-    [JsonPropertyName("updateChannelShown")]
-    public bool UpdateChannelShown { get; set; }
-
     /// <summary>The channel, or the published releases where nothing sensible is stored.</summary>
     [JsonIgnore]
     public UpdateChannel Channel

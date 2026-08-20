@@ -64,16 +64,16 @@ public partial class SettingsWindow : Window
         WarningThresholdBox.Value = (decimal)settings.WarningThreshold;
         CriticalThresholdBox.Value = (decimal)settings.CriticalThreshold;
 
-        VersionText.Text = T.Version(
-            Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? T.Unknown);
+        VersionText.Text = T.Version(ProgramVersion.Current.ToString());
 
         ChannelBox.ItemsSource = new List<string> { T.SettingsChannelStable, T.SettingsChannelPreRelease };
         ChannelBox.SelectedIndex = settings.Channel == UpdateChannel.PreRelease ? 1 : 0;
 
-        // Visible from the start where it has been found before, or where a
-        // pre-release is actually selected: a setting that could not be undone
-        // without knowing the trick would be a trap.
-        ChannelSection.IsVisible = settings.UpdateChannelShown || settings.Channel == UpdateChannel.PreRelease;
+        // Visible from the start exactly while a pre-release is selected: a
+        // setting that could not be undone without knowing the trick would be a
+        // trap. Back on the published releases it disappears again with the next
+        // opening - it is not a switch anyone needs in view.
+        ChannelSection.IsVisible = settings.Channel == UpdateChannel.PreRelease;
 
         VersionText.PointerPressed += (_, _) => CountVersionClick();
 
@@ -259,8 +259,7 @@ public partial class SettingsWindow : Window
             Language = language.Code,
             InstallPromptShown = _settings.InstallPromptShown,
             LastRunVersion = _settings.LastRunVersion,
-            Channel = ChannelBox.SelectedIndex == 1 ? UpdateChannel.PreRelease : UpdateChannel.Stable,
-            UpdateChannelShown = ChannelSection.IsVisible
+            Channel = ChannelBox.SelectedIndex == 1 ? UpdateChannel.PreRelease : UpdateChannel.Stable
         };
 
         _settingsStore.Save(_settings);
