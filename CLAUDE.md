@@ -12,8 +12,12 @@ able to read it - but the conversation stays in the language its author thinks
 in. The one exception is the interface strings, which exist in nine languages;
 English is the source there as well.
 
-The commit history up to August 2026 is in German. It stays that way - rewriting
-it would change every hash, and the releases and their tags hang off those.
+The commit messages up to August 2026 are in German and stay that way.
+
+The history itself was rewritten once, on 2026-08-20, to carry the licence
+retroactively. Every hash changed with it and the tags were rebuilt. That was a
+deliberate one-off while nobody had forked the repository; it is not a habit,
+and a second one would break every clone that exists by then.
 
 ## Commands
 
