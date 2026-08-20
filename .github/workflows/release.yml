@@ -131,19 +131,26 @@ jobs:
       - name: Does the bundle start at all?
         shell: bash
         run: |
-          set -euo pipefail
-          # A package that does not start must reach nobody. There is no screen
-          # on the runner, so this catches an immediate crash and nothing more.
-          "ClaudeUsageChecker.app/Contents/MacOS/ClaudeUsageChecker" &
+          set -uo pipefail
+          # A package that does not start must reach nobody. What can be caught
+          # here is an immediate crash - and whatever it said on the way out.
+          "ClaudeUsageChecker.app/Contents/MacOS/ClaudeUsageChecker" > start.log 2>&1 &
           PID=$!
           sleep 25
-          if ! kill -0 "$PID" 2>/dev/null; then
-            wait "$PID" && STATUS=0 || STATUS=$?
-            echo "::error::The application exited immediately (exit code $STATUS)."
-            exit 1
+          if kill -0 "$PID" 2>/dev/null; then
+            kill "$PID"
+            echo "Started successfully."
+            exit 0
           fi
-          kill "$PID"
-          echo "Started successfully."
+
+          wait "$PID" && STATUS=0 || STATUS=$?
+          echo "--- exit code $STATUS"
+          echo "--- standard output and error"
+          cat start.log || true
+          echo "--- crash log"
+          cat "$HOME/Library/Application Support/ClaudeUsageChecker/crash.log" 2>/dev/null || echo "(none)"
+          echo "::error::The application exited immediately (exit code $STATUS)."
+          exit 1
 
       - name: Pack it up
         shell: bash
