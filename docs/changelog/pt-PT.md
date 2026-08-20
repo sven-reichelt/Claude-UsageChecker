@@ -30,6 +30,17 @@ numeração [Semantic Versioning](https://semver.org/lang/pt-BR/).
   «Aspeto» pode agora ser fixada em claro ou escuro. A escolha já vale
   enquanto é feita: a cor é a única definição cujo efeito não se deixa descrever
   numa frase.
+- **As duas sessões num relance.** As definições dizem agora, logo no topo, se
+  uma instalação do Claude Code tem sessão iniciada e se o início de sessão
+  próprio funciona: ambos, sempre, seja qual for o que estiver em uso. O
+  caminho seguido nada diz sobre se o outro funcionaria, e é precisamente essa
+  a pergunta quando os números deixam de chegar.
+
+### Corrigido
+- **As versões de teste para além da nona não eram oferecidas.** O rótulo depois
+  do hífen era comparado como texto, pelo que «beta.10» ficava abaixo de
+  «beta.9»: a quem testava dizia-se que estava em dia. Agora os rótulos são
+  contados, parte a parte, como manda o versionamento semântico.
 ## [0.7.2] – 2026-08-20
 
 ### Corrigido

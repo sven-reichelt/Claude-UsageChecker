@@ -117,10 +117,12 @@ public sealed record ProgramVersion : IComparable<ProgramVersion>
     /// pre-release and onto the finished version.
     /// </para>
     /// <para>
-    /// Two labels are compared as text. That is enough for "beta.1" against
-    /// "beta.2" and wrong for "beta.10" against "beta.2" - deliberately not
-    /// solved, because the way out of a pre-release is the finished version, not
-    /// counting labels. Whoever needs more numbers them "beta.02".
+    /// Two labels are compared the way semantic versioning prescribes: split at
+    /// the dots, and a part made of digits counts as a number rather than as
+    /// text. Otherwise "beta.10" sorts below "beta.9", because "1" comes before
+    /// "9" - which is not a thought experiment. It was written off here as one
+    /// ("nobody counts that far"), and the tenth test build of the day was the
+    /// one that could not be offered to the person testing it.
     /// </para>
     /// </remarks>
     public int CompareTo(ProgramVersion? other)
@@ -141,7 +143,57 @@ public sealed record ProgramVersion : IComparable<ProgramVersion>
             (null, null) => 0,
             (null, _) => 1,
             (_, null) => -1,
-            var (mine, theirs) => string.CompareOrdinal(mine, theirs)
+            var (mine, theirs) => ComparePreRelease(mine, theirs)
+        };
+    }
+
+    /// <summary>
+    /// Orders two pre-release labels, dot separated part by dot separated part.
+    /// </summary>
+    /// <remarks>
+    /// The rules are those of semantic versioning: a part of digits compares as
+    /// a number, anything else as text, and a numeric part ranks below a
+    /// textual one. Where everything matches so far, the shorter label is the
+    /// smaller one - "beta" comes before "beta.1".
+    /// </remarks>
+    private static int ComparePreRelease(string mine, string theirs)
+    {
+        var left = mine.Split('.');
+        var right = theirs.Split('.');
+
+        for (var i = 0; i < Math.Max(left.Length, right.Length); i++)
+        {
+            if (i >= left.Length)
+            {
+                return -1;
+            }
+
+            if (i >= right.Length)
+            {
+                return 1;
+            }
+
+            var order = ComparePart(left[i], right[i]);
+            if (order != 0)
+            {
+                return order;
+            }
+        }
+
+        return 0;
+    }
+
+    private static int ComparePart(string mine, string theirs)
+    {
+        var mineIsNumber = int.TryParse(mine, NumberStyles.None, CultureInfo.InvariantCulture, out var left);
+        var theirsIsNumber = int.TryParse(theirs, NumberStyles.None, CultureInfo.InvariantCulture, out var right);
+
+        return (mineIsNumber, theirsIsNumber) switch
+        {
+            (true, true) => left.CompareTo(right),
+            (true, false) => -1,
+            (false, true) => 1,
+            _ => string.CompareOrdinal(mine, theirs)
         };
     }
 

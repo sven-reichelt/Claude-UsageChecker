@@ -121,6 +121,15 @@ public static class T
 
     // Settings
     public static string SettingsTitle => L["settings.title"];
+    public static string SettingsAccountsSection => L["settings.accountsSection"];
+    public static string SettingsAccountOwn => L["settings.accountOwn"];
+    public static string SettingsAccountChecking => L["settings.accountChecking"];
+    public static string SettingsAccountSignedIn => L["settings.accountSignedIn"];
+    public static string SettingsAccountSignedInUntil(DateTimeOffset expiry) =>
+        L.Format("settings.accountSignedInUntil", expiry);
+    public static string SettingsAccountNotSignedIn => L["settings.accountNotSignedIn"];
+    public static string SettingsAccountExpired => L["settings.accountExpired"];
+    public static string SettingsAccountNoStore => L["settings.accountNoStore"];
     public static string SettingsSignInSection => L["settings.signInSection"];
     public static string SettingsSignIn => L["settings.signInButton"];
     public static string SettingsSignOut => L["settings.signOutButton"];

@@ -30,6 +30,19 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
   „Erscheinungsbild" lässt sie sich jetzt stattdessen auf hell oder dunkel
   festlegen. Die Wahl wirkt schon beim Auswählen – Farbe ist die eine
   Einstellung, deren Wirkung sich nicht in einem Satz beschreiben lässt.
+- **Beide Anmeldungen auf einen Blick.** Die Einstellungen sagen jetzt ganz
+  oben, ob eine Claude-Code-Installation angemeldet ist und ob die eigene
+  Anmeldung trägt – beides, immer, gleich welche gerade genutzt wird. Welcher
+  Weg genommen wird, sagt nämlich nichts darüber, ob der andere funktionieren
+  würde – und genau das ist die Frage, wenn keine Zahlen mehr ankommen.
+
+### Behoben
+- **Testfassungen jenseits der neunten wurden nicht angeboten.** Die Kennung
+  hinter dem Bindestrich wurde als Text verglichen, damit stand „beta.10" unter
+  „beta.9" – wer testete, bekam „ist aktuell" zu sehen. Beim Bau des Vergleichs
+  als Gedankenspiel abgetan; die zehnte Testfassung eines einzigen Tages kam
+  eine Woche später. Kennungen werden jetzt gezählt, Teil für Teil, wie es die
+  semantische Versionierung vorsieht.
 ## [0.7.2] – 2026-08-20
 
 ### Behoben

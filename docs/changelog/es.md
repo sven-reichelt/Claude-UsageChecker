@@ -30,6 +30,17 @@ versionado [Semantic Versioning](https://semver.org/lang/es/).
   predeterminado. En «Apariencia» ahora puede fijarse en claro u oscuro. La
   elección surte efecto mientras se hace: el color es el único ajuste cuyo
   efecto no se deja describir en una frase.
+- **Los dos inicios de sesión de un vistazo.** La configuración indica ahora,
+  arriba del todo, si hay una instalación de Claude Code con sesión iniciada y
+  si el inicio de sesión propio funciona: ambos, siempre, sea cual sea el que
+  se esté usando. Qué vía se toma no dice nada sobre si la otra funcionaría, y
+  esa es justo la pregunta cuando dejan de llegar las cifras.
+
+### Corregido
+- **Las versiones de prueba a partir de la décima no se ofrecían.** La etiqueta
+  tras el guión se compara ba como texto, de modo que «beta.10» quedaba por
+  debajo de «beta.9»: a quien probaba se le decía que estaba al día. Ahora las
+  etiquetas se cuentan, parte por parte, como manda el versionado semántico.
 ## [0.7.2] – 2026-08-20
 
 ### Corregido

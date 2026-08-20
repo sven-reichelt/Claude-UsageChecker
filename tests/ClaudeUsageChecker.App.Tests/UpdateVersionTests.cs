@@ -69,6 +69,35 @@ public class UpdateVersionTests
         Assert.Equal(isNewer, latest > current);
     }
 
+    /// <summary>
+    /// Pre-release labels are counted, not spelled.
+    /// </summary>
+    /// <remarks>
+    /// This was written off as a thought experiment - "nobody counts that far"
+    /// - and then the tenth test build of a single day could not be offered to
+    /// the person testing it: as text, "beta.10" sorts below "beta.9", because
+    /// "1" comes before "9". The rules of semantic versioning apply now: a part
+    /// made of digits compares as a number.
+    /// </remarks>
+    [Theory]
+    [InlineData("v0.8.0-beta.10", "v0.8.0-beta.9", true)]
+    [InlineData("v0.8.0-beta.9", "v0.8.0-beta.10", false)]
+    [InlineData("v0.8.0-beta.2", "v0.8.0-beta.10", false)]
+    [InlineData("v0.8.0-beta.11", "v0.8.0-beta.10", true)]
+    // A label with more parts outranks the one it extends.
+    [InlineData("v0.8.0-beta.1", "v0.8.0-beta", true)]
+    [InlineData("v0.8.0-beta", "v0.8.0-beta.1", false)]
+    // Text beats digits, so a release candidate outranks a beta.
+    [InlineData("v0.8.0-rc.1", "v0.8.0-beta.99", true)]
+    public void PreReleaseLabelsAreOrderedByNumberWhereTheyAreNumbers(
+        string published, string installed, bool isNewer)
+    {
+        Assert.True(GitHubReleaseUpdateService.TryParseTag(published, out var latest));
+        Assert.True(GitHubReleaseUpdateService.TryParseTag(installed, out var current));
+
+        Assert.Equal(isNewer, latest > current);
+    }
+
     [Theory]
     [InlineData(0, 2, 0, 0, "0.2.0")]
     [InlineData(1, 0, 0, 7, "1.0.0")]

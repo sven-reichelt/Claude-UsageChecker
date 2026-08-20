@@ -30,6 +30,17 @@ numerazione [Semantic Versioning](https://semver.org/lang/it/).
   «Aspetto» ora si può fissare su chiaro o scuro. La scelta ha effetto mentre
   la si compie: il colore è l'unica impostazione il cui effetto non si lascia
   descrivere in una frase.
+- **Entrambi gli accessi a colpo d'occhio.** Le impostazioni dicono ora, in
+  cima a tutto, se un'installazione di Claude Code ha l'accesso effettuato e se
+  l'accesso integrato funziona: entrambi, sempre, qualunque sia quello in uso.
+  Quale via venga presa non dice nulla su come se la caverebbe l'altra, ed è
+  esattamente la domanda quando i numeri smettono di arrivare.
+
+### Corretto
+- **Le versioni di prova oltre la nona non venivano proposte.** L'etichetta
+  dopo il trattino veniva confrontata come testo, così «beta.10» finiva sotto
+  «beta.9»: a chi provava veniva detto che era aggiornato. Ora le etichette si
+  contano, parte per parte, come prescrive il versionamento semantico.
 ## [0.7.2] – 2026-08-20
 
 ### Corretto

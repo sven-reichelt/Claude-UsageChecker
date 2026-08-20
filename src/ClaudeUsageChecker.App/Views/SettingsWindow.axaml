@@ -37,6 +37,25 @@
         <!-- Left: who the application signs in as, and how it behaves. -->
         <StackPanel Grid.Column="0" Spacing="18">
 
+          <!-- Both routes to a token, side by side and always both. Which one
+               is in use says nothing about whether the other would work, and
+               that is exactly the question when something is wrong. -->
+          <StackPanel Spacing="8">
+            <TextBlock x:Name="AccountsHeading" FontWeight="SemiBold" />
+
+            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" RowSpacing="4">
+              <TextBlock x:Name="AccountCliLabel" FontSize="12" Margin="0,0,12,0" />
+              <TextBlock Grid.Column="1" x:Name="AccountCliStatus" FontSize="12"
+                         TextWrapping="Wrap" Opacity="0.8" />
+
+              <TextBlock Grid.Row="1" x:Name="AccountOwnLabel" FontSize="12" Margin="0,0,12,0" />
+              <TextBlock Grid.Row="1" Grid.Column="1" x:Name="AccountOwnStatus" FontSize="12"
+                         TextWrapping="Wrap" Opacity="0.8" />
+            </Grid>
+          </StackPanel>
+
+          <Separator />
+
           <StackPanel Spacing="8">
             <TextBlock x:Name="SignInHeading" FontWeight="SemiBold" />
             <TextBlock x:Name="SignInStatus" TextWrapping="Wrap" FontSize="12" Opacity="0.8" />

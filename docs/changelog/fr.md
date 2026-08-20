@@ -30,6 +30,18 @@ numérotation [Semantic Versioning](https://semver.org/lang/fr/).
   défaut. Sous « Apparence », elle peut désormais être fixée en clair ou en
   sombre. Le choix prend effet pendant qu'on le fait : la couleur est le seul
   réglage dont l'effet ne se laisse pas décrire en une phrase.
+- **Les deux connexions d'un coup d'œil.** Les paramètres indiquent désormais,
+  tout en haut, si une installation Claude Code est connectée et si la
+  connexion intégrée fonctionne : les deux, toujours, quelle que soit celle qui
+  sert. La voie empruntée ne dit rien de ce que vaudrait l'autre, et c'est
+  précisément la question quand les chiffres cessent d'arriver.
+
+### Corrigé
+- **Les versions d'essai au-delà de la neuvième n'étaient pas proposées.**
+  L'étiquette après le tiret était comparée comme du texte : « beta.10 » passait
+  donc sous « beta.9 », et l'on annonçait à qui testait qu'il était à jour. Les
+  étiquettes sont désormais comptées, partie par partie, comme le veut la
+  gestion sémantique de version.
 ## [0.7.2] – 2026-08-20
 
 ### Corrigé

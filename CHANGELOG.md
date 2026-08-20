@@ -30,6 +30,19 @@ the versioning [Semantic Versioning](https://semver.org/).
   Appearance it can now be pinned to light or dark instead. The choice takes
   effect while it is being made - colour is the one setting whose effect cannot
   be described in a sentence.
+- **Both sign-ins at a glance.** The settings now say, above everything else,
+  whether a Claude Code installation is signed in and whether the application's
+  own sign-in works - both of them, always, whichever one is actually in use.
+  Which route is taken says nothing about whether the other would work, and
+  that is exactly the question when the figures stop arriving.
+
+### Fixed
+- **Test builds beyond the ninth were not offered.** The label after the
+  hyphen was compared as text, so "beta.10" sorted below "beta.9" - the one
+  who was testing was told they were up to date. Written off as a thought
+  experiment when the comparison was built; the tenth test build of a single
+  day arrived a week later. Labels are counted now, part by part, as semantic
+  versioning prescribes.
 ## [0.7.2] – 2026-08-20
 
 ### Fixed

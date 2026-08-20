@@ -110,6 +110,71 @@ public partial class SettingsWindow : Window
 
         UpdateSignInStatus();
         UpdateRelocationHint();
+        RefreshAccounts();
+    }
+
+    /// <summary>
+    /// The state of both routes to a token, whichever of them is in use.
+    /// </summary>
+    /// <remarks>
+    /// Which one the application ends up taking says nothing about whether the
+    /// other would work - and that is exactly the question when the figures
+    /// stop arriving. So both are asked, every time this window opens.
+    /// </remarks>
+    private void RefreshAccounts()
+    {
+        AccountOwnStatus.Text = DescribeOwnSignIn();
+
+        // The token of a Claude Code installation sits in a file or in the
+        // keychain, so asking costs a read. It is done off the interface and
+        // written in when the answer arrives.
+        AccountCliStatus.Text = T.SettingsAccountChecking;
+        _ = DescribeClaudeCodeAsync();
+    }
+
+    private string DescribeOwnSignIn()
+    {
+        if (_oauthTokenStore is not { IsSupported: true })
+        {
+            return T.SettingsAccountNoStore;
+        }
+
+        var tokens = _oauthTokenStore.Read();
+        if (tokens is null)
+        {
+            return T.SettingsAccountNotSignedIn;
+        }
+
+        return tokens.ExpiresAt is { } expiry
+            ? T.SettingsAccountSignedInUntil(expiry.ToLocalTime())
+            : T.SettingsAccountSignedIn;
+    }
+
+    private async Task DescribeClaudeCodeAsync()
+    {
+        string text;
+
+        try
+        {
+            var token = await new ClaudeCliTokenProvider().TryGetTokenAsync().ConfigureAwait(true);
+
+            text = token switch
+            {
+                null => T.SettingsAccountNotSignedIn,
+                // Expired is worth saying rather than hiding: this token is only
+                // ever read, never refreshed, so nothing here will mend it.
+                var t when t.IsExpired(DateTimeOffset.UtcNow, TimeSpan.Zero) => T.SettingsAccountExpired,
+                { ExpiresAt: { } expiry } => T.SettingsAccountSignedInUntil(expiry.ToLocalTime()),
+                _ => T.SettingsAccountSignedIn
+            };
+        }
+        catch (Exception ex) when (ex is not OutOfMemoryException)
+        {
+            // A window that cannot answer says so; it does not fall over.
+            text = T.SettingsAccountNotSignedIn;
+        }
+
+        AccountCliStatus.Text = text;
     }
 
     /// <summary>
@@ -141,6 +206,10 @@ public partial class SettingsWindow : Window
     private void ApplyTexts()
     {
         Title = T.SettingsTitle;
+
+        AccountsHeading.Text = T.SettingsAccountsSection;
+        AccountCliLabel.Text = T.SourceClaudeCli;
+        AccountOwnLabel.Text = T.SettingsAccountOwn;
 
         SignInHeading.Text = T.SettingsSignInSection;
         SignInButton.Content = T.SettingsSignIn;
@@ -216,7 +285,11 @@ public partial class SettingsWindow : Window
     private void LimitToScreen() => ScreenFit.Apply(this, ContentScroller);
 
     /// <summary>Refreshes the sign-in display from outside.</summary>
-    public void RefreshSignInStatus() => UpdateSignInStatus();
+    public void RefreshSignInStatus()
+    {
+        UpdateSignInStatus();
+        RefreshAccounts();
+    }
 
     private void UpdateSignInStatus()
     {
@@ -248,6 +321,7 @@ public partial class SettingsWindow : Window
         {
             _oauthTokenStore.Clear();
             UpdateSignInStatus();
+            RefreshAccounts();
             SettingsChanged?.Invoke(this, _settings);
         }
         catch (InvalidOperationException ex)

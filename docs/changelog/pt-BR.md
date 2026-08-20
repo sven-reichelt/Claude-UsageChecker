@@ -30,6 +30,17 @@ versionamento [Semantic Versioning](https://semver.org/lang/pt-BR/).
   «Aparência» agora dá para fixá-lo em claro ou escuro. A escolha já vale
   enquanto é feita: a cor é o único ajuste cujo efeito não se deixa descrever
   em uma frase.
+- **Os dois logins de relance.** As configurações agora dizem, bem no alto, se
+  uma instalação do Claude Code está conectada e se o login próprio funciona:
+  os dois, sempre, seja qual for o que estiver em uso. Qual caminho é tomado
+  não diz nada sobre se o outro funcionaria, e essa é justamente a pergunta
+  quando os números param de chegar.
+
+### Corrigido
+- **Versões de teste além da nona não eram oferecidas.** O rótulo depois do
+  hífen era comparado como texto, de modo que «beta.10» ficava abaixo de
+  «beta.9»: a quem testava se dizia que estava em dia. Agora os rótulos são
+  contados, parte por parte, como manda o versionamento semântico.
 ## [0.7.2] – 2026-08-20
 
 ### Corrigido
