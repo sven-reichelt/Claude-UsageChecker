@@ -341,8 +341,14 @@ public partial class App : Application, IDisposable
     public static Uri RepositoryUri { get; } =
         new($"https://github.com/{RepositoryOwner}/{RepositoryName}");
 
-    private static IUpdateService CreateUpdateService(HttpClient httpClient) =>
-        new GitHubReleaseUpdateService(httpClient, RepositoryOwner, RepositoryName, CurrentVersion);
+    /// <remarks>
+    /// The channel is read on every check rather than captured once: whoever
+    /// switches to pre-releases in the settings expects the next check to follow
+    /// it, not the next start.
+    /// </remarks>
+    private IUpdateService CreateUpdateService(HttpClient httpClient) =>
+        new GitHubReleaseUpdateService(
+            httpClient, RepositoryOwner, RepositoryName, CurrentVersion, () => _settings.Channel);
 
     private void ShowDetails()
     {

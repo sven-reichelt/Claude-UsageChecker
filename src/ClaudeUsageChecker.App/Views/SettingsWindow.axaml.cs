@@ -22,6 +22,10 @@ public partial class SettingsWindow : Window
     private readonly Func<InstallResult>? _relocate;
     private readonly Action<bool> _applyAutostart;
     private AppSettings _settings;
+    private int _versionClicks;
+
+    /// <summary>How often the version number has to be clicked to reveal the channel.</summary>
+    internal const int ClicksToRevealChannel = 5;
 
     public SettingsWindow() : this(new SettingsStore(), new AppSettings())
     {
@@ -63,6 +67,16 @@ public partial class SettingsWindow : Window
         VersionText.Text = T.Version(
             Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? T.Unknown);
 
+        ChannelBox.ItemsSource = new List<string> { T.SettingsChannelStable, T.SettingsChannelPreRelease };
+        ChannelBox.SelectedIndex = settings.Channel == UpdateChannel.PreRelease ? 1 : 0;
+
+        // Visible from the start where it has been found before, or where a
+        // pre-release is actually selected: a setting that could not be undone
+        // without knowing the trick would be a trap.
+        ChannelSection.IsVisible = settings.UpdateChannelShown || settings.Channel == UpdateChannel.PreRelease;
+
+        VersionText.PointerPressed += (_, _) => CountVersionClick();
+
         SignInButton.Click += (_, _) => SignInRequested?.Invoke(this, EventArgs.Empty);
         SignOutButton.Click += (_, _) => SignOut();
         SaveButton.Click += (_, _) => SaveAndClose();
@@ -73,6 +87,31 @@ public partial class SettingsWindow : Window
 
         UpdateSignInStatus();
         UpdateRelocationHint();
+    }
+
+    /// <summary>
+    /// Counts the clicks on the version number and reveals the choice of update
+    /// channel at the fifth.
+    /// </summary>
+    /// <remarks>
+    /// Five is enough that nobody arrives there by accident and few enough to be
+    /// found on purpose. Once revealed it stays revealed - it is saved along
+    /// with everything else, so nobody has to hunt for it twice.
+    /// </remarks>
+    private void CountVersionClick()
+    {
+        if (ChannelSection.IsVisible)
+        {
+            return;
+        }
+
+        _versionClicks++;
+
+        if (_versionClicks >= ClicksToRevealChannel)
+        {
+            ChannelSection.IsVisible = true;
+            ContentScroller.ScrollToEnd();
+        }
     }
 
     /// <summary>Sets every fixed label from the language file.</summary>
@@ -93,6 +132,10 @@ public partial class SettingsWindow : Window
         LanguageHeading.Text = T.SettingsLanguageSection;
         LanguageHint.Text = T.SettingsLanguageHint;
         LanguageLabel.Text = T.SettingsLanguageLabel;
+
+        ChannelHeading.Text = T.SettingsChannelSection;
+        ChannelHint.Text = T.SettingsChannelHint;
+        ChannelLabel.Text = T.SettingsChannelLabel;
 
         ThresholdHeading.Text = T.SettingsThresholdSection;
         ThresholdIntro.Text = T.SettingsThresholdHint;
@@ -215,7 +258,9 @@ public partial class SettingsWindow : Window
             CriticalThreshold = critical,
             Language = language.Code,
             InstallPromptShown = _settings.InstallPromptShown,
-            LastRunVersion = _settings.LastRunVersion
+            LastRunVersion = _settings.LastRunVersion,
+            Channel = ChannelBox.SelectedIndex == 1 ? UpdateChannel.PreRelease : UpdateChannel.Stable,
+            UpdateChannelShown = ChannelSection.IsVisible
         };
 
         _settingsStore.Save(_settings);

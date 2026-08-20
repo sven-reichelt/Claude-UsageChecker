@@ -130,6 +130,11 @@ public static class T
     public static string SettingsLanguageSection => L["settings.languageSection"];
     public static string SettingsLanguageHint => L["settings.languageHint"];
     public static string SettingsLanguageLabel => L["settings.languageLabel"];
+    public static string SettingsChannelSection => L["settings.channelSection"];
+    public static string SettingsChannelHint => L["settings.channelHint"];
+    public static string SettingsChannelLabel => L["settings.channelLabel"];
+    public static string SettingsChannelStable => L["settings.channelStable"];
+    public static string SettingsChannelPreRelease => L["settings.channelPreRelease"];
     public static string SettingsThresholdSection => L["settings.thresholdSection"];
     public static string SettingsThresholdHint => L["settings.thresholdHint"];
     public static string SettingsWarningThreshold => L["settings.warningThreshold"];

@@ -46,6 +46,35 @@ public sealed class AppSettings
     public string? Language { get; set; }
 
     /// <summary>
+    /// Which releases the update check considers: only the published ones, or
+    /// pre-releases as well.
+    /// </summary>
+    /// <remarks>
+    /// Stored as text rather than as a number, so that the settings file stays
+    /// readable and an unknown value falls back to the safe side instead of
+    /// landing somewhere by its ordinal.
+    /// </remarks>
+    [JsonPropertyName("updateChannel")]
+    public string? UpdateChannel { get; set; }
+
+    /// <summary>
+    /// Whether the choice of channel has been found before. Once revealed it
+    /// stays revealed - hunting for the same trick twice helps nobody.
+    /// </summary>
+    [JsonPropertyName("updateChannelShown")]
+    public bool UpdateChannelShown { get; set; }
+
+    /// <summary>The channel, or the published releases where nothing sensible is stored.</summary>
+    [JsonIgnore]
+    public UpdateChannel Channel
+    {
+        get => string.Equals(UpdateChannel, "prerelease", StringComparison.OrdinalIgnoreCase)
+            ? Settings.UpdateChannel.PreRelease
+            : Settings.UpdateChannel.Stable;
+        set => UpdateChannel = value == Settings.UpdateChannel.PreRelease ? "prerelease" : "stable";
+    }
+
+    /// <summary>
     /// The version that ran last - three parts, "0.5.0" for instance. It is how
     /// the application recognises after an update which changes it has to show.
     /// Empty means: the very first start.

@@ -16,6 +16,9 @@
     <StackPanel DockPanel.Dock="Bottom" Margin="20,0,20,20" Spacing="18">
       <Separator />
       <Grid ColumnDefinitions="*,Auto,Auto">
+        <!-- Clicking it five times reveals the choice of update channel. A
+             cursor of its own would give it away; it is meant to be found by
+             someone looking, not noticed by everyone. -->
         <TextBlock x:Name="VersionText" FontSize="11" Opacity="0.6" VerticalAlignment="Center" />
         <Button Grid.Column="1" x:Name="CancelButton" Margin="0,0,8,0" />
         <Button Grid.Column="2" x:Name="SaveButton" IsDefault="True" />
@@ -88,6 +91,21 @@
 
           <TextBlock x:Name="ThresholdHint" IsVisible="False" TextWrapping="Wrap"
                      FontSize="11" Foreground="{DynamicResource CriticalBrush}" />
+        </StackPanel>
+
+        <!-- Hidden until the version number at the bottom has been clicked five
+             times. Not a secret worth keeping, but not a choice to stumble into
+             either: a pre-release is meant for whoever agreed to test one. Once
+             found it stays, so nobody has to hunt for it twice. -->
+        <StackPanel x:Name="ChannelSection" Spacing="10" IsVisible="False">
+          <Separator />
+          <TextBlock x:Name="ChannelHeading" FontWeight="SemiBold" />
+          <TextBlock x:Name="ChannelHint" TextWrapping="Wrap" FontSize="12" Opacity="0.8" />
+
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock x:Name="ChannelLabel" VerticalAlignment="Center" FontSize="12" />
+            <ComboBox Grid.Column="1" x:Name="ChannelBox" Width="200" />
+          </Grid>
         </StackPanel>
       </StackPanel>
     </ScrollViewer>
