@@ -216,13 +216,30 @@ internal static class MacOsBundle
             startInfo.ArgumentList.Add(argument);
         }
 
-        using var process = Process.Start(startInfo);
+        // A program that is not there throws rather than failing, and the
+        // exception is of a kind the caller does not catch - it would travel up
+        // to the message loop and end the application without a word. Every one
+        // of these lives in /usr/bin or /usr/sbin and is always there, which is
+        // exactly the assumption that makes this worth writing down.
+        Process? process;
+        try
+        {
+            process = Process.Start(startInfo);
+        }
+        catch (System.ComponentModel.Win32Exception)
+        {
+            return -1;
+        }
+
         if (process is null)
         {
             return -1;
         }
 
-        await process.WaitForExitAsync(cancellationToken).ConfigureAwait(false);
-        return process.ExitCode;
+        using (process)
+        {
+            await process.WaitForExitAsync(cancellationToken).ConfigureAwait(false);
+            return process.ExitCode;
+        }
     }
 }

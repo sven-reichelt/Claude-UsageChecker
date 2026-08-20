@@ -181,4 +181,28 @@ public class MacOsBundleTests
         // The path it would copy to is a Windows one, whatever machine asks.
         Assert.EndsWith(".exe", SelfInstaller.TargetPath, StringComparison.Ordinal);
     }
+
+    /// <summary>
+    /// A signing tool that is not there answers no, rather than throwing.
+    /// </summary>
+    /// <remarks>
+    /// Process.Start throws when the program is missing, and the exception is
+    /// of a kind the update path does not catch - it would travel up to the
+    /// message loop and end the application without a word, which is the
+    /// failure mode every tray action is guarded against. Answering no is also
+    /// the right answer: what cannot be verified is not installed.
+    ///
+    /// On a Mac these programs are always there, so the test can only run where
+    /// they are not - which is where it matters.
+    /// </remarks>
+    [Fact]
+    public async Task AMissingSigningToolIsAnsweredRatherThanThrown()
+    {
+        if (OperatingSystem.IsMacOS())
+        {
+            return;
+        }
+
+        Assert.False(await MacOsBundle.IsAcceptableAsync("/Applications/X.app", CancellationToken.None));
+    }
 }
