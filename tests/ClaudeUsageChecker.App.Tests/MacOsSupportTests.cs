@@ -1,4 +1,5 @@
 using Avalonia.Headless.XUnit;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using ClaudeUsageChecker.App.Services;
 using ClaudeUsageChecker.Core.Localization;
@@ -157,6 +158,60 @@ public class MacOsSupportTests
         // of our own beside it was the same thing twice on the same shortcut.
         Assert.DoesNotContain(T.TrayExit, headers);
     }
+
+    /// <summary>
+    /// The application menu follows a change of language.
+    /// </summary>
+    /// <remarks>
+    /// A menu already handed to macOS does not relabel itself; the entries stay
+    /// in the language they were built in, which is how the application ended
+    /// up Italian with a German menu beside the apple. Handing over a fresh one
+    /// is what reaches the system.
+    ///
+    /// Only answerable where the menu exists at all, so this steps aside on
+    /// Windows - the macOS build in CI runs the same suite and does answer it.
+    /// </remarks>
+    [AvaloniaFact]
+    public void TheApplicationMenuFollowsAChangeOfLanguage()
+    {
+        if (!OperatingSystem.IsMacOS())
+        {
+            return;
+        }
+
+        var application = Avalonia.Application.Current!;
+        var before = Localizer.Current.Language;
+
+        try
+        {
+            Localizer.Use(Language.Find("de")!);
+            ((App)application).GetType()
+                .GetMethod("BuildMacOsApplicationMenu", BindingFlags.NonPublic | BindingFlags.Instance)!
+                .Invoke(application, null);
+
+            var german = Headers(application);
+            Assert.Contains(T.AboutTitle, german);
+
+            Localizer.Use(Language.Find("it")!);
+            ((App)application).GetType()
+                .GetMethod("BuildMacOsApplicationMenu", BindingFlags.NonPublic | BindingFlags.Instance)!
+                .Invoke(application, null);
+
+            var italian = Headers(application);
+
+            Assert.Contains(T.AboutTitle, italian);
+            Assert.NotEqual(german, italian);
+        }
+        finally
+        {
+            Localizer.Use(before);
+        }
+    }
+
+    private static List<string?> Headers(Avalonia.Application application) =>
+        [.. Avalonia.Controls.NativeMenu.GetMenu(application)!.Items
+            .OfType<Avalonia.Controls.NativeMenuItem>()
+            .Select(i => i.Header)];
 
     /// <summary>The label is a reverse domain name, as launchd expects.</summary>
     [Fact]

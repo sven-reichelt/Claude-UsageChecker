@@ -69,6 +69,23 @@
             <CheckBox x:Name="RefreshChecksUpdatesBox" />
           </StackPanel>
 
+          <!-- Hidden until the version number at the bottom has been clicked five
+               times. Not a secret worth keeping, but not a choice to stumble into
+               either: a pre-release is meant for whoever agreed to test one. It
+               stays visible while one is selected, so there is always a way back;
+               on the published releases it is gone again at the next opening. -->
+          <StackPanel x:Name="ChannelSection" Spacing="10" IsVisible="False">
+            <Separator />
+            <TextBlock x:Name="ChannelHeading" FontWeight="SemiBold" />
+            <TextBlock x:Name="ChannelHint" TextWrapping="Wrap" FontSize="12" Opacity="0.8" />
+
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock x:Name="ChannelLabel" VerticalAlignment="Center" FontSize="12"
+                         TextWrapping="Wrap" Margin="0,0,8,0" />
+              <ComboBox Grid.Column="1" x:Name="ChannelBox" Width="200" />
+            </Grid>
+          </StackPanel>
+
         </StackPanel>
 
         <!-- A hairline between the columns: without it the two halves read as
@@ -89,7 +106,7 @@
               <!-- The language names are each written in their own language and are
                    therefore not translated - someone who switched the interface to
                    Russian by accident will recognise "Deutsch". -->
-              <ComboBox Grid.Column="1" x:Name="LanguageBox" Width="160" />
+              <ComboBox Grid.Column="1" x:Name="LanguageBox" Width="200" />
             </Grid>
           </StackPanel>
 
@@ -102,7 +119,7 @@
             <Grid ColumnDefinitions="*,Auto">
               <TextBlock x:Name="ThemeLabel" VerticalAlignment="Center" FontSize="12"
                          TextWrapping="Wrap" Margin="0,0,8,0" />
-              <ComboBox Grid.Column="1" x:Name="ThemeBox" Width="160" />
+              <ComboBox Grid.Column="1" x:Name="ThemeBox" Width="200" />
             </Grid>
           </StackPanel>
 
@@ -128,23 +145,6 @@
 
             <TextBlock x:Name="ThresholdHint" IsVisible="False" TextWrapping="Wrap"
                        FontSize="11" Foreground="{DynamicResource CriticalBrush}" />
-          </StackPanel>
-
-          <!-- Hidden until the version number at the bottom has been clicked five
-               times. Not a secret worth keeping, but not a choice to stumble into
-               either: a pre-release is meant for whoever agreed to test one. It
-               stays visible while one is selected, so there is always a way back;
-               on the published releases it is gone again at the next opening. -->
-          <StackPanel x:Name="ChannelSection" Spacing="10" IsVisible="False">
-            <Separator />
-            <TextBlock x:Name="ChannelHeading" FontWeight="SemiBold" />
-            <TextBlock x:Name="ChannelHint" TextWrapping="Wrap" FontSize="12" Opacity="0.8" />
-
-            <Grid ColumnDefinitions="*,Auto">
-              <TextBlock x:Name="ChannelLabel" VerticalAlignment="Center" FontSize="12"
-                         TextWrapping="Wrap" Margin="0,0,8,0" />
-              <ComboBox Grid.Column="1" x:Name="ChannelBox" Width="160" />
-            </Grid>
           </StackPanel>
 
         </StackPanel>

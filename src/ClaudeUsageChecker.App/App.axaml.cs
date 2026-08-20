@@ -258,6 +258,16 @@ public partial class App : Application, IDisposable
     {
         _tray?.ApplyTexts();
 
+        // The menu beside the apple is exported to the system and does not
+        // follow along by itself. A menu handed over a second time does get
+        // pushed through, though - Avalonia watches the property for that, once
+        // the exporter behind it exists. So it is rebuilt: a fresh menu, in the
+        // language of the moment.
+        if (OperatingSystem.IsMacOS())
+        {
+            BuildMacOsApplicationMenu();
+        }
+
         if (_detailsWindow is { } window)
         {
             window.ApplyTexts();
@@ -291,13 +301,19 @@ public partial class App : Application, IDisposable
     /// the same shortcut.
     /// </para>
     /// <para>
-    /// The timing decides whether any of it arrives. Avalonia's exporter reads
-    /// this property exactly once; where it finds nothing, it builds its own
-    /// menu, writes that into the very same property, and never looks again.
-    /// Setting it afterwards changes a value nobody reads a second time - which
-    /// is what the first attempt did, from the lifetime callback, with no
-    /// visible effect whatsoever. Read out of AvaloniaNativeMenuExporter rather
-    /// than guessed at a third time.
+    /// The timing decides whether any of it arrives at startup. Avalonia's
+    /// exporter reads this property exactly once as it comes up; where it finds
+    /// nothing, it builds its own menu, writes that into the very same
+    /// property, and never looks again by itself. Setting it before that is
+    /// what makes ours the one it finds - the first attempt, from the lifetime
+    /// callback, was too late and had no visible effect whatsoever.
+    /// </para>
+    /// <para>
+    /// Afterwards it is the other way round: once the exporter exists, handing
+    /// over a <em>different</em> menu does reach the system, because Avalonia
+    /// watches the property for exactly that. Which is why this can be called
+    /// again on a language change - and has to be, since a menu already
+    /// exported does not relabel itself.
     /// </para>
     /// </remarks>
     private void BuildMacOsApplicationMenu()

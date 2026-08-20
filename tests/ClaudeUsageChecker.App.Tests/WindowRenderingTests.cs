@@ -103,6 +103,15 @@ public class WindowRenderingTests : IDisposable
         Capture(
             new SettingsWindow(new SettingsStore(file.Path), new AppSettings(), applyAutostart: _ => { }),
             $"settings-{code}");
+
+        // The same window with the section for testers unfolded - the one state
+        // in which the two columns are at their most uneven.
+        Capture(
+            new SettingsWindow(
+                new SettingsStore(file.Path),
+                new AppSettings { Channel = UpdateChannel.PreRelease },
+                applyAutostart: _ => { }),
+            $"settings-channel-{code}");
         Capture(new SignInWindow(), $"signin-{code}");
         Capture(new InstallPromptWindow(), $"setup-{code}");
         Capture(
