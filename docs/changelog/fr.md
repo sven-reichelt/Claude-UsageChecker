@@ -25,6 +25,11 @@ numérotation [Semantic Versioning](https://semver.org/lang/fr/).
   non par un développeur enregistré. Le remplacement automatique reste
   désactivé sur macOS pour l'instant : la nouvelle version se récupère à la main.
 
+- **Clair ou sombre, au choix.** L'application a toujours suivi l'apparence du
+  système ; cela convient dans la plupart des cas et reste le réglage par
+  défaut. Sous « Apparence », elle peut désormais être fixée en clair ou en
+  sombre. Le choix prend effet pendant qu'on le fait : la couleur est le seul
+  réglage dont l'effet ne se laisse pas décrire en une phrase.
 ## [0.7.2] – 2026-08-20
 
 ### Corrigé

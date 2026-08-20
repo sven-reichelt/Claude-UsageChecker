@@ -25,6 +25,11 @@ numeração [Semantic Versioning](https://semver.org/lang/pt-BR/).
   um programador registado. A substituição automática mantém-se desligada no
   macOS por agora: a versão nova é obtida à mão.
 
+- **Claro ou escuro, à escolha.** A aplicação sempre seguiu o aspeto do
+  sistema; isso serve na maioria dos casos e continua a ser a predefinição. Em
+  «Aspeto» pode agora ser fixada em claro ou escuro. A escolha já vale
+  enquanto é feita: a cor é a única definição cujo efeito não se deixa descrever
+  numa frase.
 ## [0.7.2] – 2026-08-20
 
 ### Corrigido

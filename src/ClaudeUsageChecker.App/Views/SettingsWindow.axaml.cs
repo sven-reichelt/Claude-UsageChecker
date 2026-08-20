@@ -1,6 +1,7 @@
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
 using ClaudeUsageChecker.App.Services;
 using ClaudeUsageChecker.App.Settings;
@@ -69,6 +70,17 @@ public partial class SettingsWindow : Window
             ? T.VersionPreRelease(ProgramVersion.Current.ToString())
             : T.Version(ProgramVersion.Current.ToString());
 
+        ThemeBox.ItemsSource = new List<string>
+        {
+            T.SettingsThemeSystem, T.SettingsThemeLight, T.SettingsThemeDark
+        };
+        ThemeBox.SelectedIndex = (int)settings.AppearanceMode;
+
+        // Applied while choosing, not on saving. Colour is the one setting
+        // whose effect cannot be described in a sentence - it has to be seen,
+        // and seeing it means being able to change one's mind before saving.
+        ThemeBox.SelectionChanged += (_, _) => ApplyTheme((AppearanceMode)Math.Max(ThemeBox.SelectedIndex, 0));
+
         ChannelBox.ItemsSource = new List<string> { T.SettingsChannelStable, T.SettingsChannelPreRelease };
         ChannelBox.SelectedIndex = settings.Channel == UpdateChannel.PreRelease ? 1 : 0;
 
@@ -83,7 +95,15 @@ public partial class SettingsWindow : Window
         SignInButton.Click += (_, _) => SignInRequested?.Invoke(this, EventArgs.Empty);
         SignOutButton.Click += (_, _) => SignOut();
         SaveButton.Click += (_, _) => SaveAndClose();
-        CancelButton.Click += (_, _) => Close();
+
+        // The appearance was applied while it was being chosen, so cancelling
+        // has something to undo - unlike every other setting here, which only
+        // takes effect on saving.
+        CancelButton.Click += (_, _) =>
+        {
+            ApplyTheme(settings.AppearanceMode);
+            Close();
+        };
 
         LaunchAtLoginBox.IsCheckedChanged += (_, _) => UpdateRelocationHint();
         Opened += (_, _) => LimitToScreen();
@@ -140,6 +160,10 @@ public partial class SettingsWindow : Window
         LanguageHint.Text = T.SettingsLanguageHint;
         LanguageLabel.Text = T.SettingsLanguageLabel;
 
+        ThemeHeading.Text = T.SettingsThemeSection;
+        ThemeHint.Text = T.SettingsThemeHint;
+        ThemeLabel.Text = T.SettingsThemeLabel;
+
         ChannelHeading.Text = T.SettingsChannelSection;
         ChannelHint.Text = T.SettingsChannelHint;
         ChannelLabel.Text = T.SettingsChannelLabel;
@@ -151,6 +175,23 @@ public partial class SettingsWindow : Window
 
         CancelButton.Content = T.Cancel;
         SaveButton.Content = T.Save;
+    }
+
+    /// <summary>
+    /// Puts the chosen appearance in place at once.
+    /// </summary>
+    /// <remarks>
+    /// On the application rather than this window: every other window is
+    /// created afresh and would take the new theme anyway, but the details
+    /// window and the menu of the notification area outlive the change. Setting
+    /// it in one place reaches all of them.
+    /// </remarks>
+    private static void ApplyTheme(AppearanceMode mode)
+    {
+        if (Application.Current is { } application)
+        {
+            application.RequestedThemeVariant = mode.ToVariant();
+        }
     }
 
     /// <summary>The language currently selected in the picker.</summary>
@@ -265,6 +306,7 @@ public partial class SettingsWindow : Window
             WarningThreshold = warning,
             CriticalThreshold = critical,
             Language = language.Code,
+            AppearanceMode = (AppearanceMode)Math.Max(ThemeBox.SelectedIndex, 0),
             InstallPromptShown = _settings.InstallPromptShown,
             LastRunVersion = _settings.LastRunVersion,
             Channel = ChannelBox.SelectedIndex == 1 ? UpdateChannel.PreRelease : UpdateChannel.Stable

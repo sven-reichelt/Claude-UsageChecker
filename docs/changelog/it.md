@@ -25,6 +25,11 @@ numerazione [Semantic Versioning](https://semver.org/lang/it/).
   da uno sviluppatore registrato. La sostituzione automatica resta disattivata
   su macOS per ora: la nuova versione si scarica a mano.
 
+- **Chiaro o scuro, a scelta.** L'applicazione ha sempre seguito l'aspetto del
+  sistema; va bene quasi sempre e resta l'impostazione predefinita. Sotto
+  «Aspetto» ora si può fissare su chiaro o scuro. La scelta ha effetto mentre
+  la si compie: il colore è l'unica impostazione il cui effetto non si lascia
+  descrivere in una frase.
 ## [0.7.2] – 2026-08-20
 
 ### Corretto

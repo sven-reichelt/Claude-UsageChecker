@@ -25,6 +25,11 @@ the versioning [Semantic Versioning](https://semver.org/).
   than by a registered developer. Self-replacement stays off on macOS for now -
   a new version is fetched by hand.
 
+- **Light or dark, by choice.** The application has always followed the theme
+  of the system, which is what most people want and stays the default. Under
+  Appearance it can now be pinned to light or dark instead. The choice takes
+  effect while it is being made - colour is the one setting whose effect cannot
+  be described in a sentence.
 ## [0.7.2] – 2026-08-20
 
 ### Fixed

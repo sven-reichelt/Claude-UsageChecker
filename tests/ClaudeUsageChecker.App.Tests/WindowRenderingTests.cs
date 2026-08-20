@@ -50,6 +50,47 @@ public class WindowRenderingTests : IDisposable
         return data;
     }
 
+    /// <summary>
+    /// Every window in the dark, once, in the source language.
+    /// </summary>
+    /// <remarks>
+    /// The application follows the theme of the system and always has, without
+    /// anyone ever having looked at the result. Drawing is the only thing that
+    /// answers the question: a brush that resolves to a light colour on a dark
+    /// ground is perfectly valid and completely unreadable, and no measurement
+    /// notices. One language is enough here - what is being looked at is the
+    /// colours, and those do not change with the words.
+    /// </remarks>
+    [AvaloniaFact]
+    public void EveryWindowDrawsInTheDark()
+    {
+        Localizer.Use(Language.Default);
+
+        var before = Avalonia.Application.Current!.RequestedThemeVariant;
+        Avalonia.Application.Current.RequestedThemeVariant = Avalonia.Styling.ThemeVariant.Dark;
+
+        try
+        {
+            using var file = new TemporaryFile();
+
+            Capture(BuildDetails(), "dark-details");
+            Capture(
+                new SettingsWindow(new SettingsStore(file.Path), new AppSettings(), applyAutostart: _ => { }),
+                "dark-settings");
+            Capture(new SignInWindow(), "dark-signin");
+            Capture(new InstallPromptWindow(), "dark-setup");
+            Capture(
+                new AboutWindow(new Uri("https://example.invalid/repo"), new ProgramVersion(new Version(0, 6, 1))),
+                "dark-about");
+            Capture(BuildReleaseNotes(), "dark-notes");
+            Capture(LayoutInEveryLanguageTests.BuildTrayMenu(), "dark-menu");
+        }
+        finally
+        {
+            Avalonia.Application.Current.RequestedThemeVariant = before;
+        }
+    }
+
     [AvaloniaTheory]
     [MemberData(nameof(Languages))]
     public void EveryWindowDraws(string code)

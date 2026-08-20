@@ -42,6 +42,22 @@ public sealed class AppSettings
     [JsonPropertyName("refreshChecksForUpdates")]
     public bool RefreshChecksForUpdates { get; set; } = true;
 
+    /// <summary>
+    /// Light, dark, or the system. Stored as text so that the settings file
+    /// stays readable and an unknown value falls back to the system rather than
+    /// landing somewhere by its ordinal.
+    /// </summary>
+    [JsonPropertyName("appearance")]
+    public string? Appearance { get; set; }
+
+    /// <summary>The choice, or the system where nothing sensible is stored.</summary>
+    [JsonIgnore]
+    public AppearanceMode AppearanceMode
+    {
+        get => AppearanceModes.Parse(Appearance);
+        set => Appearance = AppearanceModes.Format(value);
+    }
+
     /// <summary>Warning threshold in percent.</summary>
     [JsonPropertyName("warningThreshold")]
     public double WarningThreshold { get; set; } = 75d;

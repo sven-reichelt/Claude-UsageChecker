@@ -98,6 +98,10 @@ public partial class App : Application, IDisposable
             // right language already.
             Localizer.Use(Language.Find(_settings.Language) ?? Language.FromSystem());
 
+            // Light, dark, or whatever the system says. Default means the last
+            // of those, so this is a no-op for everyone who never chose.
+            RequestedThemeVariant = _settings.AppearanceMode.ToVariant();
+
             Compose();
         }
 
@@ -479,6 +483,7 @@ public partial class App : Application, IDisposable
         {
             _settings = settings;
             ErrorGuard.Run("apply the language", ApplyLanguage);
+            RequestedThemeVariant = _settings.AppearanceMode.ToVariant();
             ErrorGuard.Forget("call after a settings change", RefreshAsync);
         };
         window.SignInRequested += (_, _) => ErrorGuard.Run("open the sign-in", () => ShowSignIn(window));

@@ -25,6 +25,11 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
   einem eingetragenen Entwickler. Der Selbstaustausch bleibt auf macOS vorerst
   aus – eine neue Fassung wird von Hand geholt.
 
+- **Hell oder dunkel, nach Wahl.** Die Anwendung folgt seit jeher dem
+  Erscheinungsbild des Systems; das passt meistens und bleibt die Vorgabe. Unter
+  „Erscheinungsbild" lässt sie sich jetzt stattdessen auf hell oder dunkel
+  festlegen. Die Wahl wirkt schon beim Auswählen – Farbe ist die eine
+  Einstellung, deren Wirkung sich nicht in einem Satz beschreiben lässt.
 ## [0.7.2] – 2026-08-20
 
 ### Behoben

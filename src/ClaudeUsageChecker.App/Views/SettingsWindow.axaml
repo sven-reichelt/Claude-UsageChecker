@@ -96,6 +96,19 @@
           <Separator />
 
           <StackPanel Spacing="10">
+            <TextBlock x:Name="ThemeHeading" FontWeight="SemiBold" />
+            <TextBlock x:Name="ThemeHint" TextWrapping="Wrap" FontSize="12" Opacity="0.8" />
+
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock x:Name="ThemeLabel" VerticalAlignment="Center" FontSize="12"
+                         TextWrapping="Wrap" Margin="0,0,8,0" />
+              <ComboBox Grid.Column="1" x:Name="ThemeBox" Width="160" />
+            </Grid>
+          </StackPanel>
+
+          <Separator />
+
+          <StackPanel Spacing="10">
             <TextBlock x:Name="ThresholdHeading" FontWeight="SemiBold" />
             <TextBlock x:Name="ThresholdIntro" TextWrapping="Wrap" FontSize="12" Opacity="0.8" />
 

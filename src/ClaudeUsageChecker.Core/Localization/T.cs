@@ -142,6 +142,12 @@ public static class T
     public static string SettingsChannelLabel => L["settings.channelLabel"];
     public static string SettingsChannelStable => L["settings.channelStable"];
     public static string SettingsChannelPreRelease => L["settings.channelPreRelease"];
+    public static string SettingsThemeSection => L["settings.themeSection"];
+    public static string SettingsThemeHint => L["settings.themeHint"];
+    public static string SettingsThemeLabel => L["settings.themeLabel"];
+    public static string SettingsThemeSystem => L["settings.themeSystem"];
+    public static string SettingsThemeLight => L["settings.themeLight"];
+    public static string SettingsThemeDark => L["settings.themeDark"];
     public static string SettingsThresholdSection => L["settings.thresholdSection"];
     public static string SettingsThresholdHint => L["settings.thresholdHint"];
     public static string SettingsWarningThreshold => L["settings.warningThreshold"];

@@ -25,6 +25,11 @@ versionado [Semantic Versioning](https://semver.org/lang/es/).
   por un desarrollador registrado. La sustitución automática sigue desactivada
   en macOS por ahora: la nueva versión se descarga a mano.
 
+- **Claro u oscuro, a elección.** La aplicación siempre ha seguido la apariencia
+  del sistema; eso sirve en la mayoría de los casos y sigue siendo lo
+  predeterminado. En «Apariencia» ahora puede fijarse en claro u oscuro. La
+  elección surte efecto mientras se hace: el color es el único ajuste cuyo
+  efecto no se deja describir en una frase.
 ## [0.7.2] – 2026-08-20
 
 ### Corregido
