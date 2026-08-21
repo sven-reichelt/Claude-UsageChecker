@@ -86,21 +86,30 @@ limits read from the `limits` list, and nine languages.
 macOS arrived with 0.8.0 and has been tried on a real machine (Apple silicon,
 Tahoe 26.5): menu bar, keychain, autostart, the token of a Claude Code
 installation, the sign-in through the browser and the update check all work.
-0.9.0 added the two things that were missing there: the bundle is signed with a
-Developer ID and notarised by Apple, and it replaces itself the way the Windows
-version has since 0.4.0.
-
 0.8.0 also brought the choice of appearance (light, dark, or the system) and an
 overview of both sign-ins at the top of the settings.
 
-The suite runs on macOS in CI as well, and the release workflow starts the
-bundle it has just built. For a platform nobody here can open, that start is
-the most valuable test there is - it caught a crash that all 593 green tests
-had missed.
+**0.9.0 closed macOS out**, and every step of it was confirmed on that machine
+rather than reasoned about: the bundle is signed with a Developer ID and
+notarised by Apple; it is delivered as a **disk image**, where double-clicking
+the application inside makes it install itself into the applications folder,
+start from there and eject the image behind it; and it replaces itself at the
+push of a button the way the Windows version has since 0.4.0. Autostart survives
+a reboot. The zip stays attached to each release for the update check alone.
+
+That last day cost seven pre-releases, and what they bought is written into the
+pitfalls below. The short version: **a green test suite said nothing about any
+of it.** A refused bundle, a Gatekeeper check asking the wrong question in two
+places, an update that replaced itself and then left the Mac with nothing
+running - each was found by a person opening the thing, and each is now pinned
+by a test or by a step in the release workflow.
 
 Open: how long the sign-in survives a longer break (Anthropic does not document
-the lifetime of the refresh token), and whether the figures on the Pro
-subscription look the way the README describes. Details in
+the lifetime of the refresh token), whether the figures on the Pro subscription
+look the way the README describes, and why exactly the beta.2 zip was refused on
+a Mac - Archive Utility was measured and is innocent, so the leading suspicion
+is the online check macOS makes for a quarantined application whose notarisation
+is minutes old. Unproven, and recorded as such. Details in
 [CHANGELOG.md](CHANGELOG.md).
 
 ## Pitfalls that have bitten before
