@@ -281,6 +281,15 @@ where it guarded the only thing between a download and running it -
 `TheDownloadedBundleIsAssessedAsAnApplication` pins it now. **One wrong idea
 tends to have been written down twice.**
 
+**The release workflow tests on `windows-latest` only.** So a test that assumes
+a Windows path passes there, passes on this machine, and is caught by nothing
+until the macOS job of `ci.yml` runs - which happens on push, not on tag. Three
+tests held the Windows target for the only one and went out with 0.9.0 green all
+the way. The already-recorded rule about the CI running in English while this
+machine runs in German has a second half: **the platform differs too, and only
+one job asks about it.** Nothing shipped wrong - the assertions were wrong, not
+the code - but the release was cut with a red `main`.
+
 **"Can I replace myself here?" is not "may I install myself there?"**
 `SelfInstaller.ShouldOffer` hung on `UpdateInstaller.IsSupported`, which on macOS
 asks whether the folder *around the running bundle* can be written to. A disk
