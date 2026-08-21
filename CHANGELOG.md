@@ -26,6 +26,23 @@ the versioning [Semantic Versioning](https://semver.org/).
 
   Both together, because neither replaces the other. A checksum proves that the
   file is the one the server sent; a signature proves who built it.
+- **macOS is delivered as a disk image.** Open it, drag the application onto the
+  Applications folder beside it, done - no terminal, no unpacking.
+
+  The convenience is the smaller half of the reason. Most of this application is
+  managed .NET assemblies, and those are not Mach-O files, so their signatures
+  cannot be stored inside them: macOS keeps them in extended attributes beside
+  them instead. A zip can carry those only as side-cars, and whether they come
+  back as attributes is decided by whichever tool unpacks it. Where that goes
+  wrong, 202 of the 221 files in the bundle stand unsigned, the notarisation
+  ticket no longer fits a signature that no longer holds, and macOS reports that
+  it cannot verify the application is free of malware - which sounds like an
+  accusation and is really a lost file attribute.
+
+  A disk image is mounted rather than unpacked. Nothing stands between the
+  signature and the system that checks it. The zip stays attached to the release
+  for the update check, which unpacks it with `ditto` and therefore keeps what
+  matters.
 
 ## [0.8.0] – 2026-08-20
 

@@ -316,7 +316,13 @@ jobs:
           # The question Gatekeeper will be asked on someone else's machine,
           # asked here instead. Anything but "accepted" means whoever downloads
           # this gets a refusal rather than a program.
-          spctl --assess --type install --verbose=4 ClaudeUsageChecker.app
+          #
+          # "execute", not "install": that is the rule set macOS applies when
+          # someone opens an application. "install" assesses installer packages
+          # and answered for a while here - the wrong question, politely
+          # answered "accepted", while the bundle a tester double-clicked was
+          # being refused.
+          spctl --assess --type execute --verbose=4 ClaudeUsageChecker.app
           codesign --display --verbose=4 ClaudeUsageChecker.app 2>&1 | grep -E "Authority|TeamIdentifier|flags"
 
       # Ad-hoc, not a developer certificate. It gives the bundle a stable
@@ -368,6 +374,165 @@ jobs:
             > ClaudeUsageChecker-macos-arm64.zip.sha256
           cat ClaudeUsageChecker-macos-arm64.zip.sha256
 
+      # The zip above is what the application fetches for its own update, and it
+      # unpacks that with ditto, which restores everything. A person downloading
+      # through a browser has no such guarantee: 202 of the 221 files in this
+      # bundle are managed .NET assemblies, and those are not Mach-O, so codesign
+      # cannot put their signature inside them - it goes into an extended
+      # attribute beside them. A zip can only carry those as AppleDouble
+      # side-cars, and whether they come back as attributes depends entirely on
+      # the tool that unpacks it.
+      #
+      # A disk image has no such step. It is a filesystem, the attributes sit in
+      # it the way they sit on a disk, and double-clicking mounts it rather than
+      # unpacking it. Nothing stands between the signature and Gatekeeper.
+      - name: Put it in a disk image
+        shell: bash
+        run: |
+          set -euo pipefail
+          DMG="ClaudeUsageChecker-macos-arm64.dmg"
+          STAGE="$RUNNER_TEMP/dmg"
+
+          rm -rf "$STAGE"
+          mkdir -p "$STAGE"
+          # ditto rather than cp: the extended attributes carrying the
+          # signatures are the whole point of this exercise.
+          ditto ClaudeUsageChecker.app "$STAGE/ClaudeUsageChecker.app"
+          # The shortcut that makes the window a drag-and-drop target.
+          ln -s /Applications "$STAGE/Applications"
+
+          # HFS+ rather than APFS: it keeps extended attributes just as well and
+          # mounts on every macOS this application claims to support, back to 12.
+          hdiutil create \
+            -volname "Claude UsageChecker" \
+            -srcfolder "$STAGE" \
+            -fs HFS+ -format UDZO -ov \
+            "$DMG"
+
+      - name: Sign and notarise the disk image
+        if: steps.signing.outputs.enabled == 'true'
+        shell: bash
+        env:
+          IDENTITY: ${{ secrets.MACOS_SIGNING_IDENTITY }}
+          API_KEY: ${{ secrets.APPLE_API_KEY }}
+          API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          API_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER_ID }}
+        run: |
+          set -euo pipefail
+          DMG="ClaudeUsageChecker-macos-arm64.dmg"
+
+          # The image is a second thing to be trusted, not merely a wrapper: it
+          # is what the download carries and what Gatekeeper inspects first. The
+          # bundle inside already has its own ticket from the submission above.
+          codesign --force --timestamp \
+            --keychain "$KEYCHAIN" --sign "$IDENTITY" "$DMG"
+
+          KEY_ID="$(printf %s "$API_KEY_ID" | tr -d '[:space:]')"
+          ISSUER_ID="$(printf %s "$API_ISSUER_ID" | tr -d '[:space:]')"
+          echo "$API_KEY" | base64 --decode > "$RUNNER_TEMP/api-key.p8"
+          CREDENTIALS=(--key "$RUNNER_TEMP/api-key.p8" --key-id "$KEY_ID" --issuer "$ISSUER_ID")
+
+          SUBMISSION="$(xcrun notarytool submit "$DMG" \
+            "${CREDENTIALS[@]}" --output-format json | jq -r '.id')"
+          echo "Submission: $SUBMISSION"
+
+          xcrun notarytool wait "$SUBMISSION" "${CREDENTIALS[@]}" --timeout 45m || true
+
+          STATUS="$(xcrun notarytool info "$SUBMISSION" "${CREDENTIALS[@]}" \
+            --output-format json | jq -r '.status')"
+          echo "Apple says: $STATUS"
+
+          if [ "$STATUS" != "Accepted" ]; then
+            xcrun notarytool log "$SUBMISSION" "${CREDENTIALS[@]}" || true
+            rm -f "$RUNNER_TEMP/api-key.p8"
+            echo "::error::Notarisation of the disk image ended as $STATUS. Submission $SUBMISSION."
+            exit 1
+          fi
+
+          rm -f "$RUNNER_TEMP/api-key.p8"
+          xcrun stapler staple "$DMG"
+          xcrun stapler validate "$DMG"
+
+      # The check that was missing, and whose absence a tester found instead: up
+      # to here every question was asked of the bundle lying on this runner, and
+      # that one nobody downloads. What ships is the image and the zip, so those
+      # are what get asked.
+      - name: Would a double-click do?
+        if: steps.signing.outputs.enabled == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          DMG="ClaudeUsageChecker-macos-arm64.dmg"
+          MOUNT="$RUNNER_TEMP/mnt"
+
+          echo "=== the disk image, mounted the way a double-click mounts it ==="
+          mkdir -p "$MOUNT"
+          hdiutil attach -nobrowse -readonly -mountpoint "$MOUNT" "$DMG"
+          # A trap so a failing check still gives the runner its image back.
+          trap 'hdiutil detach "$MOUNT" -quiet || true' EXIT
+
+          APP="$MOUNT/ClaudeUsageChecker.app"
+          codesign --verify --strict --verbose=2 "$APP"
+          xcrun stapler validate "$APP"
+          spctl --assess --type execute --verbose=4 "$APP"
+
+          hdiutil detach "$MOUNT" -quiet
+          trap - EXIT
+
+          echo "=== the zip, unpacked the way the application unpacks it ==="
+          UNPACKED="$RUNNER_TEMP/from-zip"
+          rm -rf "$UNPACKED"
+          ditto -xk ClaudeUsageChecker-macos-arm64.zip "$UNPACKED"
+          codesign --verify --strict --verbose=2 "$UNPACKED/ClaudeUsageChecker.app"
+          xcrun stapler validate "$UNPACKED/ClaudeUsageChecker.app"
+          spctl --assess --type execute --verbose=4 "$UNPACKED/ClaudeUsageChecker.app"
+
+      # Not a gate: this is the measurement nobody had. A tester's double-click
+      # on the zip produced "Apple could not verify ... is free of malware", and
+      # whether Archive Utility drops those extended attributes was guessed at
+      # rather than known. Now the runner says so out loud on every release. It
+      # decides nothing - the disk image is the answer either way - but a
+      # recorded fact beats a plausible story.
+      - name: What does Archive Utility make of the zip?
+        if: steps.signing.outputs.enabled == 'true'
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -uo pipefail
+          PROBE="$RUNNER_TEMP/probe"
+          rm -rf "$PROBE"
+          mkdir -p "$PROBE"
+          cp ClaudeUsageChecker-macos-arm64.zip "$PROBE/"
+
+          # The same program the Finder hands a double-clicked archive to.
+          open -a "Archive Utility" "$PROBE/ClaudeUsageChecker-macos-arm64.zip"
+          for _ in $(seq 1 60); do
+            [ -d "$PROBE/ClaudeUsageChecker.app" ] && break
+            sleep 1
+          done
+
+          if [ ! -d "$PROBE/ClaudeUsageChecker.app" ]; then
+            echo "Archive Utility produced nothing within a minute - no measurement this time."
+            exit 0
+          fi
+
+          SIDECARS="$(find "$PROBE/ClaudeUsageChecker.app" -name '._*' | wc -l | tr -d ' ')"
+          echo "AppleDouble side-cars left lying as files: $SIDECARS"
+          echo "--- codesign"
+          codesign --verify --strict --verbose=2 "$PROBE/ClaudeUsageChecker.app" || true
+          echo "--- spctl"
+          spctl --assess --type execute --verbose=4 "$PROBE/ClaudeUsageChecker.app" || true
+
+      # Last, and that is not an accident: stapling the ticket rewrites the
+      # image, so a sum taken before it would describe a file nobody receives.
+      - name: Compute the disk image checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          DMG="ClaudeUsageChecker-macos-arm64.dmg"
+          shasum -a 256 "$DMG" | sed "s|  .*|  $DMG|" > "$DMG.sha256"
+          cat "$DMG.sha256"
+
       - name: Hand it over
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
@@ -375,6 +540,8 @@ jobs:
           path: |
             ClaudeUsageChecker-macos-arm64.zip
             ClaudeUsageChecker-macos-arm64.zip.sha256
+            ClaudeUsageChecker-macos-arm64.dmg
+            ClaudeUsageChecker-macos-arm64.dmg.sha256
           if-no-files-found: error
 
   release:
@@ -482,23 +649,29 @@ jobs:
           name: macos-bundle
           path: publish
 
-      - name: Read the macOS checksum
+      - name: Read the macOS checksums
         id: macos
         shell: pwsh
         run: |
-          $name = "ClaudeUsageChecker-macos-arm64.zip"
-          # Recomputed here rather than trusted: the file travelled through
-          # an artifact store between two machines.
-          $hash = (Get-FileHash "publish/$name" -Algorithm SHA256).Hash.ToLower()
-          $claimed = (Get-Content "publish/$name.sha256").Split(" ")[0]
-          if ($hash -ne $claimed) {
-            Write-Error "The macOS bundle does not match its checksum."
-            exit 1
+          # Two packages for one platform, and they are not alternatives: the
+          # disk image is what a person downloads, the zip is what the
+          # application fetches for its own update. Both are recomputed here
+          # rather than trusted - they travelled through an artifact store
+          # between two machines.
+          foreach ($pair in @(@("zip", "ClaudeUsageChecker-macos-arm64.zip"),
+                              @("dmg", "ClaudeUsageChecker-macos-arm64.dmg"))) {
+            $key, $name = $pair
+            $hash = (Get-FileHash "publish/$name" -Algorithm SHA256).Hash.ToLower()
+            $claimed = (Get-Content "publish/$name.sha256").Split(" ")[0]
+            if ($hash -ne $claimed) {
+              Write-Error "$name does not match its checksum."
+              exit 1
+            }
+            $size = [math]::Round((Get-Item "publish/$name").Length / 1MB, 1)
+            "$key-name=$name"     | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+            "$key-sha256=$hash"   | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+            "$key-size=$size"     | Out-File -FilePath $env:GITHUB_OUTPUT -Append
           }
-          $size = [math]::Round((Get-Item "publish/$name").Length / 1MB, 1)
-          "name=$name" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-          "sha256=$hash" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-          "size=$size" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
       - name: Create the release
         uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2
@@ -519,8 +692,10 @@ jobs:
           files: |
             publish/${{ steps.package.outputs.name }}
             publish/${{ steps.package.outputs.name }}.sha256
-            publish/${{ steps.macos.outputs.name }}
-            publish/${{ steps.macos.outputs.name }}.sha256
+            publish/${{ steps.macos.outputs.dmg-name }}
+            publish/${{ steps.macos.outputs.dmg-name }}.sha256
+            publish/${{ steps.macos.outputs.zip-name }}
+            publish/${{ steps.macos.outputs.zip-name }}.sha256
             LICENSE
           body: |
             ## Claude UsageChecker ${{ steps.version.outputs.version }}
@@ -530,7 +705,11 @@ jobs:
             | | |
             |---|---|
             | **Windows (x64)** | `ClaudeUsageChecker.exe`, ${{ steps.package.outputs.size }} MB |
-            | **macOS (Apple silicon)** | `${{ steps.macos.outputs.name }}`, ${{ steps.macos.outputs.size }} MB |
+            | **macOS (Apple silicon)** | `${{ steps.macos.outputs.dmg-name }}`, ${{ steps.macos.outputs.dmg-size }} MB |
+
+            The `.zip` attached alongside is the same application in the form
+            the update check fetches. For installing by hand, take the disk
+            image.
 
             ### Installation on Windows
 
@@ -543,41 +722,28 @@ jobs:
 
             ### Installation on macOS
 
-            ${{ needs.macos.outputs.signed == 'true' && 'Signed with a Developer ID and notarised by Apple, with the ticket stapled to the bundle: it opens on any Mac, straight from the browser, without asking anything of you.' || 'Signed ad hoc rather than by a registered developer, so macOS refuses it unless it is fetched from the terminal rather than through a browser.' }}
+            ${{ needs.macos.outputs.signed == 'true' && 'Signed with a Developer ID and notarised by Apple, image and application each with its own ticket: it opens on any Mac, straight from the browser, without asking anything of you.' || 'Signed ad hoc rather than by a registered developer, so macOS refuses it unless it is fetched from the terminal rather than through a browser.' }}
 
-            Either way the terminal is the shortest route:
+            Open `${{ steps.macos.outputs.dmg-name }}` and drag the application
+            onto the Applications folder beside it. That is all of it.
 
-            ```
-            pkill -f ClaudeUsageChecker
-            rm -rf /Applications/ClaudeUsageChecker.app
-            curl -L -O https://github.com/${{ github.repository }}/releases/download/v${{ steps.version.outputs.version }}/${{ steps.macos.outputs.name }}
-            ditto -xk ${{ steps.macos.outputs.name }} .
-            mv ClaudeUsageChecker.app /Applications/
-            open -a /Applications/ClaudeUsageChecker.app
-            ```
-
-            That is the first installation. From 0.9.0 on, every later version
-            arrives through **Install now and restart** in the application
-            itself, the same way it has on Windows since 0.4.0 - the sequence
-            above is only needed once.
-
-            The first two lines have nothing to do on a fresh machine and say so
-            harmlessly; coming from an older version they are what makes the
-            rest work at all, because `mv` refuses to overwrite a bundle that is
-            already there - it moves the new one inside the old, and the
-            application carries on running from the version that was meant to be
-            replaced.
+            Coming from an older version, quit it first - the icon in the menu
+            bar, **Quit** - and confirm replacing it. From 0.9.0 on every later
+            version arrives through **Install now and restart** in the
+            application itself, the same way it has on Windows since 0.4.0, so
+            this is a first installation and nothing more.
 
             The icon appears in the menu bar; the application has no dock icon
             and no window of its own on start.
 
-            ${{ needs.macos.outputs.signed == 'true' && ' ' || 'Downloaded through a browser after all? `xattr -dr com.apple.quarantine /Applications/ClaudeUsageChecker.app` takes it out of quarantine.' }}
+            ${{ needs.macos.outputs.signed == 'true' && 'A disk image is used here rather than a zip for a reason: most of this application is managed .NET assemblies, which are not Mach-O, so their signatures live in extended attributes beside them. A zip carries those only as side-cars, and whether they survive depends on the tool that unpacks it. An image is mounted, not unpacked - nothing gets the chance to drop them.' || 'Downloaded through a browser after all? `xattr -dr com.apple.quarantine /Applications/ClaudeUsageChecker.app` takes it out of quarantine.' }}
 
             ### Checksums (SHA-256)
 
             ```
             ${{ steps.package.outputs.sha256 }}  ClaudeUsageChecker.exe
-            ${{ steps.macos.outputs.sha256 }}  ${{ steps.macos.outputs.name }}
+            ${{ steps.macos.outputs.dmg-sha256 }}  ${{ steps.macos.outputs.dmg-name }}
+            ${{ steps.macos.outputs.zip-sha256 }}  ${{ steps.macos.outputs.zip-name }}
             ```
 
             ### License

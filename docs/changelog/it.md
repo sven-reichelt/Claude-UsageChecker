@@ -27,6 +27,24 @@ numerazione [Semantic Versioning](https://semver.org/lang/it/).
   Entrambe, perché nessuna sostituisce l'altra. Una somma di controllo dimostra
   che il file è quello inviato dal server; una firma dimostra chi lo ha
   costruito.
+- **macOS viene distribuito come immagine disco.** Aprila, trascina
+  l'applicazione sulla cartella Applicazioni che le sta accanto, e basta:
+  niente terminale, niente decompressione.
+
+  La comodità è la parte minore del motivo. Gran parte di questa applicazione è
+  fatta di assembly .NET gestiti, che non sono file Mach-O: la loro firma non
+  può quindi stare al loro interno, e macOS la conserva in attributi estesi
+  accanto a essi. Uno zip può trasportarli solo come file di accompagnamento, e
+  se tornino a essere attributi lo decide lo strumento che lo decomprime. Quando
+  ciò non riesce, 202 dei 221 file del pacchetto restano senza firma,
+  l'autenticazione non corrisponde più a una firma che non vale più, e macOS
+  comunica di non poter verificare che l'applicazione sia priva di software
+  dannoso: suona come un'accusa ed è un attributo di file perduto.
+
+  Un'immagine disco si monta anziché decomprimersi. Fra la firma e il sistema
+  che la verifica non c'è nulla. Lo zip resta allegato alla pubblicazione per il
+  controllo degli aggiornamenti, che lo decomprime con `ditto` e conserva così
+  ciò che conta.
 
 ## [0.8.0] – 2026-08-20
 

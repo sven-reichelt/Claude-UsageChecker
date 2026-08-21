@@ -27,6 +27,24 @@ numeração [Semantic Versioning](https://semver.org/lang/pt-BR/).
   As duas em conjunto, porque nenhuma substitui a outra. Uma soma de
   verificação prova que o ficheiro é o que o servidor enviou; uma assinatura
   prova quem o construiu.
+- **O macOS é entregue como imagem de disco.** Abra-a, arraste a aplicação para
+  a pasta Aplicações ao lado, e está feito: sem terminal e sem descompactar.
+
+  A comodidade é a menor parte do motivo. A maior parte desta aplicação são
+  assemblies geridos do .NET, que não são ficheiros Mach-O, pelo que a
+  assinatura deles não pode ficar guardada no seu interior: o macOS mantém-na em
+  atributos estendidos ao lado. Um zip só os consegue transportar como ficheiros
+  acompanhantes, e se voltam a ser atributos é decidido pela ferramenta que o
+  descompacta. Quando isso corre mal, 202 dos 221 ficheiros do pacote ficam sem
+  assinatura, o reconhecimento já não corresponde a uma assinatura que já não
+  vale, e o macOS comunica que não consegue verificar se a aplicação está livre
+  de software malicioso — o que soa a acusação e é um atributo de ficheiro
+  perdido.
+
+  Uma imagem de disco é montada, não descompactada. Entre a assinatura e o
+  sistema que a verifica não está nada. O zip continua anexado à publicação para
+  a verificação de atualizações, que o descompacta com `ditto` e assim preserva
+  o que importa.
 
 ## [0.8.0] – 2026-08-20
 

@@ -27,6 +27,25 @@ versionado [Semantic Versioning](https://semver.org/lang/es/).
   Ambas cosas, porque ninguna sustituye a la otra. Una suma de verificación
   demuestra que el archivo es el que envió el servidor; una firma demuestra
   quién lo creó.
+- **macOS se entrega como imagen de disco.** Ábrela, arrastra la aplicación a la
+  carpeta Aplicaciones que hay al lado, y ya está: sin terminal y sin
+  descomprimir.
+
+  La comodidad es la menor parte del motivo. La mayor parte de esta aplicación
+  son ensamblados gestionados de .NET, que no son archivos Mach-O, de modo que
+  su firma no puede guardarse dentro de ellos: macOS la guarda en atributos
+  extendidos junto a ellos. Un zip solo puede transportarlos como archivos
+  acompañantes, y que vuelvan a convertirse en atributos lo decide la
+  herramienta que lo descomprima. Cuando eso sale mal, 202 de los 221 archivos
+  del paquete quedan sin firmar, la notarización ya no encaja con una firma que
+  ya no vale, y macOS informa de que no puede verificar que la aplicación esté
+  libre de software malicioso: suena a acusación y es un atributo de archivo
+  perdido.
+
+  Una imagen de disco se monta en lugar de descomprimirse. Entre la firma y el
+  sistema que la comprueba no hay nada. El zip sigue adjunto a la publicación
+  para la comprobación de actualizaciones, que lo descomprime con `ditto` y así
+  conserva lo que importa.
 
 ## [0.8.0] – 2026-08-20
 

@@ -27,6 +27,25 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
   Beides zusammen, weil keines das andere ersetzt. Eine Prüfsumme belegt, dass
   die Datei die vom Server gesendete ist; eine Signatur belegt, wer sie gebaut
   hat.
+- **macOS wird als Disk-Image ausgeliefert.** Öffnen, die Anwendung auf den
+  danebenliegenden Programme-Ordner ziehen, fertig – kein Terminal, kein
+  Auspacken.
+
+  Die Bequemlichkeit ist dabei der kleinere Teil des Grundes. Der größte Teil
+  dieser Anwendung besteht aus verwalteten .NET-Dateien, und die sind keine
+  Mach-O-Dateien, weshalb ihre Signatur nicht in ihnen selbst liegen kann:
+  macOS legt sie in erweiterten Attributen daneben ab. Ein Zip kann die nur als
+  Beiwagen tragen, und ob daraus wieder Attribute werden, entscheidet das
+  Werkzeug, das es auspackt. Wo das schiefgeht, stehen 202 der 221 Dateien im
+  Paket unsigniert da, die Beglaubigung passt nicht mehr zu einer Signatur, die
+  nicht mehr gilt, und macOS meldet, es könne die Anwendung nicht auf
+  Schadsoftware prüfen – was wie ein Vorwurf klingt und ein verlorenes
+  Dateiattribut ist.
+
+  Ein Disk-Image wird eingehängt statt ausgepackt. Zwischen der Signatur und
+  dem prüfenden System steht nichts. Das Zip bleibt der Veröffentlichung
+  beigelegt, für die Update-Prüfung, die es mit `ditto` auspackt und dabei
+  behält, worauf es ankommt.
 
 ## [0.8.0] – 2026-08-20
 

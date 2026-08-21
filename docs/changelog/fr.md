@@ -27,6 +27,25 @@ numérotation [Semantic Versioning](https://semver.org/lang/fr/).
   Les deux ensemble, car aucune ne remplace l'autre. Une somme de contrôle
   prouve que le fichier est celui qu'a envoyé le serveur ; une signature prouve
   qui l'a construit.
+- **macOS est livré sous forme d'image disque.** Ouvrez-la, faites glisser
+  l'application sur le dossier Applications placé à côté, et c'est tout : pas de
+  terminal, pas de décompression.
+
+  Le confort n'est que la moindre part de la raison. L'essentiel de cette
+  application est fait d'assemblages .NET gérés, qui ne sont pas des fichiers
+  Mach-O : leur signature ne peut donc pas être rangée à l'intérieur, et macOS
+  la place dans des attributs étendus à côté d'eux. Un zip ne peut les
+  transporter que sous forme de fichiers annexes, et c'est l'outil qui le
+  décompresse qui décide s'ils redeviennent des attributs. Quand cela échoue,
+  202 des 221 fichiers du paquet se retrouvent non signés, la notarisation ne
+  correspond plus à une signature qui ne tient plus, et macOS annonce qu'il ne
+  peut pas vérifier que l'application est exempte de logiciels malveillants —
+  ce qui sonne comme une accusation et n'est qu'un attribut de fichier perdu.
+
+  Une image disque se monte au lieu de se décompresser. Rien ne s'interpose
+  entre la signature et le système qui la vérifie. Le zip reste joint à la
+  publication pour la vérification des mises à jour, qui le décompresse avec
+  `ditto` et conserve ainsi ce qui compte.
 
 ## [0.8.0] – 2026-08-20
 

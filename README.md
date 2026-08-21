@@ -145,10 +145,19 @@ every key still missing.
 * An active Claude subscription (Pro or Max)
 
 The published packages need neither the SDK nor a .NET runtime. On macOS the
-application comes as a bundle signed with a Developer ID and notarised by Apple,
-with the ticket stapled into it, so it opens by double-clicking on any Mac -
-offline as well. From 0.9.0 on, updates happen at the push of a button there
-too; only the first installation goes by hand.
+application comes as a disk image: open it, drag the application onto the
+Applications folder beside it, done. Image and application are each signed with
+a Developer ID and notarised by Apple, with the ticket stapled in, so it opens
+on any Mac - offline as well. From 0.9.0 on, updates happen at the push of a
+button there too; only the first installation goes by hand.
+
+An image rather than a zip, because most of the application is managed .NET
+assemblies. Those are not Mach-O files, so macOS cannot keep their signatures
+inside them and puts them in extended attributes beside them instead - which a
+zip carries only as side-cars, and which survive or not depending on the tool
+that unpacks it. An image is mounted, not unpacked. The zip is still attached to
+each release: it is what the update check fetches, and the application unpacks
+that one itself.
 
 ### Build and run
 

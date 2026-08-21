@@ -241,3 +241,30 @@ made over the flags and extended attributes as well, and a tool that drops them
 hands back a bundle that fails its own signature check - which the update then
 refuses, correctly and inexplicably. The release workflow packs with `ditto -c
 -k --keepParent` for the same reason.
+
+**Which is why a zip is not how this application is handed to a person.** The
+rule above holds wherever we do the unpacking - the update path does, with
+`ditto`. A download does not: whoever gets the file picks the tool, and 202 of
+the 221 files in this bundle are managed .NET assemblies, which are not Mach-O,
+so their signatures sit in extended attributes rather than inside the files. A
+zip carries those only as `._` side-cars. Lose them and the bundle is unsigned
+in 202 places, the notarisation ticket no longer matches, and macOS says
+"Apple could not verify ... is free of malware" - which reads as an accusation
+and is a dropped file attribute. Since 0.9.0 the release therefore ships a
+**disk image**, which is mounted rather than unpacked. The zip stays attached
+for the update check alone.
+
+**Ask Gatekeeper `--type execute`, not `--type install`.** For an application
+`install` is the wrong rule set - it assesses installer packages. It answered
+"accepted" in the release workflow for a whole release while the bundle a
+tester double-clicked was being refused. A check that answers a different
+question than the one reality asks is worse than no check: it is a green light
+nobody earned.
+
+**Every check before 0.9.0 was asked of the bundle lying on the runner - and
+that one nobody downloads.** What ships is the image and the zip, and neither
+was ever unpacked and re-examined. The step "Would a double-click do?" now
+mounts the image and unpacks the zip and puts all three questions - `codesign
+--verify`, `stapler validate`, `spctl --assess` - to what actually leaves the
+building. The general form: **test the artefact, not the workspace it came
+from.**

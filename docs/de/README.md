@@ -147,10 +147,20 @@ sie in `Language.All` ein; ein Test meldet dann jeden Schlüssel, der noch fehlt
 * Ein aktives Claude-Abonnement (Pro oder Max)
 
 Die veröffentlichten Pakete brauchen weder das SDK noch eine .NET-Laufzeit. Unter
-macOS kommt die Anwendung als Bündel, signiert mit einer Developer-ID und von
-Apple beglaubigt, die Bestätigung fest eingeheftet – es startet per Doppelklick
-auf jedem Mac, auch ohne Netzverbindung. Ab 0.9.0 erneuert es sich auch dort
-auf Knopfdruck; von Hand geschieht nur die erste Einrichtung.
+macOS kommt die Anwendung als Disk-Image: öffnen, die Anwendung auf den
+danebenliegenden Programme-Ordner ziehen, fertig. Image und Anwendung sind
+jeweils mit einer Developer-ID signiert und von Apple beglaubigt, die
+Bestätigung fest eingeheftet – es startet auf jedem Mac, auch ohne
+Netzverbindung. Ab 0.9.0 erneuert es sich auch dort auf Knopfdruck; von Hand
+geschieht nur die erste Einrichtung.
+
+Ein Image und kein Zip, weil der größte Teil der Anwendung aus verwalteten
+.NET-Dateien besteht. Die sind keine Mach-O-Dateien, macOS kann ihre Signatur
+also nicht in ihnen selbst ablegen und legt sie in erweiterten Attributen
+daneben ab – die ein Zip nur als Beiwagen trägt und die je nach Auspackwerkzeug
+überleben oder eben nicht. Ein Image wird eingehängt, nicht ausgepackt. Das Zip
+liegt jeder Veröffentlichung weiter bei: Es ist das, was die Update-Prüfung
+holt, und die packt es selbst aus.
 
 ### Bauen und starten
 
