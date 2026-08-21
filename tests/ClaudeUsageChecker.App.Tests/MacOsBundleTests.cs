@@ -229,16 +229,32 @@ public class MacOsBundleTests
     /// into a folder that only Windows has. Found by looking for what else
     /// reads that property.
     /// </remarks>
+    /// <summary>Each platform is offered its own place, not the other's.</summary>
+    /// <remarks>
+    /// This test used to say "on Windows only" and assert that the target ends
+    /// in <c>.exe</c> "whatever machine asks". Since 0.9.0 that is wrong on both
+    /// counts, and only the macOS job in CI said so - on Windows the assertion
+    /// stayed true and the release workflow, which tests on windows-latest,
+    /// stayed green. The pitfall the repository already knew: **the machine that
+    /// finds this kind of fault is the other one.**
+    /// </remarks>
     [Fact]
-    public void ThePermanentSetupIsOfferedOnWindowsOnly()
+    public void EachPlatformIsOfferedItsOwnPlace()
     {
-        if (!OperatingSystem.IsWindows())
+        if (OperatingSystem.IsMacOS())
         {
+            Assert.Equal("/Applications/ClaudeUsageChecker.app", SelfInstaller.TargetPath);
+            Assert.DoesNotContain('\\', SelfInstaller.TargetPath);
+        }
+        else if (OperatingSystem.IsWindows())
+        {
+            Assert.EndsWith(".exe", SelfInstaller.TargetPath, StringComparison.Ordinal);
+        }
+        else
+        {
+            // Nowhere else can it replace itself, so nowhere else is it offered.
             Assert.False(SelfInstaller.ShouldOffer);
         }
-
-        // The path it would copy to is a Windows one, whatever machine asks.
-        Assert.EndsWith(".exe", SelfInstaller.TargetPath, StringComparison.Ordinal);
     }
 
     /// <summary>

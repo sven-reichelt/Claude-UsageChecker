@@ -111,7 +111,16 @@ public class SelfInstallerTests
     {
         // %LOCALAPPDATA%\Programs is the location Windows intends for
         // applications without administrator rights. That keeps the root of the
-        // user profile clear.
+        // user profile clear. On macOS the same question was answered decades
+        // earlier, and the answer is the applications folder - so this asks only
+        // where it applies. Written unguarded, it passed here and failed in CI
+        // on the Mac.
+        if (OperatingSystem.IsMacOS())
+        {
+            Assert.Equal("/Applications", SelfInstaller.TargetDirectory);
+            return;
+        }
+
         var expected = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "Programs",
@@ -135,8 +144,16 @@ public class SelfInstallerTests
     {
         // The self-update writes to this path; a version number in it would be
         // wrong after the first update. On top of that, the tray pinning depends
-        // on the path.
-        Assert.Equal("ClaudeUsageChecker.exe", Path.GetFileName(SelfInstaller.TargetPath));
+        // on the path. The rule holds on both platforms; only the extension
+        // differs, because on macOS what is put there is a bundle.
+        Assert.Equal(
+            OperatingSystem.IsMacOS() ? "ClaudeUsageChecker.app" : "ClaudeUsageChecker.exe",
+            Path.GetFileName(SelfInstaller.TargetPath));
+
+        Assert.DoesNotContain(
+            "0.",
+            Path.GetFileName(SelfInstaller.TargetPath),
+            StringComparison.Ordinal);
     }
 
     [Fact]
