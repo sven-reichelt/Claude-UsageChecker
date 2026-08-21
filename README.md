@@ -145,11 +145,20 @@ every key still missing.
 * An active Claude subscription (Pro or Max)
 
 The published packages need neither the SDK nor a .NET runtime. On macOS the
-application comes as a disk image: open it, drag the application onto the
-Applications folder beside it, done. Image and application are each signed with
-a Developer ID and notarised by Apple, with the ticket stapled in, so it opens
-on any Mac - offline as well. From 0.9.0 on, updates happen at the push of a
-button there too; only the first installation goes by hand.
+application comes as a disk image: open it and double-click the application
+inside. It notices that it is running from an image, offers to move into the
+Applications folder, starts from there and ejects the image behind it. Dragging
+it across by hand works just as well.
+
+Image and application are each signed with a Developer ID and notarised by
+Apple, with the ticket stapled in, so it opens on any Mac, offline as well.
+macOS still asks once - *an app downloaded from the internet … Apple checked it
+for malicious software and none was detected* - which is what it asks of every
+downloaded application, and the second half of that sentence is the notarisation
+answering. **Open**, once, and never again.
+
+From 0.9.0 on, updates happen at the push of a button on macOS too; only the
+first installation goes this way.
 
 **The `.dmg` is the installation; the `.zip` is not a second way to do it.**
 The zip is attached to every release for one purpose: the application downloads
@@ -285,13 +294,18 @@ git push origin v0.2.0
 The workflow `.github/workflows/release.yml` builds both platforms: a
 self-contained single file for Windows x64, and an application bundle for Apple
 silicon, put together on a Mac because the icon needs `sips` and `iconutil`.
-Each is checked for size, started once to see that it comes up at all, and
-given a SHA-256 sum; the result is a **draft** release. Only publishing it by
-hand makes it visible to the update check - that way nothing goes out
-unchecked.
+The bundle is signed, notarised and stapled, then shipped twice - as a disk
+image for installing and as a zip for the update check. Each file is checked for
+size, started once to see that it comes up at all, and given a SHA-256 sum; the
+result is a **draft** release. Only publishing it by hand makes it visible to
+the update check - that way nothing goes out unchecked.
 
-Starting the built package matters most for the platform nobody here can open:
-it caught a crash on macOS that the whole green test suite had missed.
+Two of those checks exist because their absence was found by a person rather
+than a machine. Starting the built package caught a crash on macOS that the
+whole green test suite had missed. And **"Would a double-click do?"** mounts the
+image and unpacks the zip and asks `codesign`, `stapler` and `spctl` about what
+comes out - because every check before it was asked of the bundle lying on the
+runner, and that one nobody downloads.
 
 A tag may carry a label - `v0.9.0-beta.1` - which makes the release a
 pre-release. Those reach only whoever asked for them, and GitHub leaves them

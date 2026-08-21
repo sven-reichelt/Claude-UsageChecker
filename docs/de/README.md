@@ -147,12 +147,21 @@ sie in `Language.All` ein; ein Test meldet dann jeden Schlüssel, der noch fehlt
 * Ein aktives Claude-Abonnement (Pro oder Max)
 
 Die veröffentlichten Pakete brauchen weder das SDK noch eine .NET-Laufzeit. Unter
-macOS kommt die Anwendung als Disk-Image: öffnen, die Anwendung auf den
-danebenliegenden Programme-Ordner ziehen, fertig. Image und Anwendung sind
-jeweils mit einer Developer-ID signiert und von Apple beglaubigt, die
-Bestätigung fest eingeheftet – es startet auf jedem Mac, auch ohne
-Netzverbindung. Ab 0.9.0 erneuert es sich auch dort auf Knopfdruck; von Hand
-geschieht nur die erste Einrichtung.
+macOS kommt die Anwendung als Disk-Image: öffnen und die Anwendung darin
+doppelklicken. Sie merkt, dass sie von einem Image läuft, bietet an, in den
+Programme-Ordner umzuziehen, startet von dort und wirft das Image hinter sich
+aus. Von Hand hinüberziehen geht genauso.
+
+Image und Anwendung sind jeweils mit einer Developer-ID signiert und von Apple
+beglaubigt, die Bestätigung fest eingeheftet – es startet auf jedem Mac, auch
+ohne Netzverbindung. Einmal fragt macOS trotzdem – *ein aus dem Internet
+geladenes Programm … Apple hat es auf Schadsoftware geprüft und nichts
+gefunden* –, und das fragt es bei jedem heruntergeladenen Programm; die zweite
+Hälfte dieses Satzes ist die Beglaubigung, die antwortet. Einmal **Öffnen**,
+danach nie wieder.
+
+Ab 0.9.0 erneuert sich die Anwendung auch unter macOS auf Knopfdruck; diesen Weg
+geht nur die erste Einrichtung.
 
 **Das `.dmg` ist die Einrichtung; das `.zip` ist kein zweiter Weg dorthin.**
 Das Zip liegt jeder Veröffentlichung zu genau einem Zweck bei: Die Anwendung
@@ -288,14 +297,21 @@ git push origin v0.2.0
 Der Ablauf `.github/workflows/release.yml` baut beide Plattformen: eine
 eigenständige Einzeldatei für Windows x64 und ein Programmbündel für Apple
 Silicon, zusammengesetzt auf einem Mac, weil das Symbol `sips` und `iconutil`
-braucht. Beide werden auf Größe geprüft, einmal gestartet, um zu sehen, ob sie
-überhaupt hochkommen, und mit einer SHA-256-Summe versehen; heraus kommt ein
-**Entwurf** der Veröffentlichung. Erst das Freigeben von Hand macht sie für die
-Aktualisierungsprüfung sichtbar – so geht nichts ungeprüft hinaus.
+braucht. Das Bündel wird signiert, beglaubigt und geheftet und dann zweimal
+ausgeliefert – als Disk-Image zum Einrichten und als Zip für die
+Aktualisierungsprüfung. Jede Datei wird auf Größe geprüft, einmal gestartet, um
+zu sehen, ob sie überhaupt hochkommt, und mit einer SHA-256-Summe versehen;
+heraus kommt ein **Entwurf** der Veröffentlichung. Erst das Freigeben von Hand
+macht sie für die Aktualisierungsprüfung sichtbar – so geht nichts ungeprüft
+hinaus.
 
-Das Starten des gebauten Pakets zählt vor allem bei der Plattform, die hier
-niemand öffnen kann: Es hat unter macOS einen Absturz gefangen, den die ganze
-grüne Testsuite übersehen hatte.
+Zwei dieser Prüfungen gibt es, weil ihr Fehlen einem Menschen aufgefallen ist
+und keiner Maschine. Das Starten des gebauten Pakets hat unter macOS einen
+Absturz gefangen, den die ganze grüne Testsuite übersehen hatte. Und **„Would a
+double-click do?"** hängt das Image ein, packt das Zip aus und fragt `codesign`,
+`stapler` und `spctl` nach dem, was dabei herauskommt – denn jede Prüfung davor
+richtete sich an das Bündel, das auf dem Läufer lag, und das lädt niemand
+herunter.
 
 Eine Marke darf eine Kennung tragen – `v0.9.0-beta.1` –, dann wird daraus eine
 Vorabversion. Die erreicht nur, wer danach gefragt hat, und GitHub lässt sie

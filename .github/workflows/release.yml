@@ -727,16 +727,26 @@ jobs:
 
             ### Installation on macOS
 
-            ${{ needs.macos.outputs.signed == 'true' && 'Signed with a Developer ID and notarised by Apple, image and application each with its own ticket: it opens on any Mac, straight from the browser, without asking anything of you.' || 'Signed ad hoc rather than by a registered developer, so macOS refuses it unless it is fetched from the terminal rather than through a browser.' }}
+            ${{ needs.macos.outputs.signed == 'true' && 'Signed with a Developer ID and notarised by Apple, image and application each with its own ticket: it opens on any Mac, offline as well, and nothing has to be talked out of the system by hand.' || 'Signed ad hoc rather than by a registered developer, so macOS refuses it unless it is fetched from the terminal rather than through a browser.' }}
 
-            Open `${{ steps.macos.outputs.dmg-name }}` and drag the application
-            onto the Applications folder beside it. That is all of it.
+            Open `${{ steps.macos.outputs.dmg-name }}` and **double-click the
+            application inside it**. It notices that it is running from a disk
+            image, offers to move into the Applications folder, starts from
+            there and ejects the image behind it. Dragging it across by hand
+            works just as well, if you prefer that.
+
+            **macOS asks once**, whichever way you go: *"ClaudeUsageChecker" is
+            an app downloaded from the internet. Are you sure you want to open
+            it?* - and, underneath, that Apple checked it for malicious software
+            and found none. That second sentence is the notarisation doing its
+            job. Every application downloaded through a browser is asked after
+            in this way, exactly once; **Open** is the answer.
 
             Coming from an older version, quit it first - the icon in the menu
-            bar, **Quit** - and confirm replacing it. From 0.9.0 on every later
-            version arrives through **Install now and restart** in the
-            application itself, the same way it has on Windows since 0.4.0, so
-            this is a first installation and nothing more.
+            bar, **Quit**. From 0.9.0 on every later version arrives through
+            **Install now and restart** in the application itself, the same way
+            it has on Windows since 0.4.0, so this is a first installation and
+            nothing more.
 
             The icon appears in the menu bar; the application has no dock icon
             and no window of its own on start.
