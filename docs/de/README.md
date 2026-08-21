@@ -154,13 +154,18 @@ Bestätigung fest eingeheftet – es startet auf jedem Mac, auch ohne
 Netzverbindung. Ab 0.9.0 erneuert es sich auch dort auf Knopfdruck; von Hand
 geschieht nur die erste Einrichtung.
 
-Ein Image und kein Zip, weil der größte Teil der Anwendung aus verwalteten
-.NET-Dateien besteht. Die sind keine Mach-O-Dateien, macOS kann ihre Signatur
-also nicht in ihnen selbst ablegen und legt sie in erweiterten Attributen
-daneben ab – die ein Zip nur als Beiwagen trägt und die je nach Auspackwerkzeug
-überleben oder eben nicht. Ein Image wird eingehängt, nicht ausgepackt. Das Zip
-liegt jeder Veröffentlichung weiter bei: Es ist das, was die Update-Prüfung
-holt, und die packt es selbst aus.
+**Das `.dmg` ist die Einrichtung; das `.zip` ist kein zweiter Weg dorthin.**
+Das Zip liegt jeder Veröffentlichung zu genau einem Zweck bei: Die Anwendung
+lädt es für ihre eigene Aktualisierung und packt es selbst aus, mit `ditto`. Es
+von Hand zu installieren ist nicht vorgesehen.
+
+Der Grund: Der größte Teil dieser Anwendung besteht aus verwalteten
+.NET-Dateien. Die sind keine Mach-O-Dateien, macOS kann ihre Signatur also nicht
+in ihnen selbst ablegen und legt sie in erweiterten Attributen daneben ab – die
+ein Zip nur als Beiwagen trägt und die je nach Auspackwerkzeug überleben oder
+eben nicht. Wo die Anwendung auspackt, wählt sie das Werkzeug. Wo ein Mensch
+auspackt, wählt er es. Ein Image wird eingehängt statt ausgepackt, damit
+zwischen die Signatur und das prüfende System nichts gerät.
 
 ### Bauen und starten
 
@@ -386,7 +391,7 @@ zurechtzurücken.
 | 0.6 | Neun Sprachen, modellbezogene Limits, einstellbare Schwellenwerte, Übersicht der Neuerungen nach einem Update ✅ |
 | 0.7 | Eigenes Menü im Infobereich, im Stil der Fenster ✅ |
 | 0.8 | macOS-Menüleiste ✅ |
-| 0.9 | Selbstaustausch unter macOS, und ein signiertes Bündel ✅ |
+| 0.9 | Selbstaustausch unter macOS, ein beglaubigtes Bündel, ausgeliefert als Disk-Image ✅ |
 
 ## Lizenz
 

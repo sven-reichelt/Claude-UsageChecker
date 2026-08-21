@@ -157,8 +157,13 @@ moot.
 is signed with a Developer ID and notarised by Apple, and before anything is put
 in place the downloaded version is asked the same question Gatekeeper would ask
 - `codesign --verify` for whether it still matches its own signature, `spctl
---assess` for whether the system accepts that signature at all. What macOS would
-refuse to run is not installed either.
+--assess --type execute` for whether the system accepts that signature at all.
+What macOS would refuse to run is not installed either.
+
+`--type execute` is not a detail. It is the rule set macOS applies to an
+application; `install` assesses installer packages and answers a question nobody
+asked - which it did here, and in the release workflow, until both were found on
+the same day.
 
 That is what the sum cannot do. A checksum proves that the file is the one the
 server sent; a signature proves who built it. Both are checked, and neither

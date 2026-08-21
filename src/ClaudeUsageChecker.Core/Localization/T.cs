@@ -193,11 +193,15 @@ public static class T
     public static string InstallTitle => L["install.title"];
     public static string InstallHeading => L["install.heading"];
     public static string InstallIntro => L["install.intro"];
+    public static string InstallIntroMac => L["install.introMac"];
     public static string InstallListIntro => L["install.listIntro"];
     public static string InstallBulletCopy => L["install.bulletCopy"];
     public static string InstallBulletAutostart => L["install.bulletAutostart"];
+    public static string InstallBulletAutostartMac => L["install.bulletAutostartMac"];
     public static string InstallBulletRestart => L["install.bulletRestart"];
+    public static string InstallBulletRestartMac => L["install.bulletRestartMac"];
     public static string InstallOutro => L["install.outro"];
+    public static string InstallOutroMac => L["install.outroMac"];
     public static string InstallLanguage => L["install.languageLabel"];
     public static string InstallLanguageHint => L["install.languageHint"];
     public static string InstallAccept => L["install.accept"];

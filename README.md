@@ -151,13 +151,18 @@ a Developer ID and notarised by Apple, with the ticket stapled in, so it opens
 on any Mac - offline as well. From 0.9.0 on, updates happen at the push of a
 button there too; only the first installation goes by hand.
 
-An image rather than a zip, because most of the application is managed .NET
-assemblies. Those are not Mach-O files, so macOS cannot keep their signatures
-inside them and puts them in extended attributes beside them instead - which a
-zip carries only as side-cars, and which survive or not depending on the tool
-that unpacks it. An image is mounted, not unpacked. The zip is still attached to
-each release: it is what the update check fetches, and the application unpacks
-that one itself.
+**The `.dmg` is the installation; the `.zip` is not a second way to do it.**
+The zip is attached to every release for one purpose: the application downloads
+it for its own update and unpacks it itself, with `ditto`. Installing from it by
+hand is not intended.
+
+The reason is that most of this application is managed .NET assemblies. Those
+are not Mach-O files, so macOS cannot keep their signatures inside them and puts
+them in extended attributes beside them instead - which a zip carries only as
+side-cars, and which survive or not depending on the tool that unpacks it. Where
+the application unpacks, it picks the tool. Where a person unpacks, they do. An
+image is mounted rather than unpacked, so nothing gets between the signature and
+the system that checks it.
 
 ### Build and run
 
@@ -376,7 +381,7 @@ effect, and the window says so instead of quietly correcting the input.
 | 0.6 | Nine languages, model-specific limits, configurable thresholds, summary of changes after an update ✅ |
 | 0.7 | Its own menu in the notification area, in the style of the windows ✅ |
 | 0.8 | macOS menu bar ✅ |
-| 0.9 | Self-replacement on macOS, and a signed bundle ✅ |
+| 0.9 | Self-replacement on macOS, a notarised bundle, delivered as a disk image ✅ |
 
 ## Contributing
 

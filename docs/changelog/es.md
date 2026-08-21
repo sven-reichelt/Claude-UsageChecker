@@ -27,9 +27,15 @@ versionado [Semantic Versioning](https://semver.org/lang/es/).
   Ambas cosas, porque ninguna sustituye a la otra. Una suma de verificación
   demuestra que el archivo es el que envió el servidor; una firma demuestra
   quién lo creó.
-- **macOS se entrega como imagen de disco.** Ábrela, arrastra la aplicación a la
-  carpeta Aplicaciones que hay al lado, y ya está: sin terminal y sin
+- **macOS se entrega como imagen de disco, y la aplicación se instala sola.**
+  Abre la imagen y haz doble clic en la aplicación: se da cuenta de que se está
+  ejecutando desde una imagen, ofrece mudarse a la carpeta Aplicaciones, arranca
+  desde allí y expulsa la imagen tras de sí. Arrastrarla a mano sigue
+  funcionando. Sin terminal en ninguno de los dos casos, y sin nada que
   descomprimir.
+
+  Se copia con `ditto`, por el motivo que sigue más abajo: una copia de
+  directorio corriente instalaría un paquete cuya firma ya no vale.
 
   La comodidad es la menor parte del motivo. La mayor parte de esta aplicación
   son ensamblados gestionados de .NET, que no son archivos Mach-O, de modo que

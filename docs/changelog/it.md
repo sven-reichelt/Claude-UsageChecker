@@ -27,9 +27,15 @@ numerazione [Semantic Versioning](https://semver.org/lang/it/).
   Entrambe, perché nessuna sostituisce l'altra. Una somma di controllo dimostra
   che il file è quello inviato dal server; una firma dimostra chi lo ha
   costruito.
-- **macOS viene distribuito come immagine disco.** Aprila, trascina
-  l'applicazione sulla cartella Applicazioni che le sta accanto, e basta:
-  niente terminale, niente decompressione.
+- **macOS viene distribuito come immagine disco, e l'applicazione si installa
+  da sé.** Apri l'immagine e fai doppio clic sull'applicazione: si accorge di
+  essere in esecuzione da un'immagine, propone di trasferirsi nella cartella
+  Applicazioni, si avvia da lì ed espelle l'immagine dietro di sé. Trascinarla a
+  mano funziona ancora. Niente terminale in nessuno dei due casi, e niente da
+  decomprimere.
+
+  Si copia con `ditto`, per il motivo indicato più sotto: una normale copia di
+  cartella installerebbe un pacchetto la cui firma non vale più.
 
   La comodità è la parte minore del motivo. Gran parte di questa applicazione è
   fatta di assembly .NET gestiti, che non sono file Mach-O: la loro firma non

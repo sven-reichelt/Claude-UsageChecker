@@ -158,14 +158,34 @@ Download, nicht der Angreifer mit Schreibrechten. Damit gehört allerdings die
 Absicherung des GitHub-Kontos zur Sicherheitskette – ohne
 Zwei-Faktor-Authentifizierung dort ist der Schutz hier hinfällig.
 
-Wer strengere Anforderungen hat, signiert die Pakete mit einem
-Codesignatur-Zertifikat und prüft die Signatur statt der Summe. Für dieses
-Hobbyprojekt steht der Aufwand in keinem Verhältnis.
+**Unter macOS gilt seit 0.9.0 eine vierte Bedingung:** die Signatur. Das Bündel
+ist mit einer Developer-ID signiert und von Apple beglaubigt, und bevor irgend
+etwas an seinen Platz kommt, wird der geladenen Fassung dieselbe Frage gestellt,
+die auch Gatekeeper stellen würde – `codesign --verify` dafür, ob sie noch zu
+ihrer eigenen Signatur passt, `spctl --assess --type execute` dafür, ob das
+System diese Signatur überhaupt annimmt. Was macOS nicht ausführen würde, wird
+auch nicht eingespielt.
 
-Der Austausch selbst nutzt aus, dass Windows eine laufende Datei zwar nicht
-überschreiben, wohl aber umbenennen lässt: umbenennen, neue Datei an den alten
-Platz, neue Fassung starten, selbst beenden. Scheitert der zweite Schritt, wird
-der erste zurückgenommen – es bleibt immer ein lauffähiges Programm zurück.
+`--type execute` ist dabei keine Nebensache. Es ist der Regelsatz, den macOS auf
+eine Anwendung anwendet; `install` beurteilt Installationspakete und beantwortet
+eine Frage, die niemand gestellt hat – was es hier und im Release-Ablauf auch
+tat, bis beides am selben Tag auffiel.
+
+Das ist es, was die Prüfsumme nicht leisten kann. Eine Prüfsumme belegt, dass
+die Datei die vom Server gesendete ist; eine Signatur belegt, wer sie gebaut
+hat. Beides wird geprüft, und keines ersetzt das andere. Das Windows-Paket trägt
+keine Signatur – ein Zertifikat dafür kostet einige hundert Euro im Jahr, was
+für dieses Hobbyprojekt in keinem Verhältnis steht, während das von Apple einer
+ohnehin bezahlten Mitgliedschaft beilag.
+
+Der Austausch selbst richtet sich danach, was das System zulässt. Windows lässt
+eine laufende Datei zwar nicht überschreiben, wohl aber umbenennen: umbenennen,
+neue Datei an den alten Platz, neue Fassung starten, selbst beenden. macOS ist
+großzügiger – ein laufendes Bündel darf beiseitegeschoben werden, weil der
+Prozess seine Dateien über die Inode hält und ihm der Pfad danach gleichgültig
+ist –, also gilt dieselbe Abfolge für das ganze `.app`. Scheitert der zweite
+Schritt, wird der erste zurückgenommen – es bleibt immer ein lauffähiges
+Programm zurück.
 
 ### 7. Rücksicht auf die API
 

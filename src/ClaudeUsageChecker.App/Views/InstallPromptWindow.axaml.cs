@@ -78,12 +78,20 @@ public partial class InstallPromptWindow : Window
         HeadingText.Text = T.InstallHeading;
         LanguageLabel.Text = T.InstallLanguage;
         LanguageHint.Text = T.InstallLanguageHint;
-        IntroText.Text = T.InstallIntro;
+        // The same window on both platforms, but not the same sentences: what it
+        // is running from, where that leads, and whether anything gets ejected
+        // afterwards all differ. Only the restart line asks a second question -
+        // an ejection is promised solely to whoever actually came off an image.
+        var mac = OperatingSystem.IsMacOS();
+
+        IntroText.Text = mac ? T.InstallIntroMac : T.InstallIntro;
         ListIntroText.Text = T.InstallListIntro;
         BulletCopyText.Text = T.InstallBulletCopy;
-        BulletAutostartText.Text = T.InstallBulletAutostart;
-        BulletRestartText.Text = T.InstallBulletRestart;
-        OutroText.Text = T.InstallOutro;
+        BulletAutostartText.Text = mac ? T.InstallBulletAutostartMac : T.InstallBulletAutostart;
+        BulletRestartText.Text = SelfInstaller.RunsFromDiskImage
+            ? T.InstallBulletRestartMac
+            : T.InstallBulletRestart;
+        OutroText.Text = mac ? T.InstallOutroMac : T.InstallOutro;
         InstallButton.Content = T.InstallAccept;
         LaterButton.Content = T.InstallDecline;
 

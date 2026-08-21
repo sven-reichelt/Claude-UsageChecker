@@ -26,8 +26,14 @@ the versioning [Semantic Versioning](https://semver.org/).
 
   Both together, because neither replaces the other. A checksum proves that the
   file is the one the server sent; a signature proves who built it.
-- **macOS is delivered as a disk image.** Open it, drag the application onto the
-  Applications folder beside it, done - no terminal, no unpacking.
+- **macOS is delivered as a disk image, and the application installs itself.**
+  Open the image, double-click the application: it notices that it is running
+  from an image, offers to move into the Applications folder, starts from there
+  and ejects the image behind it. Dragging it across by hand still works. No
+  terminal either way, and nothing to unpack.
+
+  It copies itself with `ditto`, for the reason below - a plain directory copy
+  would install a bundle whose signature no longer holds.
 
   The convenience is the smaller half of the reason. Most of this application is
   managed .NET assemblies, and those are not Mach-O files, so their signatures

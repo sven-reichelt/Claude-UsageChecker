@@ -27,8 +27,14 @@ versionamento [Semantic Versioning](https://semver.org/lang/pt-BR/).
   As duas juntas, porque nenhuma substitui a outra. Uma soma de verificação
   prova que o arquivo é o que o servidor enviou; uma assinatura prova quem o
   construiu.
-- **O macOS é entregue como imagem de disco.** Abra-a, arraste o aplicativo até
-  a pasta Aplicativos ao lado, e pronto: sem terminal e sem descompactar.
+- **O macOS é entregue como imagem de disco, e o aplicativo se instala
+  sozinho.** Abra a imagem e dê um clique duplo no aplicativo: ele percebe que
+  está sendo executado de uma imagem, oferece mudar-se para a pasta Aplicativos,
+  inicia de lá e ejeta a imagem atrás de si. Arrastá-lo à mão continua
+  funcionando. Sem terminal nos dois casos, e sem nada para descompactar.
+
+  Ele se copia com `ditto`, pelo motivo explicado adiante: uma cópia de pasta
+  comum instalaria um pacote cuja assinatura já não vale.
 
   A comodidade é a menor parte do motivo. A maior parte deste aplicativo são
   assemblies gerenciados do .NET, que não são arquivos Mach-O, de modo que a

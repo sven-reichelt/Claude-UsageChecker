@@ -41,7 +41,25 @@ public sealed class UpdateInstaller(HttpClient httpClient)
     public const string BackupSuffix = ".alt";
 
     /// <summary>Switch that makes the new version wait for the old one to end.</summary>
+    /// <remarks>
+    /// German, and it stays that way, alone among the identifiers here. The
+    /// value is a promise between two versions: the old one passes it, the new
+    /// one reads it. Translating it would mean a version that hands over a word
+    /// its successor does not know - the successor would not wait, would find
+    /// the single-instance lock held, and would end itself without a word,
+    /// leaving the machine with nothing running after an update. Exactly the
+    /// failure that <c>open</c> without <c>-n</c> caused on macOS.
+    /// </remarks>
     public const string WaitArgument = "--nach-update";
+
+    /// <summary>Switch that has the new version eject the volume it came from.</summary>
+    /// <remarks>
+    /// Only ever passed by the setup on macOS, and only when the application was
+    /// started from a disk image. The one that ejects has to be the new instance:
+    /// the old one is still running from that volume, and a volume in use does
+    /// not detach.
+    /// </remarks>
+    public const string EjectArgument = "--eject";
 
     /// <summary>
     /// Whether the running version can replace itself.

@@ -23,7 +23,7 @@ and a second one would break every clone that exists by then.
 
 ```powershell
 dotnet build                                      # the whole solution
-dotnet test                                       # 636 tests (Core.Tests + App.Tests)
+dotnet test                                       # 642 tests (Core.Tests + App.Tests)
 dotnet run --project src/ClaudeUsageChecker.App   # run the application
 node build/generate-icons.mjs                     # regenerate the icons
 ```
@@ -271,6 +271,20 @@ nobody earned. The same wrong question stood in `MacOsBundle.IsAcceptableAsync`,
 where it guarded the only thing between a download and running it -
 `TheDownloadedBundleIsAssessedAsAnApplication` pins it now. **One wrong idea
 tends to have been written down twice.**
+
+**"Can I replace myself here?" is not "may I install myself there?"**
+`SelfInstaller.ShouldOffer` hung on `UpdateInstaller.IsSupported`, which on macOS
+asks whether the folder *around the running bundle* can be written to. A disk
+image is read-only, so it says no - and the setup offer would have been hidden
+in the exact situation it exists for. What decides is whether the **target**
+takes a write. The near-identical wording of the two questions is what made this
+easy to write and hard to see.
+
+**Copy a bundle with `ditto`, never with .NET's own file copying.** Same reason
+as the unpacking rule: the signatures of 202 managed assemblies live in extended
+attributes, and `File.Copy` and friends know nothing about those. A setup that
+uses them installs a bundle that fails its own signature check - notarised, in
+place, and refused by macOS with a message about malware.
 
 **`open -a` does not start a second instance; it activates the running one.**
 The macOS self-update replaced the bundle correctly and then left the Mac with

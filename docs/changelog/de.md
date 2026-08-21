@@ -27,9 +27,14 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
   Beides zusammen, weil keines das andere ersetzt. Eine Prüfsumme belegt, dass
   die Datei die vom Server gesendete ist; eine Signatur belegt, wer sie gebaut
   hat.
-- **macOS wird als Disk-Image ausgeliefert.** Öffnen, die Anwendung auf den
-  danebenliegenden Programme-Ordner ziehen, fertig – kein Terminal, kein
-  Auspacken.
+- **macOS wird als Disk-Image ausgeliefert, und die Anwendung richtet sich
+  selbst ein.** Image öffnen, Anwendung doppelklicken: Sie merkt, dass sie von
+  einem Image läuft, bietet an, in den Programme-Ordner umzuziehen, startet von
+  dort und wirft das Image hinter sich aus. Von Hand hinüberziehen geht
+  weiterhin. Kein Terminal, so oder so, und nichts zum Auspacken.
+
+  Kopiert wird mit `ditto`, aus dem Grund weiter unten – ein gewöhnliches
+  Kopieren richtete ein Bündel ein, dessen Signatur nicht mehr gilt.
 
   Die Bequemlichkeit ist dabei der kleinere Teil des Grundes. Der größte Teil
   dieser Anwendung besteht aus verwalteten .NET-Dateien, und die sind keine

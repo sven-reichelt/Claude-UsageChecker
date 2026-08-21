@@ -27,8 +27,14 @@ numeração [Semantic Versioning](https://semver.org/lang/pt-BR/).
   As duas em conjunto, porque nenhuma substitui a outra. Uma soma de
   verificação prova que o ficheiro é o que o servidor enviou; uma assinatura
   prova quem o construiu.
-- **O macOS é entregue como imagem de disco.** Abra-a, arraste a aplicação para
-  a pasta Aplicações ao lado, e está feito: sem terminal e sem descompactar.
+- **O macOS é entregue como imagem de disco, e a aplicação instala-se
+  sozinha.** Abra a imagem e faça duplo clique na aplicação: repara que está a
+  ser executada a partir de uma imagem, propõe mudar-se para a pasta Aplicações,
+  arranca a partir daí e ejeta a imagem atrás de si. Arrastá-la à mão continua a
+  funcionar. Sem terminal em qualquer dos casos, e sem nada para descompactar.
+
+  Copia-se com `ditto`, pelo motivo explicado adiante: uma cópia de pasta comum
+  instalaria um pacote cuja assinatura já não vale.
 
   A comodidade é a menor parte do motivo. A maior parte desta aplicação são
   assemblies geridos do .NET, que não são ficheiros Mach-O, pelo que a

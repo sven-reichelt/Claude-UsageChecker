@@ -707,9 +707,14 @@ jobs:
             | **Windows (x64)** | `ClaudeUsageChecker.exe`, ${{ steps.package.outputs.size }} MB |
             | **macOS (Apple silicon)** | `${{ steps.macos.outputs.dmg-name }}`, ${{ steps.macos.outputs.dmg-size }} MB |
 
-            The `.zip` attached alongside is the same application in the form
-            the update check fetches. For installing by hand, take the disk
-            image.
+            > **On macOS take the `.dmg`.** That is the installation.
+            >
+            > The `.zip` beside it is attached for one purpose only: it is what
+            > the application downloads for its **own update**, and it unpacks
+            > that itself. It is not a second way to install - a bundle handed
+            > to an unpacking tool of someone else's choosing is a bundle whose
+            > signature depends on that tool, and the disk image exists so that
+            > no tool gets between the two.
 
             ### Installation on Windows
 

@@ -27,9 +27,15 @@ numérotation [Semantic Versioning](https://semver.org/lang/fr/).
   Les deux ensemble, car aucune ne remplace l'autre. Une somme de contrôle
   prouve que le fichier est celui qu'a envoyé le serveur ; une signature prouve
   qui l'a construit.
-- **macOS est livré sous forme d'image disque.** Ouvrez-la, faites glisser
-  l'application sur le dossier Applications placé à côté, et c'est tout : pas de
-  terminal, pas de décompression.
+- **macOS est livré sous forme d'image disque, et l'application s'installe
+  elle-même.** Ouvrez l'image, double-cliquez sur l'application : elle constate
+  qu'elle s'exécute depuis une image, propose de s'installer dans le dossier
+  Applications, démarre de là et éjecte l'image derrière elle. La faire glisser
+  à la main fonctionne toujours. Pas de terminal dans un cas comme dans l'autre,
+  et rien à décompresser.
+
+  Elle se copie avec `ditto`, pour la raison exposée plus bas : une copie de
+  dossier ordinaire installerait un paquet dont la signature ne tient plus.
 
   Le confort n'est que la moindre part de la raison. L'essentiel de cette
   application est fait d'assemblages .NET gérés, qui ne sont pas des fichiers

@@ -33,6 +33,10 @@ internal static class Program
         StartupArguments.WaitForPredecessor(args);
         Services.UpdateInstaller.RemovePreviousVersion();
 
+        // Only after the predecessor has gone: on macOS it was running from the
+        // image, and a volume in use does not detach.
+        StartupArguments.EjectSourceVolume(args);
+
         // A second instance would add a second tray icon and poll the API twice.
         // It therefore ends itself without a word.
         using var instance = SingleInstance.TryAcquire();
