@@ -23,7 +23,7 @@ and a second one would break every clone that exists by then.
 
 ```powershell
 dotnet build                                      # the whole solution
-dotnet test                                       # 633 tests (Core.Tests + App.Tests)
+dotnet test                                       # 636 tests (Core.Tests + App.Tests)
 dotnet run --project src/ClaudeUsageChecker.App   # run the application
 node build/generate-icons.mjs                     # regenerate the icons
 ```
@@ -254,12 +254,33 @@ and is a dropped file attribute. Since 0.9.0 the release therefore ships a
 **disk image**, which is mounted rather than unpacked. The zip stays attached
 for the update check alone.
 
+That is a risk removed, not a diagnosis: **Archive Utility - the program behind
+a double-click - was measured and is innocent.** The release workflow now
+unpacks the zip with it on every run and reports what is left: zero side-cars,
+`codesign` valid, `spctl` accepted. The refusal a tester saw therefore had some
+other cause, still unknown; the leading candidate is the online check macOS
+makes for a quarantined application whose notarisation is minutes old. Write
+down what was measured, and separately what is still guessed.
+
 **Ask Gatekeeper `--type execute`, not `--type install`.** For an application
 `install` is the wrong rule set - it assesses installer packages. It answered
 "accepted" in the release workflow for a whole release while the bundle a
 tester double-clicked was being refused. A check that answers a different
 question than the one reality asks is worse than no check: it is a green light
-nobody earned.
+nobody earned. The same wrong question stood in `MacOsBundle.IsAcceptableAsync`,
+where it guarded the only thing between a download and running it -
+`TheDownloadedBundleIsAssessedAsAnApplication` pins it now. **One wrong idea
+tends to have been written down twice.**
+
+**`open -a` does not start a second instance; it activates the running one.**
+The macOS self-update replaced the bundle correctly and then left the Mac with
+nothing running: at the moment it calls `open`, the version being replaced is
+still alive, so macOS brought *that* to the front, reported success, and the old
+process quit a breath later. `open -n` is the whole fix. The startup was built
+for a second instance all along - `Program.Main` waits for the predecessor,
+clears what it left, and only then takes the single-instance lock. Windows never
+showed this, because `Process.Start` always really starts something. Found by
+running the update on a real Mac; 633 green tests had nothing to say about it.
 
 **Every check before 0.9.0 was asked of the bundle lying on the runner - and
 that one nobody downloads.** What ships is the image and the zip, and neither

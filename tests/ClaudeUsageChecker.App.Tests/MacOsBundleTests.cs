@@ -21,6 +21,65 @@ namespace ClaudeUsageChecker.App.Tests;
 /// </remarks>
 public class MacOsBundleTests
 {
+    /// <summary>The replaced version is started as a new instance.</summary>
+    /// <remarks>
+    /// Found on a Mac, not here: the update ran through, the new version was in
+    /// place, and nothing was running afterwards - it had to be started by
+    /// hand. Without <c>-n</c>, open does not start a second instance of an
+    /// application it considers already running; it activates the running one,
+    /// which at that moment is the version being replaced. It then reports
+    /// success and quits, and no new process ever existed.
+    /// <para>
+    /// The counter-check that matters: take the flag away again and this test
+    /// has to fail. It was written that way round.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void TheReplacedVersionIsStartedAsANewInstance()
+    {
+        var arguments = MacOsBundle.StartArguments("/Applications/ClaudeUsageChecker.app", 4711);
+
+        Assert.Equal("-n", arguments[0]);
+        Assert.Equal(["-a", "/Applications/ClaudeUsageChecker.app"], arguments[1..3]);
+    }
+
+    /// <summary>Gatekeeper is asked the question it will be asked later.</summary>
+    /// <remarks>
+    /// This is the safeguard that decides whether a downloaded bundle is run at
+    /// all, and it asked <c>--type install</c> - the rule set for installer
+    /// packages, not applications. It therefore approved things macOS itself
+    /// would refuse. The same wrong question stood in the release workflow and
+    /// was found the same day, from the other end: it reported "accepted" for a
+    /// bundle a Mac was turning away.
+    /// </remarks>
+    [Fact]
+    public void TheDownloadedBundleIsAssessedAsAnApplication()
+    {
+        var arguments = MacOsBundle.GatekeeperArguments("/tmp/ClaudeUsageChecker.app");
+
+        Assert.Equal(["--assess", "--type", "execute", "/tmp/ClaudeUsageChecker.app"], arguments);
+        Assert.DoesNotContain("install", arguments);
+    }
+
+    /// <summary>The new instance is told which process to wait for.</summary>
+    /// <remarks>
+    /// The other half of the handshake, and useless without the first: the
+    /// second instance waits for this one to end, clears away what it left, and
+    /// only then takes the single-instance lock. A new instance that arrived
+    /// without the number would find the lock held and end itself without a
+    /// word - the same empty Mac by a different route.
+    /// </remarks>
+    [Fact]
+    public void TheNewInstanceIsToldWhichProcessToWaitFor()
+    {
+        var arguments = MacOsBundle.StartArguments("/Applications/ClaudeUsageChecker.app", 4711);
+
+        var args = Array.IndexOf(arguments, "--args");
+        Assert.NotEqual(-1, args);
+        Assert.Equal(UpdateInstaller.WaitArgument, arguments[args + 1]);
+        Assert.Equal("4711", arguments[args + 2]);
+    }
+
     /// <summary>The executable inside a bundle names the bundle.</summary>
     /// <remarks>
     /// This is what the program knows about itself: ProcessPath points into

@@ -140,6 +140,15 @@ internal static class MacOsBundle
     /// still matches its signature; spctl asks whether the signature is one the
     /// system accepts - a Developer ID, notarised, not revoked. A bundle that
     /// passes the first and fails the second is properly built and not welcome.
+    /// <para>
+    /// <c>--type execute</c>, because this is an application. <c>install</c> is
+    /// the rule set for installer packages, and asking it here meant this
+    /// safeguard was answering a question nobody had - politely, and in the
+    /// affirmative. The same mistake stood in the release workflow, where it
+    /// approved a bundle that macOS was refusing on a tester's machine. Where a
+    /// check is the only thing standing between a download and being run, it
+    /// has to ask what the system will ask.
+    /// </para>
     /// </remarks>
     internal static async Task<bool> IsAcceptableAsync(string bundle, CancellationToken cancellationToken)
     {
@@ -150,9 +159,13 @@ internal static class MacOsBundle
         }
 
         return await RunAsync(
-            "/usr/sbin/spctl", ["--assess", "--type", "install", bundle], cancellationToken)
+            "/usr/sbin/spctl", GatekeeperArguments(bundle), cancellationToken)
             .ConfigureAwait(false) is 0;
     }
+
+    /// <summary>The question macOS asks before it opens an application.</summary>
+    internal static string[] GatekeeperArguments(string bundle) =>
+        ["--assess", "--type", "execute", bundle];
 
     /// <summary>
     /// Puts the new bundle where the old one stands and starts it.
@@ -180,19 +193,42 @@ internal static class MacOsBundle
             return InstallResult.Failed(T.UpdaterReplaceFailed(ex.Message));
         }
 
-        // Through open rather than by running the executable: that hands the
-        // start to macOS, which then treats the program as the bundled
-        // application it is. Same reasoning as the launch agent.
         var started = await RunAsync(
-            "/usr/bin/open",
-            ["-a", bundle, "--args", UpdateInstaller.WaitArgument,
-             Environment.ProcessId.ToString(CultureInfo.InvariantCulture)],
-            cancellationToken).ConfigureAwait(false);
+            "/usr/bin/open", StartArguments(bundle, Environment.ProcessId), cancellationToken)
+            .ConfigureAwait(false);
 
         return started is 0
             ? new InstallResult(true, T.UpdaterDone)
-            : InstallResult.Failed(T.UpdaterReplaceFailed($"open -a ({started})"));
+            : InstallResult.Failed(T.UpdaterReplaceFailed($"open -n -a ({started})"));
     }
+
+    /// <summary>
+    /// How the replaced version is started: a new instance, told which process
+    /// to wait for.
+    /// </summary>
+    /// <remarks>
+    /// Through open rather than by running the executable: that hands the start
+    /// to macOS, which then treats the program as the bundled application it
+    /// is. Same reasoning as the launch agent.
+    /// <para>
+    /// <c>-n</c> is the whole difference between an update that finishes and
+    /// one that leaves the Mac with nothing running. Without it, open does not
+    /// start a second instance of an application it considers already running -
+    /// it brings the running one to the front. At this moment that is the
+    /// version being replaced, which is still alive and quits a breath later.
+    /// So open reports success, the old process goes, and no new one ever
+    /// existed. Windows never showed this because Process.Start always really
+    /// starts something.
+    /// </para>
+    /// <para>
+    /// A second instance is what the startup was built for: it waits for this
+    /// process to end, clears away what it left, and only then takes the
+    /// single-instance lock - in that order, in Program.Main.
+    /// </para>
+    /// </remarks>
+    internal static string[] StartArguments(string bundle, int waitFor) =>
+        ["-n", "-a", bundle, "--args", UpdateInstaller.WaitArgument,
+         waitFor.ToString(CultureInfo.InvariantCulture)];
 
     /// <summary>Removes the bundle set aside by the version before this one.</summary>
     internal static void RemovePreviousVersion(string? program)
