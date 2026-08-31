@@ -91,11 +91,22 @@ schlicht weggelassen – die Anzeige richtet sich allein danach, was zurückkomm
 | Sitzung (`kind: session`) | ja | ja |
 | Woche gesamt (`kind: weekly_all`) | ja | ja |
 | Wochenlimit je Modell (`kind: weekly_scoped`) | je nach Nutzung | je nach Nutzung |
-| Zusatzkontingent (`extra_usage`) | vermutlich nein | wenn aktiviert |
+| Zusatzkontingent (`extra_usage`) | bisher nicht gesehen | wenn aktiviert |
 
 Beobachtung aus der Praxis: Die modellbezogenen Wochenfenster erscheinen erst,
-wenn das jeweilige Modell in der laufenden Woche genutzt wurde. Die Pro-Spalte ist
-recherchiert, nicht gemessen.
+wenn das jeweilige Modell in der laufenden Woche genutzt wurde.
+
+Die Pro-Spalte wurde am 31.08.2026 an einem echten Abonnement gemessen; bis
+dahin war sie nur recherchiert. Sitzung und Woche gesamt kamen zurück und
+stimmten mit dem überein, was claude.ai für dasselbe Konto zeigte – auf den
+Prozentpunkt und auf die Rücksetzzeit. Ein modellbezogenes Fenster erschien
+nicht, bei einer zu einem Prozent genutzten Woche, was die Zeile darüber genau
+so vorhersagt. Das Zusatzkontingent blieb ebenfalls aus, und das ist nicht
+geklärt: Das Konto hatte das Kontingent eingeschaltet, mit einem Monatslimit von
+40 EUR, aber nichts ausgegeben und kein Guthaben. Ob der Endpunkt `spend` bei Pro
+weglässt oder es als nicht aktiviert meldet, solange das Guthaben null ist, lässt
+sich an der Anzeige nicht unterscheiden – die Anwendung blendet den Block in
+beiden Fällen aus.
 
 **Modellnamen sind nicht fest verdrahtet.** Die Anwendung liest sie aus der
 Antwort (`scope.model.display_name`) und beschriftet die Zeile damit – heute

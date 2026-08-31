@@ -90,11 +90,20 @@ left out - the display follows nothing but what comes back.
 | Session (`kind: session`) | yes | yes |
 | Weekly total (`kind: weekly_all`) | yes | yes |
 | Weekly limit per model (`kind: weekly_scoped`) | depending on use | depending on use |
-| Extra usage (`extra_usage`) | probably not | when enabled |
+| Extra usage (`extra_usage`) | not seen so far | when enabled |
 
 Observation from practice: the model-specific weekly windows only appear once
-that model has been used during the current week. The Pro column is researched,
-not measured.
+that model has been used during the current week.
+
+The Pro column was measured on 2026-08-31, on a real subscription; until then it
+was researched only. Session and weekly total came back and matched what
+claude.ai showed for the same account, to the percentage point and to the reset
+time. No model-specific window appeared - on a week one percent used, which is
+what the row above predicts. Extra usage stayed away too, and that one is not
+settled: the account had the quota switched on with a monthly cap of 40 EUR, but
+had spent nothing and held no balance. Whether the endpoint leaves `spend` out on
+Pro or reports it as not enabled while the balance is zero cannot be told from
+the display, because the application hides the block in both cases.
 
 **Model names are not hard-wired.** The application reads them from the response
 (`scope.model.display_name`) and labels the row with them - "Weekly Fable" today.

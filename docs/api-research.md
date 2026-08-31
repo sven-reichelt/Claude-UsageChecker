@@ -122,6 +122,28 @@ Not acted on:
 * `limits[].severity` is supplied by the API itself ("normal"). The application
   still classifies for itself, because the thresholds are configurable.
 
+### Addendum 2026-08-31: what a Pro subscription answers
+
+Everything above was measured against Max. A Pro account answers the same shape:
+`session` and `weekly_all` both came back and both matched what claude.ai showed
+for that account in the same minute - 12 % and 1 %, reset times included. No
+`weekly_scoped` entry appeared, on a week one percent used, which is exactly what
+the observation above predicts: a model-specific window turns up only once that
+model has been used.
+
+`spend` produced nothing to show, and that part is not settled. The account had
+the extra usage quota switched on with a monthly cap of 40 EUR, but had spent
+nothing and held no balance; the application showed no extra usage block, which
+means `spend` was either absent or came back with `enabled: false`. The display
+cannot tell the two apart - it hides the block on both - and the response itself
+was not captured. Recorded as an observation, not as a finding.
+
+Worth knowing when reading the figures: this account's weekly limits were
+temporarily raised by 50 % until 31 August. The endpoint reflects a promotion
+like that in the percentage alone and says nothing about it, so a share that
+looks harmless during the promotion is a larger share of a smaller limit the day
+after.
+
 ### Pitfalls
 
 | Observation | Consequence in the design |
@@ -297,6 +319,10 @@ wrong data source for this undertaking.
 * How long the refresh token remains valid is unknown. As long as the application
   runs regularly, it refreshes in good time. After a very long break it may have
   lapsed - then signing in once more is needed.
+* Whether `spend` reaches a Pro account at all is unmeasured. Seen once with the
+  quota switched on but no balance bought, and nothing was displayed - which
+  `spend: null` and `enabled: false` would both produce. Capturing the raw
+  response on such an account would settle it.
 * Rotating refresh tokens carry a narrow window: if storing fails between a
   successful refresh and filing it away, the old token is spent and the new one
   lost. The consequence would be signing in again, not data loss.
