@@ -176,6 +176,12 @@
   "install.decline": "不安装",
   "install.running": "正在安装 ...",
 
+  "support.coffee": "请我喝杯咖啡——打开 buymeacoffee.com",
+  "support.kofi": "在 Ko-fi 上支持——打开 ko-fi.com",
+  "support.intro": "免费、开源、无广告。如果它对你有用，欢迎支持它的开发：",
+  "tray.supportCoffee": "请我喝杯咖啡 ...",
+  "tray.supportKofi": "在 Ko-fi 上支持 ...",
+
   "about.title": "关于 Claude UsageChecker",
   "about.description": "在通知区域显示 Claude 订阅的会话限额和每周限额。通过自有登录读取用量数据，不回写任何内容。",
   "about.repository": "在 GitHub 上打开项目页面",

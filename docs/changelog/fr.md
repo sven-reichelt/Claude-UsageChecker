@@ -33,12 +33,22 @@ numérotation [Semantic Versioning](https://semver.org/lang/fr/).
 - **L'avertissement d'une limite réinitialisée se ferme tout seul.** Qui revient
   à son poste après que la session a recommencé ne devrait pas trouver une
   fenêtre rouge la déclarant épuisée, ni devoir la confirmer avant de continuer.
+- **Des boutons de soutien pour Buy Me a Coffee et Ko-fi.** Dans le menu
+  de la zone de notification, dans la fenêtre À propos et au bas des paramètres.
+  Les images sont celles que fournissent les services et portent des mots anglais
+  dans toutes les langues ; l'info-bulle indique dans la langue choisie où mène
+  un clic. Le menu de macOS ne peut pas afficher d'images : ce sont là deux
+  entrées de texte.
 
 ### Modifié
 - **L'apparence passe dans la colonne de gauche des paramètres.** Les
   avertissements sont arrivés à droite, à côté des seuils qu'ils partagent, et
   sans ce déplacement cette colonne devenait tellement plus longue que l'autre
   que la fenêtre devait défiler.
+- **Les barres de la fenêtre de détails suivent les seuils des
+  paramètres.** Elles passaient au jaune et au rouge à 75 et 90 % fixes, quels
+  que soient les réglages : seuils abaissés, l'icône et l'avertissement disaient
+  rouge tandis que la barre montrait encore une limite détendue.
 
 ## [0.9.0] – 2026-08-21
 

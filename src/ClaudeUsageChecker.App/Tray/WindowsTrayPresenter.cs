@@ -35,6 +35,8 @@ internal sealed class WindowsTrayPresenter : ITrayPresenter
 
     public event EventHandler? Clicked;
 
+    public event EventHandler<Uri>? SupportRequested;
+
     public void SetToolTip(string text) => _icon.SetToolTip(text);
 
     public void SetSeverity(TrayIconSeverity severity)
@@ -65,7 +67,12 @@ internal sealed class WindowsTrayPresenter : ITrayPresenter
 
     private void ShowMenu(PixelPoint cursor)
     {
-        _menu ??= new TrayMenuWindow();
+        if (_menu is null)
+        {
+            _menu = new TrayMenuWindow();
+            _menu.SupportRequested += (_, address) => SupportRequested?.Invoke(this, address);
+        }
+
         _menu.Render(_status, _commands);
         _menu.ShowAt(cursor);
     }

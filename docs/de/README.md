@@ -405,6 +405,9 @@ welcher es rot wird, steht in den Einstellungen – voreingestellt sind 75 % und
 nie statt, und das Fenster sagt das, statt die Eingabe stillschweigend
 zurechtzurücken.
 
+Die Balken im Detailfenster nehmen ihre Farbe aus denselben Schwellen, sodass
+Symbol, Balken und Hinweis nie Unterschiedliches erzählen.
+
 ### Hinweise
 
 Ein Symbol im Infobereich übersieht man leicht, darum öffnen dieselben Schwellen
@@ -425,6 +428,18 @@ Zeit selbst schließen, und vor allen anderen Fenstern bleiben oder nicht.
 **Vorschau zeigen** zeigt ihn mit Beispielwerten. Der Hinweis nimmt nicht die
 Tastatur: Ein Enter, das einem anderen Fenster galt, darf ihn nicht ungelesen
 bestätigen.
+
+## Das Projekt unterstützen
+
+Claude UsageChecker ist kostenlos, offen und ohne Werbung. Wenn es dir nützt,
+kannst du die Entwicklung unterstützen:
+
+<a href="https://buymeacoffee.com/svenreichelt"><img src="../../assets/support/buymeacoffee.svg" alt="Buy me a coffee" height="40"></a>
+<a href="https://ko-fi.com/svenreichelt"><img src="../../assets/support/kofi.png" alt="Support me on Ko-fi" height="40"></a>
+
+Dieselben zwei Buttons stehen in der Anwendung: im Menü des Infobereichs, im
+Über-Fenster und unten in den Einstellungen. Ein Klick öffnet die Seite im
+Browser und sonst nichts – die Anwendung sendet dabei nichts irgendwohin.
 
 ## Roadmap
 

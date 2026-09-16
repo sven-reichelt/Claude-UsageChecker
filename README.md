@@ -392,6 +392,9 @@ one at which it turns red, live in the settings - preset to 75 % and 90 %. The
 warning threshold has to be below the critical one; otherwise it would never take
 effect, and the window says so instead of quietly correcting the input.
 
+The bars in the details window take their colour from the same thresholds, so
+icon, bar and notice never tell different stories.
+
 ### Notices
 
 An icon in the notification area is easy to miss, so the same thresholds also
@@ -409,6 +412,18 @@ either wait for **OK, got it!** or close by itself after a set time, and stay in
 front of every other window or not. **Show preview** displays it with example
 figures. The notice does not take the keyboard: an Enter meant for another
 window must not confirm it unread.
+
+## Supporting the project
+
+Claude UsageChecker is free, open and without ads. If it is useful to you, you
+can support its development:
+
+<a href="https://buymeacoffee.com/svenreichelt"><img src="assets/support/buymeacoffee.svg" alt="Buy me a coffee" height="40"></a>
+<a href="https://ko-fi.com/svenreichelt"><img src="assets/support/kofi.png" alt="Support me on Ko-fi" height="40"></a>
+
+The same two buttons sit in the application: in the menu of the notification
+area, in the about window and at the foot of the settings. A click opens the
+page in the browser and nothing else - the application sends nothing anywhere.
 
 ## Roadmap
 

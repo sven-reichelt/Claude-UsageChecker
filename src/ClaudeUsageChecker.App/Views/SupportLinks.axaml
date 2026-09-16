@@ -1,0 +1,33 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="ClaudeUsageChecker.App.Views.SupportLinks">
+
+  <!-- The two buttons exactly as the services hand them out. Their wording is
+       part of the picture and therefore English in every language; the tooltip
+       beside it says in the chosen language where a click leads. -->
+  <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+    <Button x:Name="CoffeeButton" Classes="support">
+      <Image x:Name="CoffeeImage" Source="{DynamicResource BuyMeACoffeeImage}" Height="28" />
+    </Button>
+    <Button x:Name="KofiButton" Classes="support">
+      <Image x:Name="KofiImage" Source="avares://ClaudeUsageChecker/Assets/kofi.png" Height="28" />
+    </Button>
+  </StackPanel>
+
+  <UserControl.Styles>
+    <!-- No frame and no background of its own: the picture is the button. -->
+    <Style Selector="Button.support">
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="Button.support:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="Button.support:pointerover">
+      <Setter Property="Opacity" Value="0.85" />
+    </Style>
+  </UserControl.Styles>
+
+</UserControl>

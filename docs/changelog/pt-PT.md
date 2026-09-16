@@ -31,11 +31,20 @@ numeração [Semantic Versioning](https://semver.org/lang/pt-BR/).
 - **O aviso de um limite já reposto fecha-se sozinho.** Quem regressa ao
   computador depois de a sessão ter recomeçado não deveria encontrar uma janela
   vermelha a declará-la esgotada, nem ter de a confirmar para continuar.
+- **Botões de apoio para Buy Me a Coffee e Ko-fi.** No menu da área de
+  notificação, na janela Acerca e no fundo das definições. As imagens são as
+  fornecidas pelos serviços e têm palavras em inglês em todos os idiomas; a dica
+  indica no idioma escolhido para onde leva o clique. O menu do macOS não mostra
+  imagens, pelo que aí são duas entradas de texto.
 
 ### Alterado
 - **A aparência passou para a coluna esquerda das definições.** Os avisos
   entraram à direita, junto dos limiares que partilham, e sem a mudança essa
   coluna ficava tão mais comprida do que a outra que a janela tinha de deslocar.
+- **As barras da janela de detalhes seguem os limiares das definições.**
+  Antes ficavam amarelas e vermelhas em 75 e 90 % fixos, fosse o que fosse que
+  estivesse definido: com os limiares baixados, o ícone e o aviso diziam
+  vermelho enquanto a barra ainda mostrava um limite folgado.
 
 ## [0.9.0] – 2026-08-21
 

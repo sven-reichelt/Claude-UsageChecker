@@ -58,6 +58,10 @@
   <ItemGroup>
     <AvaloniaResource Include="../../assets/icons/*.png" Link="Assets/%(Filename)%(Extension)" />
     <AvaloniaResource Include="../../assets/icons/*.ico" Link="Assets/%(Filename)%(Extension)" />
+    <!-- The Ko-fi button as the service hands it out. The Buy Me a Coffee one is
+         an SVG and travels as vector geometry instead - see
+         build/generate-support-images.mjs. -->
+    <AvaloniaResource Include="../../assets/support/kofi.png" Link="Assets/kofi.png" />
     <!-- The changelog travels along: the summary shown after an update has to
          manage without network access and show exactly what belongs to the
          running version. A good ten kilobytes of text. -->

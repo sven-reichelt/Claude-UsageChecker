@@ -230,6 +230,13 @@ public static class T
     public static string InstallDecline => L["install.decline"];
     public static string InstallRunning => L["install.running"];
 
+    // Support
+    public static string SupportCoffee => L["support.coffee"];
+    public static string SupportKofi => L["support.kofi"];
+    public static string SupportIntro => L["support.intro"];
+    public static string TraySupportCoffee => L["tray.supportCoffee"];
+    public static string TraySupportKofi => L["tray.supportKofi"];
+
     // About
     public static string AboutTitle => L["about.title"];
     public static string AboutDescription => L["about.description"];

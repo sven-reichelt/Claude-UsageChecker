@@ -158,6 +158,7 @@ public partial class App : Application, IDisposable
             "update check", () => CheckForUpdatesAsync(announceUpToDate: true));
         _tray.ShowAboutRequested += (_, _) => ErrorGuard.Run("open the about window", ShowAbout);
         _tray.ExitRequested += (_, _) => ErrorGuard.Run("exit", RequestShutdown);
+        _tray.SupportRequested += (_, address) => OpenSupportPage(address);
 
         _monitor.StateChanged += (_, state) => Dispatcher.UIThread.Post(
             () => ErrorGuard.Run("refresh the details window", () => _detailsWindow?.Render(state)));
@@ -371,7 +372,8 @@ public partial class App : Application, IDisposable
     {
         var window = new AboutWindow(RepositoryUri, CurrentVersion);
         window.RepositoryRequested += (_, address) =>
-            ErrorGuard.Run("open the project page", () => OpenReleasePage(address));
+            ErrorGuard.Run("open the project page", () => OpenInBrowser(address));
+        window.SupportRequested += (_, address) => OpenSupportPage(address);
         window.ReleaseNotesRequested += (_, _) => ErrorGuard.Run(
             "show the changelog", () => ShowReleaseNotes(ChangelogResource.All(), previous: null));
 
@@ -499,10 +501,11 @@ public partial class App : Application, IDisposable
 
     private DetailsWindow CreateDetailsWindow()
     {
-        var window = new DetailsWindow();
+        // The same thresholds as the icon and the notices, read on every draw.
+        var window = new DetailsWindow { Thresholds = () => _settings.AlertRules };
         window.RefreshRequested += (_, _) => ErrorGuard.Forget("trigger a call", RefreshAndCheckAsync);
         window.ReleasePageRequested += (_, page) =>
-            ErrorGuard.Run("open the release page", () => OpenReleasePage(page));
+            ErrorGuard.Run("open the release page", () => OpenInBrowser(page));
         window.InstallRequested += (_, _) =>
             ErrorGuard.Forget("install the update", InstallUpdateAsync);
         window.Closing += (_, e) =>
@@ -540,6 +543,7 @@ public partial class App : Application, IDisposable
             ErrorGuard.Forget("call after a settings change", RefreshAsync);
         };
         window.SignInRequested += (_, _) => ErrorGuard.Run("open the sign-in", () => ShowSignIn(window));
+        window.SupportRequested += (_, address) => OpenSupportPage(address);
 
         window.Show();
         window.Activate();
@@ -695,8 +699,16 @@ public partial class App : Application, IDisposable
         _detailsWindow.Activate();
     }
 
-    private static void OpenReleasePage(Uri page) =>
+    /// <summary>
+    /// Opens a page in the default browser - the release page, the project page,
+    /// or a support page.
+    /// </summary>
+    private static void OpenInBrowser(Uri page) =>
         Process.Start(new ProcessStartInfo(page.ToString()) { UseShellExecute = true });
+
+    /// <summary>A support button was clicked, in whichever of the three places.</summary>
+    private static void OpenSupportPage(Uri page) =>
+        ErrorGuard.Run("open the support page", () => OpenInBrowser(page));
 
     /// <summary>
     /// Installs the new version and then ends this instance - the new one is

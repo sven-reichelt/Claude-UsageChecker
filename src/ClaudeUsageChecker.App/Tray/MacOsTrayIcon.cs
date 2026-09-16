@@ -69,6 +69,16 @@ internal sealed class MacOsTrayIcon : ITrayPresenter
         remove { }
     }
 
+    /// <summary>
+    /// Never raised here: a native menu cannot hold the pictures, so the
+    /// controller offers support as two plain entries on this platform.
+    /// </summary>
+    public event EventHandler<Uri>? SupportRequested
+    {
+        add { }
+        remove { }
+    }
+
     public void SetToolTip(string text) => _icon.ToolTipText = text;
 
     public void SetSeverity(TrayIconSeverity severity)

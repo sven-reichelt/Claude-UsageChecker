@@ -54,6 +54,7 @@ public sealed class TrayIconController : IDisposable
 
         _icon = CreateIcon();
         _icon.Clicked += (_, _) => ShowDetails?.Invoke(this, EventArgs.Empty);
+        _icon.SupportRequested += (_, address) => SupportRequested?.Invoke(this, address);
 
         _monitor.StateChanged += OnStateChanged;
 
@@ -88,6 +89,9 @@ public sealed class TrayIconController : IDisposable
 
     /// <summary>The user wants to exit the application.</summary>
     public event EventHandler? ExitRequested;
+
+    /// <summary>The user wants to support the project; the address is the page to open.</summary>
+    public event EventHandler<Uri>? SupportRequested;
 
     /// <summary>Relabels what outlives a language change.</summary>
     /// <remarks>
@@ -140,6 +144,17 @@ public sealed class TrayIconController : IDisposable
         // states it, and anyone reporting a problem is asked for it before
         // anything else.
         commands.Add((T.TrayAbout(Version()), () => ShowAboutRequested?.Invoke(this, EventArgs.Empty)));
+
+        // Windows shows the two support buttons as pictures below the entries.
+        // A native macOS menu holds text only, so there they are entries.
+        if (!OperatingSystem.IsWindows())
+        {
+            commands.Add((T.TraySupportCoffee,
+                () => SupportRequested?.Invoke(this, SupportLinks.BuyMeACoffee)));
+            commands.Add((T.TraySupportKofi,
+                () => SupportRequested?.Invoke(this, SupportLinks.Kofi)));
+        }
+
         commands.Add((T.TrayExit, () => ExitRequested?.Invoke(this, EventArgs.Empty)));
 
         return commands;

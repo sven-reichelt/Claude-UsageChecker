@@ -9,6 +9,9 @@
 
   <Application.Resources>
     <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://ClaudeUsageChecker/Views/SupportImages.axaml" />
+      </ResourceDictionary.MergedDictionaries>
       <SolidColorBrush x:Key="AccentBrush" Color="#D97757" />
       <SolidColorBrush x:Key="WarningBrush" Color="#E0A030" />
       <SolidColorBrush x:Key="CriticalBrush" Color="#D04040" />

@@ -176,6 +176,12 @@
   "install.decline": "Do not set up",
   "install.running": "Setting up ...",
 
+  "support.coffee": "Buy me a coffee - opens buymeacoffee.com",
+  "support.kofi": "Support on Ko-fi - opens ko-fi.com",
+  "support.intro": "Free, open and without ads. If it is useful to you, you can support its development:",
+  "tray.supportCoffee": "Buy me a coffee ...",
+  "tray.supportKofi": "Support on Ko-fi ...",
+
   "about.title": "About Claude UsageChecker",
   "about.description": "Shows the session and weekly limits of a Claude subscription in the system tray. Reads usage figures through its own sign-in and writes nothing back.",
   "about.repository": "Open project page on GitHub",

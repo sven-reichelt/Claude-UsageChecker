@@ -30,11 +30,20 @@ the versioning [Semantic Versioning](https://semver.org/).
 - **A notice about a limit that has reset closes by itself.** Whoever comes back
   to the desk after the session has started over should not find a red window
   saying it is used up, and have to confirm it before getting on.
+- **Support buttons for Buy Me a Coffee and Ko-fi.** In the menu of the
+  notification area, in the about window and at the foot of the settings. The
+  pictures are the ones the services hand out and carry English words in every
+  language; the tooltip says in the chosen language where a click leads. The
+  macOS menu cannot hold pictures, so there they are two plain entries.
 
 ### Changed
 - **Appearance moved to the left column of the settings.** The notices landed
   on the right, beside the thresholds they share, and without the move that
   column grew so far past the other that the window had to scroll.
+- **The bars in the details window follow the thresholds in the settings.**
+  They used to turn yellow and red at a fixed 75 and 90 %, whatever was set -
+  with the thresholds lowered, the icon and the notice said red while the bar
+  still showed a limit at ease.
 
 ## [0.9.0] – 2026-08-21
 

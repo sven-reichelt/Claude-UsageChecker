@@ -85,6 +85,7 @@ public partial class SettingsWindow : Window
         AlertAcknowledgeBox.IsCheckedChanged += (_, _) => UpdateAlertAutoClose();
         UpdateAlertAutoClose();
         AlertPreviewButton.Click += (_, _) => ShowAlertPreview();
+        Support.LinkRequested += (_, address) => SupportRequested?.Invoke(this, address);
 
         VersionText.Text = ProgramVersion.Current.IsPreRelease
             ? T.VersionPreRelease(ProgramVersion.Current.ToString())
@@ -309,6 +310,9 @@ public partial class SettingsWindow : Window
 
     /// <summary>The user wants to start the sign-in.</summary>
     public event EventHandler? SignInRequested;
+
+    /// <summary>The user wants to support the project; the address is the page to open.</summary>
+    public event EventHandler<Uri>? SupportRequested;
 
     /// <summary>
     /// Keeps the window inside the working area of the screen it appears on.

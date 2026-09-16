@@ -27,6 +27,13 @@ public partial class TrayMenuWindow : Window
         InitializeComponent();
 
         Deactivated += (_, _) => Hide();
+
+        // Like every other entry: the menu goes away first, then the page opens.
+        Support.LinkRequested += (_, address) =>
+        {
+            Hide();
+            SupportRequested?.Invoke(this, address);
+        };
         KeyDown += (_, e) =>
         {
             if (e.Key == Key.Escape)
@@ -35,6 +42,9 @@ public partial class TrayMenuWindow : Window
             }
         };
     }
+
+    /// <summary>The user wants to support the project; the address is the page to open.</summary>
+    public event EventHandler<Uri>? SupportRequested;
 
     /// <summary>Fills the menu with the lines to show and the entries to offer.</summary>
     /// <param name="status">
@@ -51,6 +61,9 @@ public partial class TrayMenuWindow : Window
 
         StatusPanel.Children.Clear();
         CommandPanel.Children.Clear();
+
+        // The window outlives a language change; rendering is when it catches up.
+        Support.ApplyTexts();
 
         foreach (var line in status)
         {

@@ -43,6 +43,7 @@ public partial class AboutWindow : Window
 
         RepositoryButton.Click += (_, _) => RepositoryRequested?.Invoke(this, _repository);
         ReleaseNotesButton.Click += (_, _) => ReleaseNotesRequested?.Invoke(this, EventArgs.Empty);
+        Support.LinkRequested += (_, address) => SupportRequested?.Invoke(this, address);
         CloseButton.Click += (_, _) => Close();
     }
 
@@ -58,7 +59,11 @@ public partial class AboutWindow : Window
         ReleaseNotesButton.Content = T.AboutReleaseNotes;
         LicenseText.Text = T.AboutLicense(Copyright());
         CloseButton.Content = T.Close;
+        SupportIntroText.Text = T.SupportIntro;
     }
+
+    /// <summary>The user wants to support the project; the address is the page to open.</summary>
+    public event EventHandler<Uri>? SupportRequested;
 
     /// <summary>The user wants to open the project page in a browser.</summary>
     public event EventHandler<Uri>? RepositoryRequested;

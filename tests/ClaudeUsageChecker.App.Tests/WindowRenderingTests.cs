@@ -148,12 +148,40 @@ public class WindowRenderingTests : IDisposable
         window.Hide();
     }
 
+    /// <summary>
+    /// The same figures under lowered thresholds, so that the bars show every
+    /// colour at once.
+    /// </summary>
+    /// <remarks>
+    /// The fixture above stays below 75 %, where every bar is the accent colour
+    /// - which is also exactly what the bars showed when they ignored the
+    /// settings. With 20 and 35 the session is red, the week yellow, the rest
+    /// untouched.
+    /// </remarks>
+    [AvaloniaFact]
+    public void TheDetailsWindowDrawsWithTheThresholdsFromTheSettings()
+    {
+        Localizer.Use(Language.Find("de")!);
+
+        var window = BuildDetails();
+        window.Thresholds = () => new UsageAlertRules(20, 35);
+        window.Render(DetailsState());
+
+        Capture(window, "details-thresholds-20-35");
+    }
+
     private static DetailsWindow BuildDetails()
     {
-        var now = DateTimeOffset.UtcNow;
         var window = new DetailsWindow();
+        window.Render(DetailsState());
+        return window;
+    }
 
-        window.Render(new UsageState
+    private static UsageState DetailsState()
+    {
+        var now = DateTimeOffset.UtcNow;
+
+        return new UsageState
         {
             Kind = UsageStateKind.Ready,
             Snapshot = new UsageSnapshot
@@ -167,9 +195,7 @@ public class WindowRenderingTests : IDisposable
                 RetrievedAt = now,
                 TokenSource = TokenSource.OAuth
             }
-        });
-
-        return window;
+        };
     }
 
     private static ReleaseNotesWindow BuildReleaseNotes()

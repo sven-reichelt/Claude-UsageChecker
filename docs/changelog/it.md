@@ -29,12 +29,21 @@ numerazione [Semantic Versioning](https://semver.org/lang/it/).
 - **L'avviso di un limite già azzerato si chiude da solo.** Chi torna al
   computer dopo che la sessione è ripartita non dovrebbe trovare una finestra
   rossa che la dichiara esaurita, né doverla confermare prima di proseguire.
+- **Pulsanti di sostegno per Buy Me a Coffee e Ko-fi.** Nel menu dell'area
+  di notifica, nella finestra Informazioni e in fondo alle impostazioni. Le
+  immagini sono quelle fornite dai servizi e riportano parole inglesi in ogni
+  lingua; il suggerimento dice nella lingua scelta dove porta un clic. Il menu di
+  macOS non può mostrare immagini, quindi lì sono due voci di testo.
 
 ### Modificato
 - **L'aspetto passa nella colonna sinistra delle impostazioni.** Gli avvisi sono
   arrivati a destra, accanto alle soglie che condividono, e senza lo spostamento
   quella colonna diventava così più lunga dell'altra che la finestra doveva
   scorrere.
+- **Le barre della finestra dei dettagli seguono le soglie delle
+  impostazioni.** Prima diventavano gialle e rosse a un 75 e 90 % fissi,
+  qualunque cosa fosse impostata: con le soglie abbassate, icona e avviso
+  dicevano rosso mentre la barra mostrava ancora un limite tranquillo.
 
 ## [0.9.0] – 2026-08-21
 

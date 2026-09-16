@@ -23,9 +23,10 @@ and a second one would break every clone that exists by then.
 
 ```powershell
 dotnet build                                      # the whole solution
-dotnet test                                       # 719 tests (Core.Tests + App.Tests)
+dotnet test                                       # 731 tests (Core.Tests + App.Tests)
 dotnet run --project src/ClaudeUsageChecker.App   # run the application
 node build/generate-icons.mjs                     # regenerate the icons
+node build/generate-support-images.mjs            # Buy Me a Coffee SVG -> Avalonia vector image
 ```
 
 Builds into `artifacts/` (centrally through `ArtifactsPath` in
@@ -76,7 +77,7 @@ Builds into `artifacts/` (centrally through `ArtifactsPath` in
 
 ## Status
 
-Version 0.9.0 released, 0.9.1-beta.1 out as a pre-release for testing; the
+Version 0.9.0 released, 0.9.1-beta.2 out as a pre-release for testing; the
 repository is public and written in English.
 Finished among other things: the application's own sign-in through OAuth with
 PKCE including refresh, update at the push of a button with checksum
@@ -108,7 +109,10 @@ by a test or by a step in the release workflow.
 **0.9.1 brings usage notices**, out first as a pre-release for testing: a window
 when a limit reaches yellow, red or 100 %, once per limit and stage until it
 resets, remembered in `alerts.json` across a restart. The judging lives in
-`UsageAlertTracker` (Core), the window in `UsageAlertWindow`.
+`UsageAlertTracker` (Core), the window in `UsageAlertWindow`. beta.2 adds support
+buttons (Buy Me a Coffee, Ko-fi) in the tray menu, the about window and the foot
+of the settings - one control, `SupportLinks` - and makes the bars in the
+details window follow the configured thresholds instead of a fixed 75/90.
 
 **Pro was measured on 2026-08-31** and answers as the README describes: session
 and weekly total came back and matched claude.ai to the percentage point and the

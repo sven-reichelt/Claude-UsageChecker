@@ -31,11 +31,20 @@ versionamento [Semantic Versioning](https://semver.org/lang/pt-BR/).
 - **O aviso de um limite já redefinido se fecha sozinho.** Quem volta ao
   computador depois que a sessão recomeçou não deveria encontrar uma janela
   vermelha dizendo que ela se esgotou, nem ter de confirmá-la para continuar.
+- **Botões de apoio para Buy Me a Coffee e Ko-fi.** No menu da área de
+  notificação, na janela Sobre e no rodapé das configurações. As imagens são as
+  fornecidas pelos serviços e trazem palavras em inglês em todos os idiomas; a
+  dica de ferramenta diz no idioma escolhido para onde o clique leva. O menu do
+  macOS não exibe imagens, então lá são duas entradas de texto.
 
 ### Alterado
 - **A aparência passou para a coluna esquerda das configurações.** Os avisos
   entraram à direita, ao lado dos limiares que compartilham, e sem a mudança essa
   coluna ficava tão mais longa que a outra que a janela precisava rolar.
+- **As barras da janela de detalhes seguem os limiares das
+  configurações.** Antes ficavam amarelas e vermelhas em 75 e 90 % fixos, não
+  importava o que estivesse configurado: com os limiares reduzidos, ícone e
+  aviso diziam vermelho enquanto a barra ainda mostrava um limite folgado.
 
 ## [0.9.0] – 2026-08-21
 

@@ -1,5 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="using:ClaudeUsageChecker.App.Views"
         x:Class="ClaudeUsageChecker.App.Views.TrayMenuWindow"
         SizeToContent="WidthAndHeight" MinWidth="300" MaxWidth="460"
         CanResize="False"
@@ -26,6 +27,11 @@
       <Separator x:Name="StatusSeparator" Margin="4,2,4,4" />
 
       <StackPanel x:Name="CommandPanel" Spacing="1" />
+
+      <!-- Last, below "Exit": offered, not pushed in front of what the menu is
+           for. -->
+      <Separator Margin="4,4,4,4" />
+      <views:SupportLinks x:Name="Support" ImageHeight="26" Margin="4,2,4,6" />
 
     </StackPanel>
   </Border>

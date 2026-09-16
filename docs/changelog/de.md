@@ -32,12 +32,21 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
   an den Rechner zurückkommt, nachdem die Sitzung neu begonnen hat, soll kein
   rotes Fenster vorfinden, das sie für aufgebraucht erklärt, und es erst
   bestätigen müssen.
+- **Unterstützen-Buttons für Buy Me a Coffee und Ko-fi.** Im Menü des
+  Infobereichs, im Über-Fenster und unten in den Einstellungen. Die Bilder sind
+  die der Dienste und tragen in jeder Sprache englische Wörter; der Tooltip sagt
+  in der gewählten Sprache, wohin ein Klick führt. Das macOS-Menü kann keine
+  Bilder zeigen, dort sind es zwei schlichte Einträge.
 
 ### Geändert
 - **Das Erscheinungsbild steht jetzt in der linken Spalte der Einstellungen.**
   Die Hinweise kamen rechts dazu, neben die Schwellen, die sie teilen, und ohne
   den Umzug wurde diese Spalte so viel länger als die andere, dass das Fenster
   scrollen musste.
+- **Die Balken im Detailfenster folgen den eingestellten Schwellen.** Sie
+  wurden bisher fest bei 75 und 90 % gelb und rot, gleich was eingestellt war –
+  mit abgesenkten Schwellen sagten Symbol und Hinweis Rot, während der Balken
+  noch ein entspanntes Limit zeigte.
 
 ## [0.9.0] – 2026-08-21
 

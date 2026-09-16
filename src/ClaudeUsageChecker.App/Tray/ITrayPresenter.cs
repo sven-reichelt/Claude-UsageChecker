@@ -23,6 +23,12 @@ internal interface ITrayPresenter : IDisposable
     /// </summary>
     event EventHandler? Clicked;
 
+    /// <summary>
+    /// One of the support buttons in the menu was clicked. Windows only - see
+    /// <see cref="TrayIconController"/> for how macOS offers the same.
+    /// </summary>
+    event EventHandler<Uri>? SupportRequested;
+
     /// <summary>The hover text. Ignored where the platform has none.</summary>
     void SetToolTip(string text);
 

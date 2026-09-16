@@ -176,6 +176,12 @@
   "install.decline": "Não instalar",
   "install.running": "A instalar ...",
 
+  "support.coffee": "Ofereça-me um café – abre buymeacoffee.com",
+  "support.kofi": "Apoiar no Ko-fi – abre ko-fi.com",
+  "support.intro": "Gratuito, aberto e sem publicidade. Se lhe for útil, pode apoiar o desenvolvimento:",
+  "tray.supportCoffee": "Ofereça-me um café ...",
+  "tray.supportKofi": "Apoiar no Ko-fi ...",
+
   "about.title": "Acerca do Claude UsageChecker",
   "about.description": "Mostra os limites de sessão e semanais de uma subscrição Claude na área de notificação. Lê os valores de utilização através da sua própria sessão e não escreve quaisquer dados de volta.",
   "about.repository": "Abrir a página do projeto no GitHub",

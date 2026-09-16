@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
+using ClaudeUsageChecker.App.Settings;
 using ClaudeUsageChecker.Core.Authentication;
 using ClaudeUsageChecker.Core.Formatting;
 using ClaudeUsageChecker.Core.Localization;
@@ -232,7 +233,7 @@ public partial class DetailsWindow : Window
         MessageBorder.IsVisible = message is not null;
     }
 
-    private static StackPanel BuildWindowRow(string label, UsageWindow window, DateTimeOffset now)
+    private StackPanel BuildWindowRow(string label, UsageWindow window, DateTimeOffset now)
     {
         var header = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
 
@@ -270,10 +271,25 @@ public partial class DetailsWindow : Window
         };
     }
 
-    private static SolidColorBrush BrushForUtilization(double utilization) => utilization switch
+    /// <summary>
+    /// Where the bars turn yellow and red. Read afresh on every rendering, so
+    /// that changed thresholds show at once.
+    /// </summary>
+    /// <remarks>
+    /// The bars used to turn at a fixed 75 and 90 %, whatever the settings said.
+    /// With thresholds of 50 and 70 the icon was red and the notice said so,
+    /// while the bar in this window still showed the colour of a limit at ease.
+    /// </remarks>
+    public Func<UsageAlertRules> Thresholds { get; set; } = () => new AppSettings().AlertRules;
+
+    private SolidColorBrush BrushForUtilization(double utilization) =>
+        BrushFor(Thresholds().LevelOf(utilization));
+
+    /// <summary>The colour of a stage: the accent, yellow, or red - the colours of the icon.</summary>
+    internal static SolidColorBrush BrushFor(UsageAlertLevel level) => level switch
     {
-        >= 90d => new SolidColorBrush(Color.FromRgb(0xD0, 0x40, 0x40)),
-        >= 75d => new SolidColorBrush(Color.FromRgb(0xE0, 0xA0, 0x30)),
+        >= UsageAlertLevel.Critical => new SolidColorBrush(Color.FromRgb(0xD0, 0x40, 0x40)),
+        UsageAlertLevel.Warning => new SolidColorBrush(Color.FromRgb(0xE0, 0xA0, 0x30)),
         _ => new SolidColorBrush(Color.FromRgb(0xD9, 0x77, 0x57))
     };
 }

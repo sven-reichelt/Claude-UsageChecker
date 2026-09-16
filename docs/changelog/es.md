@@ -32,11 +32,21 @@ versionado [Semantic Versioning](https://semver.org/lang/es/).
   vuelve al ordenador después de que la sesión haya empezado de nuevo no debería
   encontrar una ventana roja que la da por agotada, ni tener que confirmarla
   para seguir.
+- **Botones de apoyo para Buy Me a Coffee y Ko-fi.** En el menú del área
+  de notificación, en la ventana Acerca de y al pie de la configuración. Las
+  imágenes son las que ofrecen los servicios y llevan palabras en inglés en todos
+  los idiomas; la información emergente dice en el idioma elegido adónde lleva un
+  clic. El menú de macOS no admite imágenes, así que allí son dos entradas de
+  texto.
 
 ### Cambiado
 - **La apariencia pasa a la columna izquierda de la configuración.** Los avisos
   llegaron a la derecha, junto a los umbrales que comparten, y sin el cambio esa
   columna crecía tanto más que la otra que la ventana tenía que desplazarse.
+- **Las barras de la ventana de detalles siguen los umbrales de la
+  configuración.** Antes se volvían amarillas y rojas en un 75 y un 90 % fijos,
+  se configurara lo que se configurara: con los umbrales rebajados, el icono y
+  el aviso decían rojo mientras la barra aún mostraba un límite holgado.
 
 ## [0.9.0] – 2026-08-21
 
