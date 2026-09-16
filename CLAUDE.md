@@ -76,7 +76,8 @@ Builds into `artifacts/` (centrally through `ArtifactsPath` in
 
 ## Status
 
-Version 0.9.0 released, the repository is public and written in English.
+Version 0.9.0 released, 0.9.1-beta.1 out as a pre-release for testing; the
+repository is public and written in English.
 Finished among other things: the application's own sign-in through OAuth with
 PKCE including refresh, update at the push of a button with checksum
 verification, permanent setup with autostart, configurable thresholds, the
@@ -178,6 +179,12 @@ hand-written parameterless variant wins overload resolution, loads only the XAML
 and leaves every field null - the constructor then fails with a
 `NullReferenceException`. That compiles without error.
 `WindowConstructionTests` catches it.
+
+**On the headless test platform a `DispatcherTimer` never fires in
+`RunJobs()`.** Only the dispatcher's main loop looks at timers
+(`ManagedDispatcherImpl.RunLoop`), so a test waiting for one runs
+`Dispatcher.UIThread.MainLoop(token)` with a token cancelled by the expected
+event and by a timeout. `ANoticeThatDoesNotWaitClosesByItself` does exactly that.
 
 **Failures in tray actions otherwise end the application.** Without a window an
 exception travels all the way to the message loop and the process disappears
