@@ -52,6 +52,16 @@ public class WindowConstructionTests
     }
 
     [AvaloniaFact]
+    public void UsageAlertWindow_CanBeCreated()
+    {
+        var window = new UsageAlertWindow();
+
+        Assert.NotNull(window.FindControl<Button>("AcknowledgeButton"));
+        Assert.NotNull(window.FindControl<StackPanel>("EntriesPanel"));
+        Assert.NotNull(window.FindControl<Border>("Frame"));
+    }
+
+    [AvaloniaFact]
     public void SettingsWindow_CanBeCreated()
     {
         using var settingsFile = new TemporaryFile();

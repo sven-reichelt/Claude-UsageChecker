@@ -194,6 +194,64 @@ public static class UsageFormatter
             : T.DetailLine(label, window.Utilization, DurationFormatter.ToCompact(remaining), moment);
     }
 
+    /// <summary>The label of the limit a notice is about, "Session (5 h)" for instance.</summary>
+    public static string ToAlertLabel(UsageAlert alert)
+    {
+        ArgumentNullException.ThrowIfNull(alert);
+
+        return alert.Limit switch
+        {
+            UsageAlertLimit.Session => T.WindowSession,
+            UsageAlertLimit.Weekly => T.WindowWeeklyAll,
+            _ => T.WindowWeeklyModel(alert.ModelName ?? string.Empty)
+        };
+    }
+
+    /// <summary>The heading that belongs to a stage.</summary>
+    public static string ToAlertHeading(UsageAlertLevel level) => level switch
+    {
+        UsageAlertLevel.Exhausted => T.AlertHeadingExhausted,
+        UsageAlertLevel.Critical => T.AlertHeadingCritical,
+        _ => T.AlertHeadingWarning
+    };
+
+    /// <summary>
+    /// What a stage means, in a sentence - with the threshold the user set,
+    /// because that is the number they will recognise.
+    /// </summary>
+    public static string ToAlertExplanation(UsageAlert alert)
+    {
+        ArgumentNullException.ThrowIfNull(alert);
+
+        return alert.Level switch
+        {
+            UsageAlertLevel.Exhausted => T.AlertExhausted,
+            UsageAlertLevel.Critical => T.AlertCritical(alert.Threshold),
+            _ => T.AlertWarning(alert.Threshold)
+        };
+    }
+
+    /// <summary>
+    /// When the limit resets, as a moment and as the time left, for example
+    /// "Resets in 2 h 14 min - at 16:30".
+    /// </summary>
+    /// <remarks>
+    /// Both, because they answer different questions: the moment says when work
+    /// can go on, the time left how long that is. A notice may also stay open past
+    /// the reset, and then it says so rather than counting down to nothing.
+    /// </remarks>
+    public static string ToAlertReset(UsageWindow window, DateTimeOffset now)
+    {
+        ArgumentNullException.ThrowIfNull(window);
+
+        var remaining = window.TimeUntilReset(now);
+        var moment = DurationFormatter.ToResetMoment(window.ResetsAt, now);
+
+        return DurationFormatter.IsDue(remaining)
+            ? T.ResetDue(moment)
+            : T.ResetIn(DurationFormatter.ToCompact(remaining), moment);
+    }
+
     private static string Truncate(string value, int maxLength) =>
         value.Length <= maxLength ? value : value[..(maxLength - 1)] + "…";
 }

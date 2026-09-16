@@ -27,6 +27,7 @@ in der macOS-Menüleiste.
 | Zusatzkontingent, sofern im Abo aktiviert | ✅ |
 | Alle Limits im Kontextmenü | ✅ |
 | Einstellbare Schwellen für Gelb und Rot | ✅ |
+| Ein Hinweis bei Gelb, Rot und 100 %, mit der Rücksetzzeit | ✅ |
 | Neun Sprachen, samt übersetztem Änderungsverlauf | ✅ |
 | Übersicht der Neuerungen nach einer Aktualisierung | ✅ |
 | Token verschlüsselt in der Windows-Anmeldeinformationsverwaltung | ✅ |
@@ -403,6 +404,27 @@ welcher es rot wird, steht in den Einstellungen – voreingestellt sind 75 % und
 90 %. Die Warnschwelle muss unter der kritischen liegen; andernfalls fände sie
 nie statt, und das Fenster sagt das, statt die Eingabe stillschweigend
 zurechtzurücken.
+
+### Hinweise
+
+Ein Symbol im Infobereich übersieht man leicht, darum öffnen dieselben Schwellen
+auch einen Hinweis: wenn ein Limit Gelb erreicht, wenn es Rot erreicht, und wenn
+es aufgebraucht ist. Er nennt das Limit, seine Auslastung, was diese Stufe
+bedeutet und wann das Limit zurückgesetzt wird. Jedes Limit wird für sich
+verfolgt – die Sitzung, die Gelb erreicht, ist eine Nachricht, auch wenn das
+Wochenlimit das Symbol schon dort hält.
+
+Jede Stufe wird je Limit einmal gemeldet, bis das Limit zurückgesetzt wird. Was
+gemeldet wurde, steht in `alerts.json` neben den Einstellungen, sodass ein
+Neustart es nicht wiederholt. Ein Hinweis zu einem inzwischen zurückgesetzten
+Limit schließt sich von selbst.
+
+Unter **Einstellungen → Hinweise** lässt sich jede Stufe abschalten, und der
+Hinweis kann auf **OK, verstanden!** warten oder sich nach einer eingestellten
+Zeit selbst schließen, und vor allen anderen Fenstern bleiben oder nicht.
+**Vorschau zeigen** zeigt ihn mit Beispielwerten. Der Hinweis nimmt nicht die
+Tastatur: Ein Enter, das einem anderen Fenster galt, darf ihn nicht ungelesen
+bestätigen.
 
 ## Roadmap
 

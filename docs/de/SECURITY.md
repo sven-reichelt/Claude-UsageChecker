@@ -54,6 +54,7 @@ ausschließlich Verhaltenseinstellungen und niemals Geheimnisse.
 | Anmeldeinformationsverwaltung, `ClaudeUsageChecker:OAuth` | eigene Anmeldung (Access- und Refresh-Token) | ja |
 | Anmeldeinformationsverwaltung, `ClaudeUsageChecker:OAuthToken` | von Hand hinterlegtes Einzeltoken | ja |
 | `%LOCALAPPDATA%\ClaudeUsageChecker\settings.json` | Verhaltenseinstellungen, keine Geheimnisse | ja |
+| `%LOCALAPPDATA%\ClaudeUsageChecker\alerts.json` | welche Nutzungshinweise schon gezeigt wurden: je Limit eine Stufe und eine Rücksetzzeit | ja |
 | `%LOCALAPPDATA%\ClaudeUsageChecker\crash.log` | lokale Fehlerberichte | ja |
 | `%LOCALAPPDATA%\Programs\ClaudeUsageChecker\` | die Anwendung selbst, nach Einrichtung | ja |
 | `HKCU\…\CurrentVersion\Run`, Wert `ClaudeUsageChecker` | Autostart-Eintrag | ja |

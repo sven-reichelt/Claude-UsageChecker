@@ -70,6 +70,15 @@ public class LabellingTests : IDisposable
 
     [AvaloniaTheory]
     [MemberData(nameof(Languages))]
+    public void TheUsageNoticeIsFullyLabelled(string code)
+    {
+        Localizer.Use(Language.Find(code)!);
+
+        AssertFullyLabelled(UsageAlertWindowTests.Filled(waits: false), code);
+    }
+
+    [AvaloniaTheory]
+    [MemberData(nameof(Languages))]
     public void TheSignInWindowIsFullyLabelled(string code)
     {
         Localizer.Use(Language.Find(code)!);

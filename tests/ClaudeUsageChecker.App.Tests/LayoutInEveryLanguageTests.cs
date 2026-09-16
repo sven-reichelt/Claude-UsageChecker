@@ -110,6 +110,22 @@ public class LayoutInEveryLanguageTests : IDisposable
         AssertFits(window, code);
     }
 
+    /// <summary>
+    /// The notice with a limit at every stage, a model name and the line about
+    /// closing by itself - the most it will ever have to hold.
+    /// </summary>
+    [AvaloniaTheory]
+    [MemberData(nameof(Languages))]
+    public void TheUsageNoticeFitsInEveryLanguage(string code)
+    {
+        Localizer.Use(Language.Find(code)!);
+
+        var window = UsageAlertWindowTests.Filled(waits: false);
+
+        AssertFits(window, code);
+        window.Close();
+    }
+
     [AvaloniaTheory]
     [MemberData(nameof(Languages))]
     public void TheSignInWindowFitsInEveryLanguage(string code)

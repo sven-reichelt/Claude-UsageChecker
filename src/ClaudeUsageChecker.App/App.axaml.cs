@@ -47,6 +47,9 @@ public partial class App : Application, IDisposable
     private OAuthTokenStore? _oauthTokenStore;
     private OAuthTokenProvider? _oauthTokenProvider;
     private UpdateCheckResult? _pendingUpdate;
+    private readonly AlertMemoryStore _alertMemoryStore = new();
+    private UsageAlertTracker? _alertTracker;
+    private UsageAlertWindow? _alertWindow;
 
     public override void Initialize()
     {
@@ -159,6 +162,12 @@ public partial class App : Application, IDisposable
         _monitor.StateChanged += (_, state) => Dispatcher.UIThread.Post(
             () => ErrorGuard.Run("refresh the details window", () => _detailsWindow?.Render(state)));
 
+        // What was reported before the last exit counts as reported: without
+        // it, the autostart would repeat every notice each morning.
+        _alertTracker = new UsageAlertTracker(_alertMemoryStore.Load());
+        _monitor.StateChanged += (_, state) => Dispatcher.UIThread.Post(
+            () => ErrorGuard.Run("check for usage notices", () => CheckForAlerts(state)));
+
         _monitor.Start();
 
         if (_settings.CheckForUpdates)
@@ -265,6 +274,8 @@ public partial class App : Application, IDisposable
         {
             BuildMacOsApplicationMenu();
         }
+
+        _alertWindow?.ApplyTexts();
 
         if (_detailsWindow is { } window)
         {
@@ -516,12 +527,70 @@ public partial class App : Application, IDisposable
             _settings = settings;
             ErrorGuard.Run("apply the language", ApplyLanguage);
             RequestedThemeVariant = _settings.AppearanceMode.ToVariant();
+
+            // Against the figures already there, not only after the next call:
+            // lowering a threshold below the current figure is how the notice is
+            // tried out, and it should answer while the settings are still in
+            // view.
+            if (_monitor is not null)
+            {
+                ErrorGuard.Run("check for usage notices", () => CheckForAlerts(_monitor.State));
+            }
+
             ErrorGuard.Forget("call after a settings change", RefreshAsync);
         };
         window.SignInRequested += (_, _) => ErrorGuard.Run("open the sign-in", () => ShowSignIn(window));
 
         window.Show();
         window.Activate();
+    }
+
+    /// <summary>
+    /// Shows a notice for every limit that has just reached a stage the user
+    /// asked to hear about.
+    /// </summary>
+    /// <remarks>
+    /// A notice still open takes the new ones in rather than a second window
+    /// opening on top of it. Only a closed one gives way to a new window - with
+    /// the behaviour as it is set now, which may have changed in the meantime.
+    /// </remarks>
+    private void CheckForAlerts(UsageState state)
+    {
+        if (_alertTracker is null)
+        {
+            return;
+        }
+
+        var alerts = _alertTracker.Evaluate(state, _settings.AlertRules, DateTimeOffset.Now, out var changed);
+
+        if (changed)
+        {
+            ErrorGuard.Run("remember the usage notices", () => _alertMemoryStore.Save(_alertTracker.Marks));
+        }
+
+        if (alerts.Count == 0)
+        {
+            return;
+        }
+
+        if (_alertWindow is { } open)
+        {
+            open.Add(alerts);
+            return;
+        }
+
+        var window = new UsageAlertWindow(_settings.AlertBehaviour);
+        window.Add(alerts);
+        window.Closed += (_, _) =>
+        {
+            if (ReferenceEquals(_alertWindow, window))
+            {
+                _alertWindow = null;
+            }
+        };
+
+        _alertWindow = window;
+        window.Present();
     }
 
     /// <summary>

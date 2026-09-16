@@ -8,6 +8,35 @@ numeração [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+## [0.9.1] – 2026-09-16
+
+### Adicionado
+- **Um aviso quando um limite chega ao amarelo, ao vermelho ou se esgota.** O
+  ícone muda de cor há muito, mas um ícone na área de notificação passa
+  facilmente despercebido – no Windows fica muitas vezes na área de excesso,
+  onde ninguém o vê. Agora uma janela diz de que limite se trata, até onde
+  chegou, o que isso significa e quando será reposto. Usa os limiares já
+  definidos para o ícone, e não um par próprio, pelo que o aviso e o ícone nunca
+  se contradizem.
+
+  Uma vez por limite e nível até esse limite ser reposto, e memorizado após um
+  reinício, para que o arranque automático não repita todas as manhãs o que foi
+  dito na véspera. Vários limites ao mesmo tempo partilham uma só janela.
+- **É o utilizador que decide o quanto o aviso insiste.** Em **Definições →
+  Avisos**: de quais dos três níveis ser avisado, se espera por **OK,
+  entendido!** ou se fecha sozinho após um tempo à escolha, e se fica à frente
+  de todas as outras janelas. **Mostrar pré-visualização** apresenta-o com
+  valores de exemplo – a única forma de ver o aviso de um limite esgotado sem
+  esgotar um.
+- **O aviso de um limite já reposto fecha-se sozinho.** Quem regressa ao
+  computador depois de a sessão ter recomeçado não deveria encontrar uma janela
+  vermelha a declará-la esgotada, nem ter de a confirmar para continuar.
+
+### Alterado
+- **A aparência passou para a coluna esquerda das definições.** Os avisos
+  entraram à direita, junto dos limiares que partilham, e sem a mudança essa
+  coluna ficava tão mais comprida do que a outra que a janela tinha de deslocar.
+
 ## [0.9.0] – 2026-08-21
 
 ### Adicionado

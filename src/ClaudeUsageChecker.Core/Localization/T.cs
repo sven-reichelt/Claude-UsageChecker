@@ -166,6 +166,28 @@ public static class T
     public static string ThresholdOrder => L["settings.thresholdOrder"];
     public static string SettingsRelocationHint(string target) => L.Format("settings.relocationHint", target);
     public static string SettingsRelocating => L["settings.relocating"];
+    public static string SettingsAlertSection => L["settings.alertSection"];
+    public static string SettingsAlertHint => L["settings.alertHint"];
+    public static string SettingsAlertOnWarning => L["settings.alertOnWarning"];
+    public static string SettingsAlertOnCritical => L["settings.alertOnCritical"];
+    public static string SettingsAlertOnExhausted => L["settings.alertOnExhausted"];
+    public static string SettingsAlertAcknowledge => L["settings.alertAcknowledge"];
+    public static string SettingsAlertOnTop => L["settings.alertOnTop"];
+    public static string SettingsAlertAutoClose => L["settings.alertAutoClose"];
+    public static string SettingsAlertPreview => L["settings.alertPreview"];
+
+    // Usage notices
+    public static string AlertTitle => L["alert.title"];
+    public static string AlertHeadingWarning => L["alert.headingWarning"];
+    public static string AlertHeadingCritical => L["alert.headingCritical"];
+    public static string AlertHeadingExhausted => L["alert.headingExhausted"];
+    public static string AlertLine(string label, double percent) => L.Format("alert.line", label, percent);
+    public static string AlertWarning(double threshold) => L.Format("alert.warning", threshold);
+    public static string AlertCritical(double threshold) => L.Format("alert.critical", threshold);
+    public static string AlertExhausted => L["alert.exhausted"];
+    public static string AlertAcknowledge => L["alert.acknowledge"];
+    public static string AlertAutoClose(int seconds) => L.Format("alert.autoClose", seconds);
+    public static string AlertPreview => L["alert.preview"];
 
     // Sign-in
     public static string SignInTitle => L["signin.title"];

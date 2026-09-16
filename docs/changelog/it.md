@@ -8,6 +8,34 @@ numerazione [Semantic Versioning](https://semver.org/lang/it/).
 
 ## [Non pubblicato]
 
+## [0.9.1] – 2026-09-16
+
+### Aggiunto
+- **Un avviso quando un limite arriva al giallo, al rosso o si esaurisce.**
+  L'icona cambia colore da tempo, ma un'icona nell'area di notifica sfugge
+  facilmente: su Windows finisce spesso nell'area di overflow, dove nessuno la
+  vede. Ora una finestra dice di quale limite si tratta, a che punto è, cosa
+  significa e quando verrà azzerato. Usa le soglie già impostate per l'icona,
+  non una coppia propria, quindi avviso e icona non si contraddicono mai.
+
+  Una volta per limite e livello fino all'azzeramento di quel limite, e ricordato
+  anche dopo un riavvio, così che l'avvio automatico non ripeta ogni mattina
+  quanto detto il giorno prima. Più limiti insieme condividono una sola finestra.
+- **Quanto insiste l'avviso lo decidi tu.** In **Impostazioni → Avvisi**: per
+  quali dei tre livelli riceverlo, se attende **OK, capito!** o si chiude da solo
+  dopo un tempo a tua scelta, e se resta davanti a tutte le altre finestre.
+  **Mostra anteprima** lo mostra con valori di esempio: l'unico modo per vedere
+  l'avviso di un limite esaurito senza esaurirne uno.
+- **L'avviso di un limite già azzerato si chiude da solo.** Chi torna al
+  computer dopo che la sessione è ripartita non dovrebbe trovare una finestra
+  rossa che la dichiara esaurita, né doverla confermare prima di proseguire.
+
+### Modificato
+- **L'aspetto passa nella colonna sinistra delle impostazioni.** Gli avvisi sono
+  arrivati a destra, accanto alle soglie che condividono, e senza lo spostamento
+  quella colonna diventava così più lunga dell'altra che la finestra doveva
+  scorrere.
+
 ## [0.9.0] – 2026-08-21
 
 ### Aggiunto

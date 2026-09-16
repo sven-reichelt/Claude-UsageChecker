@@ -1,8 +1,15 @@
 using System;
 using System.Text.Json.Serialization;
 using ClaudeUsageChecker.Core.Localization;
+using ClaudeUsageChecker.Core.Services;
 
 namespace ClaudeUsageChecker.App.Settings;
+
+/// <summary>How a usage notice behaves once it is open.</summary>
+/// <param name="RequiresAcknowledgement">Stays until "OK, got it!" is clicked.</param>
+/// <param name="StaysOnTop">Stays in front of every other window.</param>
+/// <param name="AutoClose">When it closes by itself, where no confirmation is required.</param>
+public sealed record UsageAlertBehaviour(bool RequiresAcknowledgement, bool StaysOnTop, TimeSpan AutoClose);
 
 /// <summary>
 /// User settings. Deliberately holds no secrets at all - the token lives only
@@ -65,6 +72,55 @@ public sealed class AppSettings
     /// <summary>Critical threshold in percent.</summary>
     [JsonPropertyName("criticalThreshold")]
     public double CriticalThreshold { get; set; } = 90d;
+
+    /// <summary>Show a notice when a limit reaches the warning threshold.</summary>
+    [JsonPropertyName("alertOnWarning")]
+    public bool AlertOnWarning { get; set; } = true;
+
+    /// <summary>Show a notice when a limit reaches the critical threshold.</summary>
+    [JsonPropertyName("alertOnCritical")]
+    public bool AlertOnCritical { get; set; } = true;
+
+    /// <summary>Show a notice when a limit is used up.</summary>
+    [JsonPropertyName("alertOnExhausted")]
+    public bool AlertOnExhausted { get; set; } = true;
+
+    /// <summary>
+    /// Whether a notice stays until it is confirmed. Otherwise it closes by itself
+    /// after <see cref="AlertAutoCloseSeconds"/>.
+    /// </summary>
+    [JsonPropertyName("alertRequiresAcknowledgement")]
+    public bool AlertRequiresAcknowledgement { get; set; } = true;
+
+    /// <summary>Whether a notice stays in front of every other window while it is open.</summary>
+    [JsonPropertyName("alertStaysOnTop")]
+    public bool AlertStaysOnTop { get; set; } = true;
+
+    /// <summary>After how many seconds a notice that needs no confirmation closes.</summary>
+    [JsonPropertyName("alertAutoCloseSeconds")]
+    public int AlertAutoCloseSeconds { get; set; } = 30;
+
+    /// <summary>Shortest and longest time a notice may close by itself after, in seconds.</summary>
+    public const int MinimumAlertAutoCloseSeconds = 5;
+    public const int MaximumAlertAutoCloseSeconds = 3600;
+
+    /// <summary>When a notice is due - the thresholds of the icon and the stages chosen.</summary>
+    /// <remarks>
+    /// The same thresholds as the icon, deliberately without a second pair: a
+    /// notice that said "red" while the icon was still yellow would contradict
+    /// the one thing the user already sees.
+    /// </remarks>
+    [JsonIgnore]
+    public UsageAlertRules AlertRules =>
+        new(WarningThreshold, CriticalThreshold, AlertOnWarning, AlertOnCritical, AlertOnExhausted);
+
+    /// <summary>How the notice behaves once it is open.</summary>
+    [JsonIgnore]
+    public UsageAlertBehaviour AlertBehaviour => new(
+        AlertRequiresAcknowledgement,
+        AlertStaysOnTop,
+        TimeSpan.FromSeconds(Math.Clamp(
+            AlertAutoCloseSeconds, MinimumAlertAutoCloseSeconds, MaximumAlertAutoCloseSeconds)));
 
     /// <summary>
     /// Tag of the selected language, "de" or "pt-BR" for instance. Empty means:

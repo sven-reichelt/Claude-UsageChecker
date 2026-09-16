@@ -84,6 +84,7 @@ public class WindowRenderingTests : IDisposable
                 "dark-about");
             Capture(BuildReleaseNotes(), "dark-notes");
             Capture(LayoutInEveryLanguageTests.BuildTrayMenu(), "dark-menu");
+            Capture(UsageAlertWindowTests.Filled(waits: false), "dark-alert");
         }
         finally
         {
@@ -119,6 +120,7 @@ public class WindowRenderingTests : IDisposable
             $"about-{code}");
         Capture(BuildReleaseNotes(), $"notes-{code}");
         Capture(LayoutInEveryLanguageTests.BuildTrayMenu(), $"menu-{code}");
+        Capture(UsageAlertWindowTests.Filled(waits: false), $"alert-{code}");
     }
 
     /// <summary>

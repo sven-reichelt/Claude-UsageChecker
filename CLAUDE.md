@@ -23,7 +23,7 @@ and a second one would break every clone that exists by then.
 
 ```powershell
 dotnet build                                      # the whole solution
-dotnet test                                       # 642 tests (Core.Tests + App.Tests)
+dotnet test                                       # 719 tests (Core.Tests + App.Tests)
 dotnet run --project src/ClaudeUsageChecker.App   # run the application
 node build/generate-icons.mjs                     # regenerate the icons
 ```
@@ -103,6 +103,11 @@ of it.** A refused bundle, a Gatekeeper check asking the wrong question in two
 places, an update that replaced itself and then left the Mac with nothing
 running - each was found by a person opening the thing, and each is now pinned
 by a test or by a step in the release workflow.
+
+**0.9.1 brings usage notices**, out first as a pre-release for testing: a window
+when a limit reaches yellow, red or 100 %, once per limit and stage until it
+resets, remembered in `alerts.json` across a restart. The judging lives in
+`UsageAlertTracker` (Core), the window in `UsageAlertWindow`.
 
 **Pro was measured on 2026-08-31** and answers as the README describes: session
 and weekly total came back and matched claude.ai to the percentage point and the

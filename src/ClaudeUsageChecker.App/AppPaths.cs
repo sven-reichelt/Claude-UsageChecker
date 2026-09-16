@@ -29,4 +29,7 @@ internal static class AppPaths
 
     /// <summary>File holding the user settings. Contains no secrets.</summary>
     public static string SettingsFile { get; } = Path.Combine(LocalDataDirectory, "settings.json");
+
+    /// <summary>Which usage notices have been shown already, per limit. Contains no secrets.</summary>
+    public static string AlertMemoryFile { get; } = Path.Combine(LocalDataDirectory, "alerts.json");
 }

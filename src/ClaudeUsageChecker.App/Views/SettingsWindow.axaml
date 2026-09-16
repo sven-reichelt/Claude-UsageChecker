@@ -34,7 +34,7 @@
                   VerticalScrollBarVisibility="Auto">
       <Grid Margin="20" ColumnDefinitions="*,Auto,*" ColumnSpacing="20">
 
-        <!-- Left: who the application signs in as, and how it behaves. -->
+        <!-- Left: who the application signs in as, how it behaves and looks. -->
         <StackPanel Grid.Column="0" Spacing="18">
 
           <!-- Both routes to a token, side by side and always both. Which one
@@ -88,6 +88,22 @@
             <CheckBox x:Name="RefreshChecksUpdatesBox" />
           </StackPanel>
 
+          <Separator />
+
+          <!-- On this side since the notices arrived on the other: the right
+               column had grown so far past this one that the window scrolled,
+               with the new choices below its edge. -->
+          <StackPanel Spacing="10">
+            <TextBlock x:Name="ThemeHeading" FontWeight="SemiBold" />
+            <TextBlock x:Name="ThemeHint" TextWrapping="Wrap" FontSize="12" Opacity="0.8" />
+
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock x:Name="ThemeLabel" VerticalAlignment="Center" FontSize="12"
+                         TextWrapping="Wrap" Margin="0,0,8,0" />
+              <ComboBox Grid.Column="1" x:Name="ThemeBox" Width="200" />
+            </Grid>
+          </StackPanel>
+
           <!-- Hidden until the version number at the bottom has been clicked five
                times. Not a secret worth keeping, but not a choice to stumble into
                either: a pre-release is meant for whoever agreed to test one. It
@@ -112,7 +128,8 @@
         <Rectangle Grid.Column="1" Width="1" VerticalAlignment="Stretch"
                    Fill="{DynamicResource SystemControlBackgroundBaseLowBrush}" />
 
-        <!-- Right: what it shows and when it changes colour. -->
+        <!-- Right: which language it speaks, when it changes colour, and when it
+             speaks up. -->
         <StackPanel Grid.Column="2" Spacing="18">
 
           <StackPanel Spacing="10">
@@ -129,18 +146,6 @@
             </Grid>
           </StackPanel>
 
-          <Separator />
-
-          <StackPanel Spacing="10">
-            <TextBlock x:Name="ThemeHeading" FontWeight="SemiBold" />
-            <TextBlock x:Name="ThemeHint" TextWrapping="Wrap" FontSize="12" Opacity="0.8" />
-
-            <Grid ColumnDefinitions="*,Auto">
-              <TextBlock x:Name="ThemeLabel" VerticalAlignment="Center" FontSize="12"
-                         TextWrapping="Wrap" Margin="0,0,8,0" />
-              <ComboBox Grid.Column="1" x:Name="ThemeBox" Width="200" />
-            </Grid>
-          </StackPanel>
 
           <Separator />
 
@@ -164,6 +169,36 @@
 
             <TextBlock x:Name="ThresholdHint" IsVisible="False" TextWrapping="Wrap"
                        FontSize="11" Foreground="{DynamicResource CriticalBrush}" />
+          </StackPanel>
+
+          <Separator />
+
+          <!-- Right below the thresholds, because they are the same thresholds:
+               the notice speaks up exactly where the icon changes colour. -->
+          <StackPanel Spacing="10">
+            <TextBlock x:Name="AlertHeading" FontWeight="SemiBold" />
+            <TextBlock x:Name="AlertHint" TextWrapping="Wrap" FontSize="12" Opacity="0.8" />
+
+            <CheckBox x:Name="AlertOnWarningBox" />
+            <CheckBox x:Name="AlertOnCriticalBox" />
+            <CheckBox x:Name="AlertOnExhaustedBox" />
+
+            <CheckBox x:Name="AlertAcknowledgeBox" />
+            <CheckBox x:Name="AlertOnTopBox" />
+
+            <!-- Only meaningful for a notice that closes by itself, and disabled
+                 otherwise rather than hidden: the window would jump every time the
+                 box above is ticked. -->
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock x:Name="AlertAutoCloseLabel" VerticalAlignment="Center" FontSize="12"
+                         TextWrapping="Wrap" Margin="0,0,8,0" />
+              <NumericUpDown Grid.Column="1" x:Name="AlertAutoCloseBox"
+                             Minimum="5" Maximum="3600" Increment="5" Width="120" />
+            </Grid>
+
+            <!-- The only way to see the notice for a limit used up without using
+                 one up. It takes the choices above as they stand, saved or not. -->
+            <Button x:Name="AlertPreviewButton" HorizontalAlignment="Left" />
           </StackPanel>
 
         </StackPanel>

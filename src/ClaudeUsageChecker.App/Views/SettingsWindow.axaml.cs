@@ -8,7 +8,9 @@ using ClaudeUsageChecker.App.Settings;
 using ClaudeUsageChecker.Core.Authentication;
 using ClaudeUsageChecker.Core.Localization;
 using ClaudeUsageChecker.Core.Authentication.OAuth;
+using ClaudeUsageChecker.Core.Models;
 using ClaudeUsageChecker.Core.Platform;
+using ClaudeUsageChecker.Core.Services;
 
 namespace ClaudeUsageChecker.App.Views;
 
@@ -68,6 +70,21 @@ public partial class SettingsWindow : Window
         RefreshChecksUpdatesBox.IsChecked = settings.RefreshChecksForUpdates;
         WarningThresholdBox.Value = (decimal)settings.WarningThreshold;
         CriticalThresholdBox.Value = (decimal)settings.CriticalThreshold;
+        AlertOnWarningBox.IsChecked = settings.AlertOnWarning;
+        AlertOnCriticalBox.IsChecked = settings.AlertOnCritical;
+        AlertOnExhaustedBox.IsChecked = settings.AlertOnExhausted;
+        AlertAcknowledgeBox.IsChecked = settings.AlertRequiresAcknowledgement;
+        AlertOnTopBox.IsChecked = settings.AlertStaysOnTop;
+        AlertAutoCloseBox.Minimum = AppSettings.MinimumAlertAutoCloseSeconds;
+        AlertAutoCloseBox.Maximum = AppSettings.MaximumAlertAutoCloseSeconds;
+        AlertAutoCloseBox.Value = Math.Clamp(
+            settings.AlertAutoCloseSeconds,
+            AppSettings.MinimumAlertAutoCloseSeconds,
+            AppSettings.MaximumAlertAutoCloseSeconds);
+
+        AlertAcknowledgeBox.IsCheckedChanged += (_, _) => UpdateAlertAutoClose();
+        UpdateAlertAutoClose();
+        AlertPreviewButton.Click += (_, _) => ShowAlertPreview();
 
         VersionText.Text = ProgramVersion.Current.IsPreRelease
             ? T.VersionPreRelease(ProgramVersion.Current.ToString())
@@ -253,6 +270,16 @@ public partial class SettingsWindow : Window
         WarningLabel.Text = T.SettingsWarningThreshold;
         CriticalLabel.Text = T.SettingsCriticalThreshold;
 
+        AlertHeading.Text = T.SettingsAlertSection;
+        AlertHint.Text = T.SettingsAlertHint;
+        AlertOnWarningBox.Content = T.SettingsAlertOnWarning;
+        AlertOnCriticalBox.Content = T.SettingsAlertOnCritical;
+        AlertOnExhaustedBox.Content = T.SettingsAlertOnExhausted;
+        AlertAcknowledgeBox.Content = T.SettingsAlertAcknowledge;
+        AlertOnTopBox.Content = T.SettingsAlertOnTop;
+        AlertAutoCloseLabel.Text = T.SettingsAlertAutoClose;
+        AlertPreviewButton.Content = T.SettingsAlertPreview;
+
         CancelButton.Content = T.Cancel;
         SaveButton.Content = T.Save;
     }
@@ -363,6 +390,52 @@ public partial class SettingsWindow : Window
             : null;
     }
 
+    /// <summary>The time to close by itself only matters for a notice that does not wait.</summary>
+    private void UpdateAlertAutoClose()
+    {
+        var waits = AlertAcknowledgeBox.IsChecked ?? true;
+        AlertAutoCloseBox.IsEnabled = !waits;
+        AlertAutoCloseLabel.Opacity = waits ? 0.5 : 1;
+    }
+
+    /// <summary>How the notice is set to behave, as the controls stand right now.</summary>
+    private UsageAlertBehaviour SelectedAlertBehaviour() => new AppSettings
+    {
+        AlertRequiresAcknowledgement = AlertAcknowledgeBox.IsChecked ?? true,
+        AlertStaysOnTop = AlertOnTopBox.IsChecked ?? true,
+        AlertAutoCloseSeconds = (int)(AlertAutoCloseBox.Value ?? 30)
+    }.AlertBehaviour;
+
+    /// <summary>
+    /// Shows the notice with example figures - one limit at each stage.
+    /// </summary>
+    /// <remarks>
+    /// The notice for a limit used up could otherwise only be seen by using one
+    /// up. The thresholds are the ones in the boxes, saved or not, so that the
+    /// sentences name the figures the user is about to choose.
+    /// </remarks>
+    private void ShowAlertPreview()
+    {
+        var warning = (double)(WarningThresholdBox.Value ?? 75m);
+        var critical = (double)(CriticalThresholdBox.Value ?? 90m);
+        var now = DateTimeOffset.Now;
+
+        var window = new UsageAlertWindow(SelectedAlertBehaviour(), isPreview: true);
+        window.Add(
+        [
+            new UsageAlert(UsageAlertLimit.Session, null, UsageAlertLevel.Exhausted,
+                new UsageWindow(100, now.AddHours(1).AddMinutes(40)), 100),
+            new UsageAlert(UsageAlertLimit.Weekly, null, UsageAlertLevel.Critical,
+                new UsageWindow(Math.Min(critical + 2, 99), now.AddDays(2).AddHours(5)), critical),
+            // A model name as the API reports one today; in the application
+            // proper it always comes from the response.
+            new UsageAlert(UsageAlertLimit.WeeklyModel, "Fable", UsageAlertLevel.Warning,
+                new UsageWindow(warning + ((critical - warning) / 2), now.AddDays(4).AddHours(3)), warning)
+        ]);
+
+        window.Present();
+    }
+
     private void SaveAndClose()
     {
         var warning = (double)(WarningThresholdBox.Value ?? 75m);
@@ -390,6 +463,12 @@ public partial class SettingsWindow : Window
             RefreshChecksForUpdates = RefreshChecksUpdatesBox.IsChecked ?? true,
             WarningThreshold = warning,
             CriticalThreshold = critical,
+            AlertOnWarning = AlertOnWarningBox.IsChecked ?? true,
+            AlertOnCritical = AlertOnCriticalBox.IsChecked ?? true,
+            AlertOnExhausted = AlertOnExhaustedBox.IsChecked ?? true,
+            AlertRequiresAcknowledgement = AlertAcknowledgeBox.IsChecked ?? true,
+            AlertStaysOnTop = AlertOnTopBox.IsChecked ?? true,
+            AlertAutoCloseSeconds = (int)(AlertAutoCloseBox.Value ?? 30),
             Language = language.Code,
             AppearanceMode = (AppearanceMode)Math.Max(ThemeBox.SelectedIndex, 0),
             InstallPromptShown = _settings.InstallPromptShown,

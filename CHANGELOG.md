@@ -8,6 +8,34 @@ the versioning [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.9.1] – 2026-09-16
+
+### Added
+- **A notice when a limit reaches yellow, red, or its end.** The icon has
+  changed colour for a long time, but an icon in the notification area is easy
+  to miss - on Windows it often sits in the overflow where nobody sees it at
+  all. Now a window says which limit it is, how far it has come, what that
+  means, and when it resets. It uses the thresholds already set for the icon,
+  not a pair of its own, so the notice and the icon never disagree.
+
+  Once per limit and stage until that limit resets, and remembered across a
+  restart, so that the autostart does not repeat each morning what was said
+  the day before. Several limits at once share one window.
+- **How insistent the notice is, is up to you.** Under **Settings → Notices**:
+  which of the three stages to hear about, whether it waits for **OK, got it!**
+  or closes by itself after a time of your choosing, and whether it stays in
+  front of every other window. **Show preview** displays it with example
+  figures, which is the only way to see the notice for a limit used up without
+  using one up.
+- **A notice about a limit that has reset closes by itself.** Whoever comes back
+  to the desk after the session has started over should not find a red window
+  saying it is used up, and have to confirm it before getting on.
+
+### Changed
+- **Appearance moved to the left column of the settings.** The notices landed
+  on the right, beside the thresholds they share, and without the move that
+  column grew so far past the other that the window had to scroll.
+
 ## [0.9.0] – 2026-08-21
 
 ### Added

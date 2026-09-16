@@ -8,6 +8,36 @@ versionado [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+## [0.9.1] – 2026-09-16
+
+### Añadido
+- **Un aviso cuando un límite llega al amarillo, al rojo o se agota.** El icono
+  cambia de color desde hace tiempo, pero un icono en el área de notificación
+  pasa desapercibido con facilidad: en Windows suele quedar en el área de
+  desbordamiento, donde nadie lo ve. Ahora una ventana dice de qué límite se
+  trata, hasta dónde ha llegado, qué significa y cuándo se restablece. Usa los
+  umbrales ya configurados para el icono, no unos propios, así que el aviso y el
+  icono nunca se contradicen.
+
+  Una vez por límite y nivel hasta que ese límite se restablece, y recordado tras
+  un reinicio, para que el inicio automático no repita cada mañana lo dicho el
+  día anterior. Varios límites a la vez comparten una sola ventana.
+- **Tú decides lo insistente que es el aviso.** En **Configuración → Avisos**:
+  de cuál de los tres niveles quieres enterarte, si espera a **¡De acuerdo,
+  entendido!** o se cierra solo tras el tiempo que elijas, y si se mantiene
+  delante de las demás ventanas. **Mostrar vista previa** lo muestra con cifras
+  de ejemplo: la única forma de ver el aviso de un límite agotado sin agotar
+  uno.
+- **El aviso de un límite que ya se ha restablecido se cierra solo.** Quien
+  vuelve al ordenador después de que la sesión haya empezado de nuevo no debería
+  encontrar una ventana roja que la da por agotada, ni tener que confirmarla
+  para seguir.
+
+### Cambiado
+- **La apariencia pasa a la columna izquierda de la configuración.** Los avisos
+  llegaron a la derecha, junto a los umbrales que comparten, y sin el cambio esa
+  columna crecía tanto más que la otra que la ventana tenía que desplazarse.
+
 ## [0.9.0] – 2026-08-21
 
 ### Añadido

@@ -8,6 +8,38 @@ numérotation [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+## [0.9.1] – 2026-09-16
+
+### Ajouté
+- **Un avertissement quand une limite passe au jaune, au rouge ou s'épuise.**
+  L'icône change de couleur depuis longtemps, mais une icône dans la zone de
+  notification passe facilement inaperçue – sous Windows, elle se trouve souvent
+  dans la zone de débordement, où personne ne la voit. Désormais une fenêtre
+  indique de quelle limite il s'agit, où elle en est, ce que cela signifie et
+  quand elle sera réinitialisée. Elle reprend les seuils déjà réglés pour
+  l'icône, et non une paire à elle : l'avertissement et l'icône ne se
+  contredisent jamais.
+
+  Une fois par limite et par niveau jusqu'à la réinitialisation de cette limite,
+  et mémorisé après un redémarrage, pour que le démarrage automatique ne répète
+  pas chaque matin ce qui a été dit la veille. Plusieurs limites à la fois
+  partagent une seule fenêtre.
+- **C'est vous qui décidez à quel point l'avertissement insiste.** Dans
+  **Paramètres → Avertissements** : pour lesquels des trois niveaux le recevoir,
+  s'il attend **OK, compris !** ou se ferme seul après une durée de votre choix,
+  et s'il reste devant toutes les autres fenêtres. **Afficher un aperçu** le
+  montre avec des chiffres d'exemple – le seul moyen de voir l'avertissement
+  d'une limite épuisée sans en épuiser une.
+- **L'avertissement d'une limite réinitialisée se ferme tout seul.** Qui revient
+  à son poste après que la session a recommencé ne devrait pas trouver une
+  fenêtre rouge la déclarant épuisée, ni devoir la confirmer avant de continuer.
+
+### Modifié
+- **L'apparence passe dans la colonne de gauche des paramètres.** Les
+  avertissements sont arrivés à droite, à côté des seuils qu'ils partagent, et
+  sans ce déplacement cette colonne devenait tellement plus longue que l'autre
+  que la fenêtre devait défiler.
+
 ## [0.9.0] – 2026-08-21
 
 ### Ajouté

@@ -8,6 +8,37 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unveröffentlicht]
 
+## [0.9.1] – 2026-09-16
+
+### Hinzugefügt
+- **Ein Hinweis, wenn ein Limit Gelb, Rot oder sein Ende erreicht.** Das Symbol
+  wechselt schon lange die Farbe, aber ein Symbol im Infobereich übersieht man
+  leicht – unter Windows liegt es oft im Überlauf, wo es niemand sieht. Jetzt
+  sagt ein Fenster, welches Limit es ist, wie weit es ist, was das bedeutet und
+  wann es zurückgesetzt wird. Es nimmt die Schwellen, die schon für das Symbol
+  eingestellt sind, kein eigenes Paar – Hinweis und Symbol widersprechen sich
+  also nie.
+
+  Einmal je Limit und Stufe bis zu dessen Reset, und über einen Neustart hinweg
+  gemerkt, damit der Autostart nicht jeden Morgen wiederholt, was am Vortag
+  gesagt wurde. Mehrere Limits zugleich teilen sich ein Fenster.
+- **Wie nachdrücklich der Hinweis ist, bestimmst du.** Unter **Einstellungen →
+  Hinweise**: zu welcher der drei Stufen er kommt, ob er auf **OK, verstanden!**
+  wartet oder sich nach einer wählbaren Zeit selbst schließt, und ob er vor
+  allen anderen Fenstern bleibt. **Vorschau zeigen** zeigt ihn mit
+  Beispielwerten – der einzige Weg, den Hinweis für ein aufgebrauchtes Limit zu
+  sehen, ohne eines aufzubrauchen.
+- **Ein Hinweis zu einem zurückgesetzten Limit schließt sich von selbst.** Wer
+  an den Rechner zurückkommt, nachdem die Sitzung neu begonnen hat, soll kein
+  rotes Fenster vorfinden, das sie für aufgebraucht erklärt, und es erst
+  bestätigen müssen.
+
+### Geändert
+- **Das Erscheinungsbild steht jetzt in der linken Spalte der Einstellungen.**
+  Die Hinweise kamen rechts dazu, neben die Schwellen, die sie teilen, und ohne
+  den Umzug wurde diese Spalte so viel länger als die andere, dass das Fenster
+  scrollen musste.
+
 ## [0.9.0] – 2026-08-21
 
 ### Hinzugefügt

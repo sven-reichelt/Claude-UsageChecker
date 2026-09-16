@@ -52,6 +52,7 @@ behaviour settings only, and never secrets.
 | Credential Manager, `ClaudeUsageChecker:OAuth` | the application's own sign-in (access and refresh token) | yes |
 | Credential Manager, `ClaudeUsageChecker:OAuthToken` | manually stored single token | yes |
 | `%LOCALAPPDATA%\ClaudeUsageChecker\settings.json` | behaviour settings, no secrets | yes |
+| `%LOCALAPPDATA%\ClaudeUsageChecker\alerts.json` | which usage notices have been shown: a stage and a reset time per limit | yes |
 | `%LOCALAPPDATA%\ClaudeUsageChecker\crash.log` | local crash reports | yes |
 | `%LOCALAPPDATA%\Programs\ClaudeUsageChecker\` | the application itself, after setup | yes |
 | `HKCU\…\CurrentVersion\Run`, value `ClaudeUsageChecker` | autostart entry | yes |

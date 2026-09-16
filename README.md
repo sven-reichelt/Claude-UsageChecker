@@ -26,6 +26,7 @@ in the macOS menu bar.
 | Extra usage, where enabled on the subscription | ✅ |
 | Every limit in the context menu | ✅ |
 | Configurable thresholds for yellow and red | ✅ |
+| A notice at yellow, red and 100 %, with the reset time | ✅ |
 | Nine languages, changelog included | ✅ |
 | Summary of changes after an update | ✅ |
 | Token encrypted in the Windows Credential Manager | ✅ |
@@ -390,6 +391,24 @@ model-specific weekly limits. The usage level at which it turns yellow, and the
 one at which it turns red, live in the settings - preset to 75 % and 90 %. The
 warning threshold has to be below the critical one; otherwise it would never take
 effect, and the window says so instead of quietly correcting the input.
+
+### Notices
+
+An icon in the notification area is easy to miss, so the same thresholds also
+open a notice: when a limit reaches yellow, when it reaches red, and when it is
+used up. It names the limit, its usage, what that stage means, and when the limit
+resets. Each limit is followed on its own - the session reaching yellow is news
+even while the weekly limit already keeps the icon there.
+
+Every stage is announced once per limit until that limit resets. What has been
+announced is remembered in `alerts.json` beside the settings, so a restart does
+not repeat it. A notice about a limit that has since reset closes by itself.
+
+Under **Settings → Notices** each stage can be switched off, and the notice can
+either wait for **OK, got it!** or close by itself after a set time, and stay in
+front of every other window or not. **Show preview** displays it with example
+figures. The notice does not take the keyboard: an Enter meant for another
+window must not confirm it unread.
 
 ## Roadmap
 
