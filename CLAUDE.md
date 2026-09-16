@@ -107,13 +107,12 @@ by a test or by a step in the release workflow.
 **Pro was measured on 2026-08-31** and answers as the README describes: session
 and weekly total came back and matched claude.ai to the percentage point and the
 reset time, and no model-specific window appeared on a week one percent used.
-Only the extra usage quota stayed unproven - the account had it switched on with
-a 40 EUR cap but no balance, and nothing was displayed, which `spend: null` and
-`enabled: false` produce alike. Written up in [docs/api-research.md](docs/api-research.md).
+The extra usage quota showed nothing that day, with nothing spent yet; once
+something was, the amount appeared - so `spend` reaches Pro as well. Written up
+in [docs/api-research.md](docs/api-research.md).
 
 Open: how long the sign-in survives a longer break (Anthropic does not document
-the lifetime of the refresh token), whether `spend` reaches a Pro account at all,
-and why exactly the beta.2 zip was refused on
+the lifetime of the refresh token), and why exactly the beta.2 zip was refused on
 a Mac - Archive Utility was measured and is innocent, so the leading suspicion
 is the online check macOS makes for a quarantined application whose notarisation
 is minutes old. Unproven, and recorded as such. Details in

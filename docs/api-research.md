@@ -138,6 +138,10 @@ means `spend` was either absent or came back with `enabled: false`. The display
 cannot tell the two apart - it hides the block on both - and the response itself
 was not captured. Recorded as an observation, not as a finding.
 
+**Settled since:** once the same account had spent something from the quota, the
+amount spent appeared in the display. `spend` does reach a Pro account; on the
+first day there was simply nothing in it to show.
+
 Worth knowing when reading the figures: this account's weekly limits were
 temporarily raised by 50 % until 31 August. The endpoint reflects a promotion
 like that in the percentage alone and says nothing about it, so a share that
@@ -319,10 +323,6 @@ wrong data source for this undertaking.
 * How long the refresh token remains valid is unknown. As long as the application
   runs regularly, it refreshes in good time. After a very long break it may have
   lapsed - then signing in once more is needed.
-* Whether `spend` reaches a Pro account at all is unmeasured. Seen once with the
-  quota switched on but no balance bought, and nothing was displayed - which
-  `spend: null` and `enabled: false` would both produce. Capturing the raw
-  response on such an account would settle it.
 * Rotating refresh tokens carry a narrow window: if storing fails between a
   successful refresh and filing it away, the old token is spent and the new one
   lost. The consequence would be signing in again, not data loss.
