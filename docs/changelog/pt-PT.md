@@ -8,7 +8,7 @@ numeração [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
-## [0.9.1] – 2026-09-16
+## [1.0.0] – 2026-09-16
 
 ### Adicionado
 - **Um aviso quando um limite chega ao amarelo, ao vermelho ou se esgota.** O
@@ -45,6 +45,8 @@ numeração [Semantic Versioning](https://semver.org/lang/pt-BR/).
   Antes ficavam amarelas e vermelhas em 75 e 90 % fixos, fosse o que fosse que
   estivesse definido: com os limiares baixados, o ícone e o aviso diziam
   vermelho enquanto a barra ainda mostrava um limite folgado.
+  Abaixo do limiar de aviso, ficam agora num verde suave em vez do laranja de
+  destaque, demasiado parecido com o amarelo para os distinguir num relance.
 
 ## [0.9.0] – 2026-08-21
 

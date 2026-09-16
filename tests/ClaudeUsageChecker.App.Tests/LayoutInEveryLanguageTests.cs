@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.LogicalTree;
 using Avalonia.Threading;
@@ -124,6 +125,58 @@ public class LayoutInEveryLanguageTests : IDisposable
 
         AssertFits(window, code);
         window.Close();
+    }
+
+    /// <summary>
+    /// The version at the foot of the settings stays clear of the support
+    /// buttons, and they of "Cancel".
+    /// </summary>
+    /// <remarks>
+    /// Found on a real screen, not by a test: with the row shared into even
+    /// columns, "Version 0.9.1-beta.2 (Vorabversion)" ran underneath the Buy Me a
+    /// Coffee button. Nothing overflowed the window, so the width check above was
+    /// green throughout - the text was simply covered. Measured here with a
+    /// longer version than any so far, in every language, because the label
+    /// "(pre-release)" differs in length between them.
+    /// </remarks>
+    [AvaloniaTheory]
+    [MemberData(nameof(Languages))]
+    public void TheSettingsFooterKeepsTheVersionClearOfTheButtons(string code)
+    {
+        Localizer.Use(Language.Find(code)!);
+
+        using var file = new TemporaryFile();
+        var window = new SettingsWindow(
+            new SettingsStore(file.Path),
+            new AppSettings { Channel = UpdateChannel.PreRelease },
+            applyAutostart: _ => { });
+
+        var version = window.FindControl<TextBlock>("VersionText")!;
+        version.Text = T.VersionPreRelease("0.10.10-beta.10");
+
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var support = window.FindControl<SupportLinks>("Support")!;
+        var cancel = window.FindControl<Button>("CancelButton")!;
+
+        // The width of the text itself, not of the block: the block is cut to its
+        // column while the text is drawn past it and underneath whatever sits
+        // there. Measured by the block's bounds, the covered version passed.
+        var versionRight = version.TranslatePoint(default, window)!.Value.X + version.TextLayout.Width;
+        var supportLeft = support.TranslatePoint(default, window)!.Value.X;
+        var supportRight = support.TranslatePoint(new Avalonia.Point(support.Bounds.Width, 0), window)!.Value.X;
+        var cancelLeft = cancel.TranslatePoint(default, window)!.Value.X;
+        var supportNeeds = support.DesiredSize.Width - support.Margin.Left - support.Margin.Right;
+
+        window.Hide();
+
+        Assert.True(versionRight <= supportLeft,
+            $"In {code} the version ends at {versionRight:0}, the support buttons begin at {supportLeft:0}.");
+        Assert.True(supportRight <= cancelLeft,
+            $"In {code} the support buttons end at {supportRight:0}, Cancel begins at {cancelLeft:0}.");
+        Assert.True(support.Bounds.Width + 0.5 >= supportNeeds,
+            $"In {code} the support buttons get {support.Bounds.Width:0} pixels and need {supportNeeds:0}.");
     }
 
     [AvaloniaTheory]

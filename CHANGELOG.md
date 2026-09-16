@@ -8,7 +8,7 @@ the versioning [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
-## [0.9.1] – 2026-09-16
+## [1.0.0] – 2026-09-16
 
 ### Added
 - **A notice when a limit reaches yellow, red, or its end.** The icon has
@@ -44,6 +44,8 @@ the versioning [Semantic Versioning](https://semver.org/).
   They used to turn yellow and red at a fixed 75 and 90 %, whatever was set -
   with the thresholds lowered, the icon and the notice said red while the bar
   still showed a limit at ease.
+  Below the warning threshold they are now a muted green rather than the orange
+  accent, which sat too close to the yellow to tell apart at a glance.
 
 ## [0.9.0] – 2026-08-21
 

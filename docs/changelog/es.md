@@ -8,7 +8,7 @@ versionado [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
-## [0.9.1] – 2026-09-16
+## [1.0.0] – 2026-09-16
 
 ### Añadido
 - **Un aviso cuando un límite llega al amarillo, al rojo o se agota.** El icono
@@ -47,6 +47,8 @@ versionado [Semantic Versioning](https://semver.org/lang/es/).
   configuración.** Antes se volvían amarillas y rojas en un 75 y un 90 % fijos,
   se configurara lo que se configurara: con los umbrales rebajados, el icono y
   el aviso decían rojo mientras la barra aún mostraba un límite holgado.
+  Por debajo del umbral de advertencia ahora son de un verde apagado en lugar del
+  naranja de acento, demasiado parecido al amarillo para distinguirlos de un vistazo.
 
 ## [0.9.0] – 2026-08-21
 

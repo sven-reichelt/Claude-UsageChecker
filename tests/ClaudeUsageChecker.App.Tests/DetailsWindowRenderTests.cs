@@ -152,6 +152,19 @@ public class DetailsWindowRenderTests
             Assert.IsType<Avalonia.Media.SolidColorBrush>(bar.Foreground).Color);
     }
 
+    /// <summary>
+    /// A limit at ease is green - not the orange accent, which sat too close to
+    /// the yellow of the warning to tell apart at a glance.
+    /// </summary>
+    [Fact]
+    public void ALimitAtEaseIsGreen()
+    {
+        var colour = DetailsWindow.BrushFor(UsageAlertLevel.Normal).Color;
+
+        Assert.Equal(DetailsWindow.NormalColour, colour);
+        Assert.True(colour.G > colour.R && colour.G > colour.B, $"{colour} is not green.");
+    }
+
     /// <summary>A changed threshold shows at the next drawing, without a new window.</summary>
     [AvaloniaFact]
     public void ChangedThresholdsShowAtTheNextDrawing()

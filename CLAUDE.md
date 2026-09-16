@@ -23,7 +23,7 @@ and a second one would break every clone that exists by then.
 
 ```powershell
 dotnet build                                      # the whole solution
-dotnet test                                       # 731 tests (Core.Tests + App.Tests)
+dotnet test                                       # 741 tests (Core.Tests + App.Tests)
 dotnet run --project src/ClaudeUsageChecker.App   # run the application
 node build/generate-icons.mjs                     # regenerate the icons
 node build/generate-support-images.mjs            # Buy Me a Coffee SVG -> Avalonia vector image
@@ -77,7 +77,7 @@ Builds into `artifacts/` (centrally through `ArtifactsPath` in
 
 ## Status
 
-Version 0.9.0 released, 0.9.1-beta.2 out as a pre-release for testing; the
+Version 0.9.0 released, 1.0.0-beta.1 out as a pre-release for testing; the
 repository is public and written in English.
 Finished among other things: the application's own sign-in through OAuth with
 PKCE including refresh, update at the push of a button with checksum
@@ -106,10 +106,10 @@ places, an update that replaced itself and then left the Mac with nothing
 running - each was found by a person opening the thing, and each is now pinned
 by a test or by a step in the release workflow.
 
-**0.9.1 brings usage notices**, out first as a pre-release for testing: a window
+**1.0.0 brings usage notices**, out first as a pre-release for testing: a window
 when a limit reaches yellow, red or 100 %, once per limit and stage until it
 resets, remembered in `alerts.json` across a restart. The judging lives in
-`UsageAlertTracker` (Core), the window in `UsageAlertWindow`. beta.2 adds support
+`UsageAlertTracker` (Core), the window in `UsageAlertWindow`. It also brings support
 buttons (Buy Me a Coffee, Ko-fi) in the tray menu, the about window and the foot
 of the settings - one control, `SupportLinks` - and makes the bars in the
 details window follow the configured thresholds instead of a fixed 75/90.
@@ -189,6 +189,14 @@ and leaves every field null - the constructor then fails with a
 (`ManagedDispatcherImpl.RunLoop`), so a test waiting for one runs
 `Dispatcher.UIThread.MainLoop(token)` with a token cancelled by the expected
 event and by a timeout. `ANoticeThatDoesNotWaitClosesByItself` does exactly that.
+
+**A text block's bounds say nothing about where its text ends.** In a grid
+column narrower than the text, Avalonia cuts the block to the column and draws
+the text past it, underneath whatever sits beside. The version at the foot of
+the settings ran under the support buttons that way, and a test comparing block
+bounds stayed green even against the broken layout - its counter-check is what
+showed it. Measure `TextLayout.Width` for where the text really ends;
+`TheSettingsFooterKeepsTheVersionClearOfTheButtons` does.
 
 **Failures in tray actions otherwise end the application.** Without a window an
 exception travels all the way to the message loop and the process disappears

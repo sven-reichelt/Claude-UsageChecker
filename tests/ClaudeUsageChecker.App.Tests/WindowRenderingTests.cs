@@ -107,12 +107,14 @@ public class WindowRenderingTests : IDisposable
 
         // The same window with the section for testers unfolded - the one state
         // in which the two columns are at their most uneven.
-        Capture(
-            new SettingsWindow(
-                new SettingsStore(file.Path),
-                new AppSettings { Channel = UpdateChannel.PreRelease },
-                applyAutostart: _ => { }),
-            $"settings-channel-{code}");
+        // With a pre-release label at the foot, too: that is the longest the
+        // version gets, and the one a tester sees.
+        var channel = new SettingsWindow(
+            new SettingsStore(file.Path),
+            new AppSettings { Channel = UpdateChannel.PreRelease },
+            applyAutostart: _ => { });
+        channel.FindControl<TextBlock>("VersionText")!.Text = T.VersionPreRelease("1.0.0-beta.1");
+        Capture(channel, $"settings-channel-{code}");
         Capture(new SignInWindow(), $"signin-{code}");
         Capture(new InstallPromptWindow(), $"setup-{code}");
         Capture(
@@ -153,10 +155,9 @@ public class WindowRenderingTests : IDisposable
     /// colour at once.
     /// </summary>
     /// <remarks>
-    /// The fixture above stays below 75 %, where every bar is the accent colour
-    /// - which is also exactly what the bars showed when they ignored the
-    /// settings. With 20 and 35 the session is red, the week yellow, the rest
-    /// untouched.
+    /// The fixture above stays below 75 %, where every bar is green - which says
+    /// nothing about whether the bars read the settings at all. With 20 and 35
+    /// the session is red, the week yellow, the model limit still green.
     /// </remarks>
     [AvaloniaFact]
     public void TheDetailsWindowDrawsWithTheThresholdsFromTheSettings()

@@ -285,11 +285,24 @@ public partial class DetailsWindow : Window
     private SolidColorBrush BrushForUtilization(double utilization) =>
         BrushFor(Thresholds().LevelOf(utilization));
 
-    /// <summary>The colour of a stage: the accent, yellow, or red - the colours of the icon.</summary>
+    /// <summary>The colour of a stage: green, yellow, or red.</summary>
+    /// <remarks>
+    /// Green below the warning threshold. It used to be the accent colour, an
+    /// orange that sits close enough to the yellow of the warning that a limit at
+    /// ease and one past its threshold were hard to tell apart at a glance.
+    /// </remarks>
     internal static SolidColorBrush BrushFor(UsageAlertLevel level) => level switch
     {
         >= UsageAlertLevel.Critical => new SolidColorBrush(Color.FromRgb(0xD0, 0x40, 0x40)),
         UsageAlertLevel.Warning => new SolidColorBrush(Color.FromRgb(0xE0, 0xA0, 0x30)),
-        _ => new SolidColorBrush(Color.FromRgb(0xD9, 0x77, 0x57))
+        _ => new SolidColorBrush(NormalColour)
     };
+
+    /// <summary>The green of a limit at ease.</summary>
+    /// <remarks>
+    /// Muted to sit beside the yellow and the red. The tick on the icon uses a
+    /// brighter green, which is right at sixteen pixels and loud on a bar a window
+    /// wide - three candidates were drawn side by side and this one chosen.
+    /// </remarks>
+    internal static readonly Color NormalColour = Color.FromRgb(0x4E, 0x9A, 0x6B);
 }

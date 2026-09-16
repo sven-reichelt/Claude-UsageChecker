@@ -20,16 +20,20 @@
 
     <StackPanel DockPanel.Dock="Bottom" Margin="20,0,20,20" Spacing="18">
       <Separator />
-      <Grid ColumnDefinitions="*,Auto,*,Auto,Auto">
+      <!-- The version takes the width it needs, and the support buttons are
+           centred in what is left. With the middle column shared evenly, a
+           pre-release label ran underneath the buttons. -->
+      <Grid ColumnDefinitions="Auto,*,Auto,Auto">
         <!-- Clicking it five times reveals the choice of update channel. A
              cursor of its own would give it away; it is meant to be found by
              someone looking, not noticed by everyone. -->
         <TextBlock x:Name="VersionText" FontSize="11" Opacity="0.6" VerticalAlignment="Center" />
         <!-- Between the version and the buttons, in the middle of the row: in
              view whenever the settings are open, and out of the way of saving. -->
-        <views:SupportLinks Grid.Column="1" x:Name="Support" ImageHeight="28" VerticalAlignment="Center" />
-        <Button Grid.Column="3" x:Name="CancelButton" Margin="0,0,8,0" />
-        <Button Grid.Column="4" x:Name="SaveButton" IsDefault="True" />
+        <views:SupportLinks Grid.Column="1" x:Name="Support" ImageHeight="28" VerticalAlignment="Center"
+                            HorizontalAlignment="Center" Margin="12,0,12,0" />
+        <Button Grid.Column="2" x:Name="CancelButton" Margin="0,0,8,0" />
+        <Button Grid.Column="3" x:Name="SaveButton" IsDefault="True" />
       </Grid>
     </StackPanel>
 

@@ -8,7 +8,7 @@ numerazione [Semantic Versioning](https://semver.org/lang/it/).
 
 ## [Non pubblicato]
 
-## [0.9.1] – 2026-09-16
+## [1.0.0] – 2026-09-16
 
 ### Aggiunto
 - **Un avviso quando un limite arriva al giallo, al rosso o si esaurisce.**
@@ -44,6 +44,8 @@ numerazione [Semantic Versioning](https://semver.org/lang/it/).
   impostazioni.** Prima diventavano gialle e rosse a un 75 e 90 % fissi,
   qualunque cosa fosse impostata: con le soglie abbassate, icona e avviso
   dicevano rosso mentre la barra mostrava ancora un limite tranquillo.
+  Sotto la soglia di avviso ora sono di un verde smorzato invece dell'arancione
+  d'accento, troppo vicino al giallo per distinguerli a colpo d'occhio.
 
 ## [0.9.0] – 2026-08-21
 

@@ -8,7 +8,7 @@ numérotation [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
-## [0.9.1] – 2026-09-16
+## [1.0.0] – 2026-09-16
 
 ### Ajouté
 - **Un avertissement quand une limite passe au jaune, au rouge ou s'épuise.**
@@ -49,6 +49,8 @@ numérotation [Semantic Versioning](https://semver.org/lang/fr/).
   paramètres.** Elles passaient au jaune et au rouge à 75 et 90 % fixes, quels
   que soient les réglages : seuils abaissés, l'icône et l'avertissement disaient
   rouge tandis que la barre montrait encore une limite détendue.
+  Sous le seuil d'avertissement, elles sont désormais d'un vert atténué plutôt que
+  de l'orange d'accent, trop proche du jaune pour les distinguer d'un coup d'œil.
 
 ## [0.9.0] – 2026-08-21
 

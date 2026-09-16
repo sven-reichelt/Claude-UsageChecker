@@ -8,7 +8,7 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unveröffentlicht]
 
-## [0.9.1] – 2026-09-16
+## [1.0.0] – 2026-09-16
 
 ### Hinzugefügt
 - **Ein Hinweis, wenn ein Limit Gelb, Rot oder sein Ende erreicht.** Das Symbol
@@ -47,6 +47,8 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
   wurden bisher fest bei 75 und 90 % gelb und rot, gleich was eingestellt war –
   mit abgesenkten Schwellen sagten Symbol und Hinweis Rot, während der Balken
   noch ein entspanntes Limit zeigte.
+  Unterhalb der Warnschwelle sind sie jetzt gedämpft grün statt im orangen
+  Akzent, der zu nah am Gelb lag, um sie auf einen Blick zu unterscheiden.
 
 ## [0.9.0] – 2026-08-21
 
