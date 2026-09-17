@@ -209,6 +209,13 @@
   "update.unknownFormat": "Formato di versione sconosciuto: {0}",
   "update.checkFailed": "La ricerca di aggiornamenti non è riuscita.",
   "update.downloading": "Download e verifica della nuova versione ...",
+  "settings.autoUpdate": "Aggiornamenti automatici",
+  "update.noticeTitle": "Claude UsageChecker - Aggiornamento disponibile",
+  "update.noticeHeading": "È disponibile una nuova versione",
+  "update.noticeRestart": "L'aggiornamento riavvia l'applicazione; ci vogliono pochi secondi.",
+  "update.noticeManual": "Questa copia non può sostituirsi da sola: il download è nella pagina della versione.",
+  "update.noticeInstall": "Aggiorna ora",
+  "update.noticeLater": "Ricordamelo domani",
 
   "installer.locationUnknown": "L'applicazione non è riuscita a determinare la propria posizione.",
   "installer.alreadyInPlace": "L'applicazione si trova già nella posizione di destinazione.",

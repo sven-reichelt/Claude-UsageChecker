@@ -8,6 +8,24 @@ versionamento [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+## [1.0.1] – 2026-09-17
+
+### Adicionado
+- **Atualizações automáticas.** Uma nova versão encontrada ao iniciar é instalada
+  sem perguntar, e o aplicativo reinicia nela – o único momento em que ninguém
+  está no meio de algo. Ativadas por padrão, em **Configurações → Atualizações
+  automáticas**; desativadas, o início avisa que há uma nova versão, como antes.
+  Nada é instalado enquanto um aviso de uso espera confirmação, e só o aplicativo
+  instalado se substitui.
+- **Uma verificação de atualizações a cada duas horas.** Ela menciona uma nova
+  versão uma única vez, com **Atualizar agora** ou **Lembrar amanhã**, e nunca
+  instala sozinha. Segue o canal escolhido, versões prévias incluídas.
+
+### Alterado
+- **Chaves em vez de caixas de seleção nas configurações**, desenhadas como no
+  iOS: cinza quando desligadas, na cor do aplicativo quando ligadas, com um botão
+  que desliza.
+
 ## [1.0.0] – 2026-09-17
 
 ### Adicionado

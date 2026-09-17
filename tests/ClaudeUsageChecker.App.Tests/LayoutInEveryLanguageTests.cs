@@ -181,6 +181,18 @@ public class LayoutInEveryLanguageTests : IDisposable
 
     [AvaloniaTheory]
     [MemberData(nameof(Languages))]
+    public void TheUpdateQuestionFitsInEveryLanguage(string code)
+    {
+        Localizer.Use(Language.Find(code)!);
+
+        var window = new UpdateAvailableWindow(UpdateAvailableWindowTests.Update(), canInstall: true);
+        window.SetProgress(T.UpdateDownloading, busy: true);
+
+        AssertFits(window, code);
+    }
+
+    [AvaloniaTheory]
+    [MemberData(nameof(Languages))]
     public void TheSignInWindowFitsInEveryLanguage(string code)
     {
         Localizer.Use(Language.Find(code)!);

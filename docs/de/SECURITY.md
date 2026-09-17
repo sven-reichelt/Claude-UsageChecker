@@ -144,9 +144,34 @@ Abgesichert ist das durch drei Bedingungen. Fehlt eine, wird nichts eingespielt:
 2. **Adresse aus der GitHub-Antwort.** Die Download-Adresse stammt aus der
    API-Antwort zu genau diesem Repository und wird nicht aus Dateinamen
    zusammengesetzt oder erraten. Adressen ohne HTTPS werden verworfen.
-3. **Ausdrückliche Handlung des Nutzers.** Eingespielt wird nur nach einem
-   Klick auf **Jetzt einspielen und neu starten**. Es gibt keine stille
-   Aktualisierung im Hintergrund.
+3. **Die eigene Wahl des Nutzers.** Eingespielt wird nach einem Klick auf
+   **Jetzt einspielen und neu starten** oder **Update jetzt durchführen** – oder,
+   seit 1.0.1, beim Start ohne Rückfrage, wenn in den Einstellungen
+   **Automatisches Update** eingeschaltet ist. Es ist voreingestellt an und lässt
+   sich abschalten. Die Prüfung im Hintergrund alle zwei Stunden spielt nie selbst
+   ein; sie fragt.
+
+**Warum automatische Updates doch erlaubt wurden.** Bis 1.0.1 lautete die dritte
+Bedingung „ausdrücklicher Klick, nie still". Sie wurde bewusst aufgegeben, und
+die Begründung gehört hierher:
+
+* Der Klick schützte weniger, als es schien. Wem ein Update angeboten wird, der
+  klickt es an; ein Klick, den niemand verweigert, ist eine Formalie, keine
+  Prüfung.
+* Was wirklich schützt, bleibt: Eine Veröffentlichung erreicht niemanden, bevor
+  der Repository-Inhaber ihre Prüfsumme von Hand nachgerechnet und den Entwurf
+  des Release-Ablaufs freigegeben hat. Automatisch verteilt wird nichts, was
+  nicht durch diese Hand ging.
+* Unter macOS wird vor jedem Start weiterhin die Signatur geprüft; eine
+  Veröffentlichung, die nicht von der Developer-ID stammt, wird so oder so
+  abgewiesen.
+
+**Was es kostet, offen gesagt:** Unter Windows, wo das Paket keine Signatur
+trägt, könnte ein übernommenes GitHub-Konto jetzt jeden Rechner mit
+eingeschaltetem automatischem Update erreichen, ohne dass jemand klickt.
+Zwei-Faktor-Anmeldung auf diesem Konto ist deshalb keine Empfehlung, sondern Teil
+der Sicherheitskette – siehe unten. Wer dieses Risiko nicht tragen will, schaltet
+das automatische Update ab und behält den Klick.
 
 **Was die Prüfsumme nicht leistet.** Sie ersetzt keine Signatur: Wer eine
 Veröffentlichung anlegen kann, legt auch die passende Prüfsumme an. Sie schützt

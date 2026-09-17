@@ -38,6 +38,19 @@ public sealed class AppSettings
     public bool CheckForUpdates { get; set; } = true;
 
     /// <summary>
+    /// Install a new version found at startup without asking, and restart.
+    /// </summary>
+    /// <remarks>
+    /// On by default - an application nobody has to look after is one that stays
+    /// up to date. Switched off, the startup says a new version is there, as it
+    /// did before this setting existed. The check in the background every two
+    /// hours asks either way and never installs by itself; see
+    /// <see cref="Services.UpdatePolicy"/>.
+    /// </remarks>
+    [JsonPropertyName("autoUpdate")]
+    public bool AutoUpdate { get; set; } = true;
+
+    /// <summary>
     /// Whether the refresh button in the details window looks for a new version
     /// along the way.
     /// </summary>

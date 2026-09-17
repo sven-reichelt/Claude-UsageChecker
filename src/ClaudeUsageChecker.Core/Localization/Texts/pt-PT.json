@@ -209,6 +209,13 @@
   "update.unknownFormat": "Formato de versão desconhecido: {0}",
   "update.checkFailed": "A procura de atualizações falhou.",
   "update.downloading": "A transferir e a verificar a nova versão ...",
+  "settings.autoUpdate": "Atualizações automáticas",
+  "update.noticeTitle": "Claude UsageChecker - Atualização disponível",
+  "update.noticeHeading": "Está disponível uma nova versão",
+  "update.noticeRestart": "A atualização reinicia a aplicação; demora alguns segundos.",
+  "update.noticeManual": "Esta cópia não se consegue substituir a si própria – a transferência está na página da versão.",
+  "update.noticeInstall": "Atualizar agora",
+  "update.noticeLater": "Lembrar amanhã",
 
   "installer.locationUnknown": "A aplicação não conseguiu determinar a partir de onde está a ser executada.",
   "installer.alreadyInPlace": "A aplicação já se encontra no destino.",

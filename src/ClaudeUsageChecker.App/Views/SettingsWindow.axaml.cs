@@ -67,6 +67,9 @@ public partial class SettingsWindow : Window
         IntervalBox.Value = settings.PollIntervalSeconds;
         LaunchAtLoginBox.IsChecked = settings.LaunchAtLogin;
         CheckUpdatesBox.IsChecked = settings.CheckForUpdates;
+        AutoUpdateBox.IsChecked = settings.AutoUpdate;
+        AutoUpdateBox.IsCheckedChanged += (_, _) => UpdateStartupCheck();
+        UpdateStartupCheck();
         RefreshChecksUpdatesBox.IsChecked = settings.RefreshChecksForUpdates;
         WarningThresholdBox.Value = (decimal)settings.WarningThreshold;
         CriticalThresholdBox.Value = (decimal)settings.CriticalThreshold;
@@ -251,6 +254,7 @@ public partial class SettingsWindow : Window
         LaunchAtLoginBox.Content = OperatingSystem.IsMacOS()
             ? T.SettingsLaunchAtLoginMac
             : T.SettingsLaunchAtLogin;
+        AutoUpdateBox.Content = T.SettingsAutoUpdate;
         CheckUpdatesBox.Content = T.SettingsCheckForUpdates;
         RefreshChecksUpdatesBox.Content = T.SettingsRefreshChecksForUpdates;
 
@@ -394,6 +398,9 @@ public partial class SettingsWindow : Window
             : null;
     }
 
+    /// <summary>The check at startup is part of automatic updates, not a choice beside them.</summary>
+    private void UpdateStartupCheck() => CheckUpdatesBox.IsEnabled = !(AutoUpdateBox.IsChecked ?? true);
+
     /// <summary>The time to close by itself only matters for a notice that does not wait.</summary>
     private void UpdateAlertAutoClose()
     {
@@ -464,6 +471,7 @@ public partial class SettingsWindow : Window
             PollIntervalSeconds = (int)(IntervalBox.Value ?? 300),
             LaunchAtLogin = LaunchAtLoginBox.IsChecked ?? false,
             CheckForUpdates = CheckUpdatesBox.IsChecked ?? true,
+            AutoUpdate = AutoUpdateBox.IsChecked ?? true,
             RefreshChecksForUpdates = RefreshChecksUpdatesBox.IsChecked ?? true,
             WarningThreshold = warning,
             CriticalThreshold = critical,

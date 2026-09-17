@@ -8,6 +8,24 @@ the versioning [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.1] – 2026-09-17
+
+### Added
+- **Automatic updates.** A new version found at startup is installed without a
+  question, and the application restarts into it - the one moment nobody is in
+  the middle of using it. On by default, under **Settings → Automatic updates**;
+  switched off, the startup says a new version is there, as before. Nothing is
+  installed while a usage notice waits to be confirmed, and only the installed
+  application replaces itself.
+- **A check for updates every two hours.** It mentions a new version once, with
+  **Update now** or **Remind me tomorrow**, and never installs by itself. It
+  follows the chosen channel, pre-releases included.
+
+### Changed
+- **Switches instead of check boxes in the settings**, drawn the way iOS draws
+  them: grey when off, in the colour of the application when on, with a knob that
+  slides across.
+
 ## [1.0.0] – 2026-09-17
 
 ### Added

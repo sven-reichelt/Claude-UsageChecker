@@ -8,6 +8,24 @@ numeração [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+## [1.0.1] – 2026-09-17
+
+### Adicionado
+- **Atualizações automáticas.** Uma nova versão encontrada no arranque é
+  instalada sem perguntar, e a aplicação reinicia nela – o único momento em que
+  ninguém está a meio de algo. Ativadas por predefinição, em **Definições →
+  Atualizações automáticas**; desativadas, o arranque avisa que há uma nova
+  versão, como antes. Nada é instalado enquanto um aviso de utilização espera
+  confirmação, e só a aplicação instalada se substitui a si própria.
+- **Uma verificação de atualizações a cada duas horas.** Menciona uma nova versão
+  uma única vez, com **Atualizar agora** ou **Lembrar amanhã**, e nunca instala
+  sozinha. Segue o canal escolhido, versões prévias incluídas.
+
+### Alterado
+- **Interruptores em vez de caixas de verificação nas definições**, desenhados
+  como no iOS: cinzentos quando desligados, na cor da aplicação quando ligados,
+  com um botão que desliza.
+
 ## [1.0.0] – 2026-09-17
 
 ### Adicionado

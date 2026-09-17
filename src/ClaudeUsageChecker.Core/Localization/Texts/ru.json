@@ -209,6 +209,13 @@
   "update.unknownFormat": "Неизвестный формат версии: {0}",
   "update.checkFailed": "Проверка обновлений не удалась.",
   "update.downloading": "Загрузка и проверка новой версии ...",
+  "settings.autoUpdate": "Автоматические обновления",
+  "update.noticeTitle": "Claude UsageChecker - Доступно обновление",
+  "update.noticeHeading": "Доступна новая версия",
+  "update.noticeRestart": "При обновлении приложение перезапускается; это займёт несколько секунд.",
+  "update.noticeManual": "Эта копия не может заменить себя сама — загрузка есть на странице выпуска.",
+  "update.noticeInstall": "Обновить сейчас",
+  "update.noticeLater": "Напомнить завтра",
 
   "installer.locationUnknown": "Не удалось определить собственное расположение.",
   "installer.alreadyInPlace": "Приложение уже находится в целевом месте.",

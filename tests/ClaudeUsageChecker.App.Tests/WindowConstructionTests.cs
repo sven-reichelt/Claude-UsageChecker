@@ -62,6 +62,16 @@ public class WindowConstructionTests
     }
 
     [AvaloniaFact]
+    public void UpdateAvailableWindow_CanBeCreated()
+    {
+        var window = new UpdateAvailableWindow();
+
+        Assert.NotNull(window.FindControl<Button>("InstallButton"));
+        Assert.NotNull(window.FindControl<Button>("LaterButton"));
+        Assert.NotNull(window.FindControl<TextBlock>("MessageText"));
+    }
+
+    [AvaloniaFact]
     public void SettingsWindow_CanBeCreated()
     {
         using var settingsFile = new TemporaryFile();

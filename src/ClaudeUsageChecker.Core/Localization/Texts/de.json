@@ -209,6 +209,13 @@
   "update.unknownFormat": "Unbekanntes Versionsformat: {0}",
   "update.checkFailed": "Die Aktualisierungsprüfung ist fehlgeschlagen.",
   "update.downloading": "Die neue Fassung wird geladen und geprüft ...",
+  "settings.autoUpdate": "Automatisches Update",
+  "update.noticeTitle": "Claude UsageChecker - Update verfügbar",
+  "update.noticeHeading": "Eine neue Version ist verfügbar",
+  "update.noticeRestart": "Beim Aktualisieren startet die Anwendung neu; das dauert ein paar Sekunden.",
+  "update.noticeManual": "Diese Kopie kann sich nicht selbst ersetzen – auf der Release-Seite gibt es den Download.",
+  "update.noticeInstall": "Update jetzt durchführen",
+  "update.noticeLater": "Morgen erneut benachrichtigen",
 
   "installer.locationUnknown": "Der eigene Speicherort ließ sich nicht ermitteln.",
   "installer.alreadyInPlace": "Die Anwendung liegt bereits am Zielort.",

@@ -209,6 +209,13 @@
   "update.unknownFormat": "Unknown version format: {0}",
   "update.checkFailed": "The update check failed.",
   "update.downloading": "Downloading and verifying the new version ...",
+  "settings.autoUpdate": "Automatic updates",
+  "update.noticeTitle": "Claude UsageChecker - Update available",
+  "update.noticeHeading": "A new version is available",
+  "update.noticeRestart": "Updating restarts the application; that takes a few seconds.",
+  "update.noticeManual": "This copy cannot replace itself - the release page has the download.",
+  "update.noticeInstall": "Update now",
+  "update.noticeLater": "Remind me tomorrow",
 
   "installer.locationUnknown": "The application could not determine where it is running from.",
   "installer.alreadyInPlace": "The application is already in its target location.",

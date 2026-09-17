@@ -1,4 +1,4 @@
-﻿# Claude UsageChecker – notes for Claude Code
+# Claude UsageChecker – notes for Claude Code
 
 Tray application for Windows and macOS that shows the session and weekly
 limits of a Claude subscription in the notification area.
@@ -23,7 +23,7 @@ and a second one would break every clone that exists by then.
 
 ```powershell
 dotnet build                                      # the whole solution
-dotnet test                                       # 748 tests (Core.Tests + App.Tests)
+dotnet test                                       # 792 tests (Core.Tests + App.Tests)
 dotnet run --project src/ClaudeUsageChecker.App   # run the application
 node build/generate-icons.mjs                     # regenerate the icons
 node build/generate-support-images.mjs            # Buy Me a Coffee SVG -> Avalonia vector image
@@ -77,8 +77,18 @@ Builds into `artifacts/` (centrally through `ArtifactsPath` in
 
 ## Status
 
-Version 1.0.0 released on 2026-09-17, after three pre-releases of 0.9.1; the
-repository is public and written in English.
+Version 1.0.1 released on 2026-09-17 (1.0.0 the same morning, after three
+pre-releases of 0.9.1); the repository is public and written in English.
+
+**1.0.1 brought automatic updates and switches.** With **Automatic updates** on
+(the default) a version found at startup is installed without asking; off, the
+startup says it is there. A check every two hours asks once per version - update
+now, or remind me tomorrow - and never installs by itself (`UpdatePolicy`,
+`UpdateReminder`, `UpdateAvailableWindow`). The check boxes of the settings are
+drawn as iOS-style switches (`Views/SwitchStyles.axaml`, class `switch`) and are
+still check boxes underneath. **Automatic installing cannot be seen working
+until a version after 1.0.1 exists** - 1.0.0 has no such code, so the step to
+1.0.1 is a click for everyone.
 Finished among other things: the application's own sign-in through OAuth with
 PKCE including refresh, update at the push of a button with checksum
 verification, permanent setup with autostart, configurable thresholds, the
@@ -283,9 +293,14 @@ is brought back in line with them, whatever drifted.
 
 **The self-update is the most delicate path in the program.** It downloads an
 executable from the network and starts it. Three conditions secure that - a
-verified SHA-256 sum, an address from GitHub's response, an explicit click - and
-on macOS a fourth, the signature of the downloaded bundle. Changing anything
-there loosens the only safeguard that exists. Reasoning in
+verified SHA-256 sum, an address from GitHub's response, the user's own choice -
+and on macOS a fourth, the signature of the downloaded bundle. Since 1.0.1 that
+choice can be the **Automatic updates** switch rather than a click: given up
+knowingly, with the reasoning and the price (an unsigned Windows package reaching
+every machine if the GitHub account is taken over) in SECURITY.md. The gate that
+remains is the hand-published draft - never publish a release without checking
+its checksum. Changing anything else there loosens the only safeguard that
+exists. Reasoning in
 [SECURITY.md](SECURITY.md), tests in `UpdateInstallerTests` and
 `MacOsBundleTests`.
 

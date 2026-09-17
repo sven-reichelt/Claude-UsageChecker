@@ -36,6 +36,7 @@ in der macOS-Menüleiste.
 | Eigene Anmeldung per OAuth mit PKCE – unabhängig von Claude Code | ✅ |
 | Selbsttätige Erneuerung des eigenen Tokens | ✅ |
 | Aktualisierung auf Knopfdruck, mit Prüfsummenkontrolle | ✅ |
+| Automatisches Update beim Start, und eine Prüfung alle zwei Stunden | ✅ |
 | macOS-Menüleiste, Schlüsselbund und Autostart | ✅ |
 | Hell, dunkel oder wie das System | ✅ |
 | Beide Anmeldungen auf einen Blick in den Einstellungen | ✅ |
@@ -361,9 +362,33 @@ dort zwei Schaltflächen:
 * **Release-Seite öffnen** – für alle, die lieber selbst nachsehen.
 
 Stimmt die Prüfsumme nicht oder fehlt sie, wird nichts eingespielt und nichts
-ausgeführt. Eingespielt wird ausschließlich nach ausdrücklichem Klick, nie
-still im Hintergrund. Die Einzelheiten und die Grenzen dieser Absicherung
-stehen in [SECURITY.md](SECURITY.md).
+ausgeführt. Die Einzelheiten und die Grenzen dieser Absicherung stehen in
+[SECURITY.md](SECURITY.md).
+
+### Automatisches Update
+
+Seit 1.0.1 gibt es zwei Arten, mit Updates zu leben, umschaltbar unter
+**Einstellungen → Automatisches Update**:
+
+* **An** (Vorgabe) – eine beim Start gefundene neue Version wird ohne Rückfrage
+  eingespielt, und die Anwendung startet in ihr neu. Der Moment des Starts ist
+  der eine, in dem niemand gerade mittendrin ist.
+* **Aus** – der Start sagt wie bisher, dass eine neue Version da ist, und das
+  Einspielen bleibt ein Klick.
+
+In beiden Fällen läuft alle zwei Stunden eine Prüfung im Hintergrund. Sie nennt
+eine neue Version **einmal**, mit **Update jetzt durchführen** und **Morgen
+erneut benachrichtigen** – und spielt nie selbst ein, weil die Anwendung gerade
+mitten in etwas sein kann. Wer es verschiebt und den Rechner zwischendurch neu
+startet, bekommt das Update beim nächsten Start, sofern das automatische Update an
+ist. Der Kanal gilt für alles: Wer Vorabversionen gewählt hat, bekommt auch die
+automatisch.
+
+Solange ein Nutzungshinweis auf Bestätigung wartet, wird nichts eingespielt; das
+Update kommt dann beim nächsten Start. Selbst ersetzen kann sich nur das
+veröffentlichte Paket an seinem installierten Ort – eine Kopie im
+Download-Ordner, ein Entwicklungsbau oder ein Mac, dessen Programme-Ordner nicht
+beschreibbar ist, wird über das Update informiert statt aktualisiert.
 
 Der Selbstaustausch setzt die veröffentlichte Einzeldatei voraus. Im
 Entwicklungsstand liegen Dutzende Dateien nebeneinander – dort wird die

@@ -85,15 +85,18 @@
                              Minimum="180" Maximum="3600" Increment="60" Width="120" />
             </Grid>
 
-            <CheckBox x:Name="LaunchAtLoginBox" />
+            <CheckBox x:Name="LaunchAtLoginBox" Classes="switch" />
             <TextBlock x:Name="RelocationHint" IsVisible="False" TextWrapping="Wrap"
                        FontSize="11" Opacity="0.75" Margin="24,-4,0,0" />
-            <CheckBox x:Name="CheckUpdatesBox" />
+            <CheckBox x:Name="AutoUpdateBox" Classes="switch" />
+            <!-- Unavailable while automatic updates are on: they check at startup
+                 regardless, so this switch would say something that is not so. -->
+            <CheckBox x:Name="CheckUpdatesBox" Classes="switch" />
             <!-- The refresh button in the details window fetches the figures.
                  With this it looks for a new version on the way - one press
                  instead of two, and switched off for whoever would rather the
                  network was not touched more than necessary. -->
-            <CheckBox x:Name="RefreshChecksUpdatesBox" />
+            <CheckBox x:Name="RefreshChecksUpdatesBox" Classes="switch" />
           </StackPanel>
 
           <Separator />
@@ -187,12 +190,12 @@
             <TextBlock x:Name="AlertHeading" FontWeight="SemiBold" />
             <TextBlock x:Name="AlertHint" TextWrapping="Wrap" FontSize="12" Opacity="0.8" />
 
-            <CheckBox x:Name="AlertOnWarningBox" />
-            <CheckBox x:Name="AlertOnCriticalBox" />
-            <CheckBox x:Name="AlertOnExhaustedBox" />
+            <CheckBox x:Name="AlertOnWarningBox" Classes="switch" />
+            <CheckBox x:Name="AlertOnCriticalBox" Classes="switch" />
+            <CheckBox x:Name="AlertOnExhaustedBox" Classes="switch" />
 
-            <CheckBox x:Name="AlertAcknowledgeBox" />
-            <CheckBox x:Name="AlertOnTopBox" />
+            <CheckBox x:Name="AlertAcknowledgeBox" Classes="switch" />
+            <CheckBox x:Name="AlertOnTopBox" Classes="switch" />
 
             <!-- Only meaningful for a notice that closes by itself, and disabled
                  otherwise rather than hidden: the window would jump every time the

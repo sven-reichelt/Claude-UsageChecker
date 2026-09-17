@@ -1,0 +1,85 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- A check box drawn as a switch, the way iOS draws its settings: the label
+       on the left, a pill on the right edge, grey when off and in the colour of
+       the application when on, with a white knob that slides across.
+
+       Still a CheckBox underneath - IsChecked, the labels from the language
+       files and every test that finds these controls by name stay exactly as
+       they were. Only the picture changes. -->
+
+  <Styles.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Light">
+          <SolidColorBrush x:Key="SwitchTrackOffBrush" Color="#E3E3E8" />
+          <SolidColorBrush x:Key="SwitchTrackOffPointerOverBrush" Color="#D6D6DC" />
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Dark">
+          <SolidColorBrush x:Key="SwitchTrackOffBrush" Color="#3A3A3E" />
+          <SolidColorBrush x:Key="SwitchTrackOffPointerOverBrush" Color="#48484D" />
+        </ResourceDictionary>
+      </ResourceDictionary.ThemeDictionaries>
+    </ResourceDictionary>
+  </Styles.Resources>
+
+  <Style Selector="CheckBox.switch">
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid ColumnDefinitions="*,Auto" Background="{TemplateBinding Background}">
+          <ContentPresenter x:Name="PART_ContentPresenter"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            VerticalAlignment="Center"
+                            TextWrapping="Wrap"
+                            Margin="0,0,12,0" />
+
+          <Border x:Name="Track" Grid.Column="1"
+                  Width="44" Height="26" CornerRadius="13"
+                  VerticalAlignment="Center"
+                  Background="{DynamicResource SwitchTrackOffBrush}">
+            <Border.Transitions>
+              <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.15" />
+              </Transitions>
+            </Border.Transitions>
+
+            <Border x:Name="Knob"
+                    Width="22" Height="22" CornerRadius="11"
+                    Margin="2" HorizontalAlignment="Left"
+                    Background="White"
+                    BoxShadow="0 1 3 0 #40000000"
+                    RenderTransform="translateX(0px)">
+              <Border.Transitions>
+                <Transitions>
+                  <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.15" />
+                </Transitions>
+              </Border.Transitions>
+            </Border>
+          </Border>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style Selector="CheckBox.switch:pointerover /template/ Border#Track">
+    <Setter Property="Background" Value="{DynamicResource SwitchTrackOffPointerOverBrush}" />
+  </Style>
+
+  <Style Selector="CheckBox.switch:checked /template/ Border#Track">
+    <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+  </Style>
+
+  <Style Selector="CheckBox.switch:checked /template/ Border#Knob">
+    <Setter Property="RenderTransform" Value="translateX(18px)" />
+  </Style>
+
+  <Style Selector="CheckBox.switch:disabled">
+    <Setter Property="Opacity" Value="0.5" />
+  </Style>
+
+</Styles>

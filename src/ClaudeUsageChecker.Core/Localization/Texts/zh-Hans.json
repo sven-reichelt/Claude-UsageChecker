@@ -209,6 +209,13 @@
   "update.unknownFormat": "未知的版本格式：{0}",
   "update.checkFailed": "检查更新失败。",
   "update.downloading": "正在下载并校验新版本 ...",
+  "settings.autoUpdate": "自动更新",
+  "update.noticeTitle": "Claude UsageChecker - 有可用更新",
+  "update.noticeHeading": "有新版本可用",
+  "update.noticeRestart": "更新时应用会重新启动，只需几秒钟。",
+  "update.noticeManual": "此副本无法自行替换——请在发布页面下载。",
+  "update.noticeInstall": "立即更新",
+  "update.noticeLater": "明天再提醒我",
 
   "installer.locationUnknown": "本应用无法确定自身所在位置。",
   "installer.alreadyInPlace": "本应用已位于目标位置。",

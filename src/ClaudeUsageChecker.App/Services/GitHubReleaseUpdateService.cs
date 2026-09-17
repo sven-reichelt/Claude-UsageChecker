@@ -15,9 +15,9 @@ namespace ClaudeUsageChecker.App.Services;
 /// Queries the latest release of a GitHub repository.
 /// </summary>
 /// <remarks>
-/// Deliberately only a check with a pointer to the release page: nothing is
-/// downloaded or executed automatically. Installing stays a deliberate decision
-/// of the user.
+/// Only the check: it reports what it found and downloads nothing. Whether a
+/// version found is installed - by a click, or at startup where automatic
+/// updates are on - is decided elsewhere; see <see cref="UpdatePolicy"/>.
 /// </remarks>
 public sealed class GitHubReleaseUpdateService(
     HttpClient httpClient,

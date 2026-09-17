@@ -79,6 +79,16 @@ public class LabellingTests : IDisposable
 
     [AvaloniaTheory]
     [MemberData(nameof(Languages))]
+    public void TheUpdateQuestionIsFullyLabelled(string code)
+    {
+        Localizer.Use(Language.Find(code)!);
+
+        AssertFullyLabelled(new UpdateAvailableWindow(UpdateAvailableWindowTests.Update(), canInstall: true), code);
+        AssertFullyLabelled(new UpdateAvailableWindow(UpdateAvailableWindowTests.Update(), canInstall: false), code);
+    }
+
+    [AvaloniaTheory]
+    [MemberData(nameof(Languages))]
     public void TheSignInWindowIsFullyLabelled(string code)
     {
         Localizer.Use(Language.Find(code)!);

@@ -35,6 +35,7 @@ in the macOS menu bar.
 | Own sign-in through OAuth with PKCE - independent of Claude Code | ✅ |
 | Automatic refresh of the application's own token | ✅ |
 | Update at the push of a button, with checksum verification | ✅ |
+| Automatic updates at startup, and a check every two hours | ✅ |
 | macOS menu bar, keychain and autostart | ✅ |
 | Light, dark, or whatever the system says | ✅ |
 | Both sign-ins at a glance in the settings | ✅ |
@@ -353,9 +354,32 @@ there:
 * **Open release page** – for anyone who prefers to look for themselves.
 
 If the checksum does not match, or is missing, nothing is installed and nothing
-is executed. Installing happens only after an explicit click, never silently in
-the background. The details and the limits of that safeguard are in
+is executed. The details and the limits of that safeguard are in
 [SECURITY.md](SECURITY.md).
+
+### Automatic updates
+
+Since 1.0.1 there are two ways to live with updates, switched under **Settings →
+Automatic updates**:
+
+* **On** (the default) – a new version found at startup is installed without a
+  question, and the application restarts into it. The moment it starts is the
+  one moment nobody is in the middle of using it.
+* **Off** – the startup says a new version is there, as before, and installing
+  stays a click.
+
+Either way a check runs in the background every two hours. It mentions a new
+version **once**, with **Update now** and **Remind me tomorrow** - and never
+installs by itself, because the application may be in the middle of something.
+Whoever puts it off and restarts the machine meanwhile gets the update at the
+next start, where automatic updates are on. The update channel applies to all of
+it: whoever has chosen pre-releases gets those automatically as well.
+
+Nothing is installed while a usage notice waits to be confirmed; the update
+comes at the next start instead. Only the published package at its installed
+location replaces itself - a copy in the downloads folder, a development build or
+a Mac whose applications folder it may not write to is told about the update
+rather than updated.
 
 The self-update requires the published single file. In a development build dozens
 of files sit side by side - the button is not even offered there.

@@ -85,6 +85,7 @@ public class WindowRenderingTests : IDisposable
             Capture(BuildReleaseNotes(), "dark-notes");
             Capture(LayoutInEveryLanguageTests.BuildTrayMenu(), "dark-menu");
             Capture(UsageAlertWindowTests.Filled(waits: false), "dark-alert");
+            Capture(new UpdateAvailableWindow(UpdateAvailableWindowTests.Update(), canInstall: true), "dark-update");
         }
         finally
         {
@@ -123,6 +124,7 @@ public class WindowRenderingTests : IDisposable
         Capture(BuildReleaseNotes(), $"notes-{code}");
         Capture(LayoutInEveryLanguageTests.BuildTrayMenu(), $"menu-{code}");
         Capture(UsageAlertWindowTests.Filled(waits: false), $"alert-{code}");
+        Capture(new UpdateAvailableWindow(UpdateAvailableWindowTests.Update(), canInstall: true), $"update-{code}");
     }
 
     /// <summary>

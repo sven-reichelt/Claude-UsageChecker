@@ -272,6 +272,13 @@ public static class T
     public static string UpdateUnknownFormat(string tag) => L.Format("update.unknownFormat", tag);
     public static string UpdateCheckFailed => L["update.checkFailed"];
     public static string UpdateDownloading => L["update.downloading"];
+    public static string UpdateNoticeTitle => L["update.noticeTitle"];
+    public static string UpdateNoticeHeading => L["update.noticeHeading"];
+    public static string UpdateNoticeRestart => L["update.noticeRestart"];
+    public static string UpdateNoticeManual => L["update.noticeManual"];
+    public static string UpdateNoticeInstall => L["update.noticeInstall"];
+    public static string UpdateNoticeLater => L["update.noticeLater"];
+    public static string SettingsAutoUpdate => L["settings.autoUpdate"];
 
     // Self-installation
     public static string InstallerLocationUnknown => L["installer.locationUnknown"];

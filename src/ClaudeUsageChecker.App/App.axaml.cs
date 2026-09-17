@@ -50,6 +50,9 @@ public partial class App : Application, IDisposable
     private readonly AlertMemoryStore _alertMemoryStore = new();
     private UsageAlertTracker? _alertTracker;
     private UsageAlertWindow? _alertWindow;
+    private readonly UpdateReminder _updateReminder = new();
+    private UpdateAvailableWindow? _updateWindow;
+    private DispatcherTimer? _updateTimer;
 
     public override void Initialize()
     {
@@ -171,11 +174,18 @@ public partial class App : Application, IDisposable
 
         _monitor.Start();
 
-        if (_settings.CheckForUpdates)
+        // Automatic updates check at startup whatever the other switch says:
+        // installing a version presupposes having looked for one.
+        if (_settings.AutoUpdate || _settings.CheckForUpdates)
         {
-            ErrorGuard.Forget(
-                "update check at startup", () => CheckForUpdatesAsync(announceUpToDate: false));
+            ErrorGuard.Forget("update check at startup", CheckAtStartupAsync);
         }
+
+        // Every two hours, whatever the settings: a new version is mentioned once,
+        // with the choice of installing it now or hearing about it tomorrow.
+        _updateTimer = new DispatcherTimer { Interval = UpdatePolicy.BackgroundInterval };
+        _updateTimer.Tick += (_, _) => ErrorGuard.Forget("update check in the background", CheckInBackgroundAsync);
+        _updateTimer.Start();
 
         // Only once the native libraries are loaded can the application spot its
         // own extraction folder - before that it either cleaned up nothing or
@@ -286,6 +296,7 @@ public partial class App : Application, IDisposable
         }
 
         _alertWindow?.ApplyTexts();
+        _updateWindow?.ApplyTexts();
 
         if (_detailsWindow is { } window)
         {
@@ -747,6 +758,146 @@ public partial class App : Application, IDisposable
         RequestShutdown();
     }
 
+    /// <summary>Whether this copy can replace itself: the published package at its installed location.</summary>
+    private static bool CanInstallHere => UpdateInstaller.IsSupported && SelfInstaller.IsInstalled;
+
+    /// <summary>
+    /// The check at startup: installs without asking where automatic updates
+    /// are on, and says a new version is there where they are not.
+    /// </summary>
+    private async Task CheckAtStartupAsync()
+    {
+        if (_updateService is null)
+        {
+            return;
+        }
+
+        var result = await _updateService.CheckAsync().ConfigureAwait(false);
+
+        await Dispatcher.UIThread.InvokeAsync(async () =>
+        {
+            // A usage notice that waits to be confirmed is not taken away by a
+            // restart; the update is announced instead and comes at the next start.
+            var busy = _alertWindow is { WaitsForConfirmation: true };
+
+            var action = UpdatePolicy.AtStartup(
+                result, _settings.AutoUpdate, _settings.CheckForUpdates, CanInstallHere, busy);
+
+            if (action == StartupUpdateAction.None)
+            {
+                return;
+            }
+
+            // Told about at startup counts as told: the check in the background
+            // does not ask about the same version two hours later.
+            if (result.AvailableVersion is { } version)
+            {
+                _updateReminder.Asked(version);
+            }
+
+            if (action == StartupUpdateAction.Install)
+            {
+                await InstallAutomaticallyAsync(result).ConfigureAwait(true);
+                return;
+            }
+
+            ShowUpdateResult(result, openWindow: true);
+        });
+    }
+
+    /// <summary>
+    /// Installs a version found at startup without asking. Where it fails, the
+    /// user is told the same way as without automatic updates, with the reason.
+    /// </summary>
+    private async Task InstallAutomaticallyAsync(UpdateCheckResult update)
+    {
+        if (_updateHttpClient is null)
+        {
+            return;
+        }
+
+        var installer = new UpdateInstaller(_updateHttpClient);
+        var result = await installer.InstallAsync(update).ConfigureAwait(true);
+
+        if (result.Succeeded)
+        {
+            // The new version is already waiting for this one to end, and will
+            // show what has changed as soon as it is up.
+            RequestShutdown();
+            return;
+        }
+
+        ShowUpdateResult(update, openWindow: true);
+        _detailsWindow?.SetInstallProgress(result.Message, busy: false);
+    }
+
+    /// <summary>
+    /// The check every two hours: asks once per version, never installs by itself.
+    /// </summary>
+    private async Task CheckInBackgroundAsync()
+    {
+        if (_updateService is null || _updateWindow is not null)
+        {
+            return;
+        }
+
+        var result = await _updateService.CheckAsync().ConfigureAwait(false);
+
+        await Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            if (result.Status != UpdateCheckStatus.UpdateAvailable
+                || _updateWindow is not null
+                || !_updateReminder.ShouldAsk(result.AvailableVersion, DateTimeOffset.Now))
+            {
+                return;
+            }
+
+            ErrorGuard.Run("ask about the update", () => AskAboutUpdate(result));
+        });
+    }
+
+    private void AskAboutUpdate(UpdateCheckResult update)
+    {
+        _updateReminder.Asked(update.AvailableVersion!);
+
+        var window = new UpdateAvailableWindow(update, CanInstallHere);
+        window.InstallRequested += (_, _) =>
+            ErrorGuard.Forget("install the update", () => InstallFromQuestionAsync(window, update));
+        window.ReleasePageRequested += (_, page) =>
+            ErrorGuard.Run("open the release page", () => OpenInBrowser(page));
+        window.RemindLaterRequested += (_, _) =>
+            _updateReminder.RemindTomorrow(update.AvailableVersion!, DateTimeOffset.Now);
+        window.Closed += (_, _) =>
+        {
+            if (ReferenceEquals(_updateWindow, window))
+            {
+                _updateWindow = null;
+            }
+        };
+
+        _updateWindow = window;
+        window.Present();
+    }
+
+    private async Task InstallFromQuestionAsync(UpdateAvailableWindow window, UpdateCheckResult update)
+    {
+        if (_updateHttpClient is null)
+        {
+            return;
+        }
+
+        window.SetProgress(T.UpdateDownloading, busy: true);
+
+        var result = await new UpdateInstaller(_updateHttpClient).InstallAsync(update).ConfigureAwait(true);
+
+        window.SetProgress(result.Message, busy: result.Succeeded);
+
+        if (result.Succeeded)
+        {
+            RequestShutdown();
+        }
+    }
+
     private void RequestShutdown()
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
@@ -757,6 +908,7 @@ public partial class App : Application, IDisposable
 
     private void Shutdown()
     {
+        _updateTimer?.Stop();
         _tray?.Dispose();
         _monitor?.DisposeAsync().AsTask().GetAwaiter().GetResult();
         _oauthTokenProvider?.Dispose();

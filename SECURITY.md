@@ -140,8 +140,31 @@ Three conditions secure it. If one is missing, nothing is installed:
 2. **The address from GitHub's response.** The download address comes from the
    API response for exactly this repository and is not pieced together from file
    names or guessed. Addresses without HTTPS are discarded.
-3. **An explicit act by the user.** Installing happens only after a click on
-   **Install now and restart**. There is no silent update in the background.
+3. **The user's own choice.** Installing happens after a click on **Install now
+   and restart** or **Update now** - or, since 1.0.1, at startup without a
+   question, where **Automatic updates** is switched on in the settings. It is on
+   by default, and it can be switched off. The check in the background every two
+   hours never installs by itself; it asks.
+
+**Why automatic updates were allowed after all.** Until 1.0.1 the third
+condition read "an explicit click, never silently". It was given up knowingly,
+and the reasoning belongs here:
+
+* The click protected less than it seemed. Whoever is offered an update clicks
+  it; a click that nobody refuses is a formality, not a check.
+* What does protect stays in place: a release reaches nobody until the
+  repository owner has checked its checksum by hand and published the draft the
+  release workflow made. Nothing is distributed automatically that has not been
+  through that hand.
+* On macOS the signature is still checked before anything runs, so a release
+  that did not come from the Developer ID is refused either way.
+
+**What it costs, said plainly:** on Windows, where the package carries no
+signature, a compromised GitHub account could now reach every machine with
+automatic updates on without anyone clicking anything. Two-factor
+authentication on that account is therefore not a recommendation but part of
+the security chain - see below. Whoever does not want to carry that risk
+switches automatic updates off and keeps the click.
 
 **What the checksum does not achieve.** It is no substitute for a signature:
 whoever can create a release can create the matching checksum too. It protects

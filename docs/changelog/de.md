@@ -8,6 +8,25 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unveröffentlicht]
 
+## [1.0.1] – 2026-09-17
+
+### Hinzugefügt
+- **Automatisches Update.** Eine beim Start gefundene neue Version wird ohne
+  Rückfrage eingespielt, und die Anwendung startet in ihr neu – der eine Moment,
+  in dem niemand gerade mittendrin ist. Voreingestellt an, unter **Einstellungen →
+  Automatisches Update**; ausgeschaltet sagt der Start wie bisher, dass eine neue
+  Version da ist. Solange ein Nutzungshinweis auf Bestätigung wartet, wird nichts
+  eingespielt, und nur die installierte Anwendung ersetzt sich selbst.
+- **Alle zwei Stunden eine Prüfung auf Updates.** Sie nennt eine neue Version
+  einmal, mit **Update jetzt durchführen** oder **Morgen erneut
+  benachrichtigen**, und spielt nie selbst ein. Sie folgt dem gewählten Kanal,
+  Vorabversionen eingeschlossen.
+
+### Geändert
+- **Schalter statt Häkchen in den Einstellungen**, gezeichnet wie unter iOS:
+  grau, wenn aus, in der Farbe der Anwendung, wenn an, mit einem Knopf, der
+  hinübergleitet.
+
 ## [1.0.0] – 2026-09-17
 
 ### Hinzugefügt
