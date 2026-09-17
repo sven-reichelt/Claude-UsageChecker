@@ -8,7 +8,7 @@ numeração [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
-## [1.0.0] – 2026-09-16
+## [0.9.1] – 2026-09-17
 
 ### Adicionado
 - **Um aviso quando um limite chega ao amarelo, ao vermelho ou se esgota.** O
@@ -47,6 +47,16 @@ numeração [Semantic Versioning](https://semver.org/lang/pt-BR/).
   vermelho enquanto a barra ainda mostrava um limite folgado.
   Abaixo do limiar de aviso, ficam agora num verde suave em vez do laranja de
   destaque, demasiado parecido com o amarelo para os distinguir num relance.
+
+### Corrigido
+- **O arranque automático podia desaparecer enquanto as definições ainda
+  diziam que sim.** A caixa continuava assinalada sobre uma entrada que já não
+  existia, e só desmarcar, guardar, assinalar e guardar de novo a repunha. Agora a
+  aplicação verifica em cada arranque se a entrada existe e aponta para o programa
+  instalado e, caso contrário, repõe-na, seja o que for que a tenha removido. Uma
+  entrada desativada no Gestor de Tarefas é respeitada. A única causa encontrada
+  foi o próprio conjunto de testes do projeto, que apagava a entrada no computador
+  onde corria; também isso já não pode acontecer.
 
 ## [0.9.0] – 2026-08-21
 

@@ -8,7 +8,7 @@ numérotation [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
-## [1.0.0] – 2026-09-16
+## [0.9.1] – 2026-09-17
 
 ### Ajouté
 - **Un avertissement quand une limite passe au jaune, au rouge ou s'épuise.**
@@ -51,6 +51,17 @@ numérotation [Semantic Versioning](https://semver.org/lang/fr/).
   rouge tandis que la barre montrait encore une limite détendue.
   Sous le seuil d'avertissement, elles sont désormais d'un vert atténué plutôt que
   de l'orange d'accent, trop proche du jaune pour les distinguer d'un coup d'œil.
+
+### Corrigé
+- **Le démarrage automatique pouvait disparaître alors que les paramètres
+  disaient toujours oui.** La case restait cochée sur une entrée qui n'existait
+  plus, et seul décocher, enregistrer, cocher et enregistrer à nouveau la
+  rétablissait. L'application vérifie désormais à chaque démarrage que l'entrée
+  existe et pointe vers le programme installé, et la remet en place sinon, quelle
+  qu'en soit la cause. Une entrée désactivée dans le gestionnaire des tâches est
+  respectée. La seule cause trouvée était la suite de tests du projet elle-même,
+  qui supprimait l'entrée sur la machine où elle tournait ; cela ne peut plus se
+  produire non plus.
 
 ## [0.9.0] – 2026-08-21
 

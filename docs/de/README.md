@@ -134,9 +134,10 @@ Oberfläche auf Französisch stellt, erwartet dort keine deutschen Datumsangaben
 
 **Der Änderungsverlauf ist mitübersetzt.** Die Übersicht der Neuerungen nach
 einer Aktualisierung erscheint also in derselben Sprache wie die Oberfläche.
-Deutsch bleibt die Quelle und steht in [CHANGELOG.md](../changelog/de.md); die
-Übersetzungen liegen unter [docs/changelog/](../changelog/). Fehlt eine, zeigt
-das Fenster die deutsche Fassung und sagt das dazu.
+Englisch ist die Quelle und steht in [CHANGELOG.md](../../CHANGELOG.md); die
+Übersetzungen, die deutsche eingeschlossen, liegen unter
+[docs/changelog/](../changelog/). Fehlt eine, zeigt das Fenster die englische
+Fassung und sagt das dazu.
 
 Nicht übersetzt werden Produkt- und Modellnamen: „Claude UsageChecker“, „Claude
 Code“ und der Name des Modells aus der API – „Fable“ heißt in jeder Sprache
@@ -454,7 +455,6 @@ Browser und sonst nichts – die Anwendung sendet dabei nichts irgendwohin.
 | 0.7 | Eigenes Menü im Infobereich, im Stil der Fenster ✅ |
 | 0.8 | macOS-Menüleiste ✅ |
 | 0.9 | Selbstaustausch unter macOS, ein beglaubigtes Bündel, ausgeliefert als Disk-Image ✅ |
-| 1.0 | Hinweise bei Gelb, Rot und 100 %, Balken nach den Schwellen, bereit für alle ✅ |
 
 ## Lizenz
 

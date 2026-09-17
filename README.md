@@ -438,7 +438,6 @@ page in the browser and nothing else - the application sends nothing anywhere.
 | 0.7 | Its own menu in the notification area, in the style of the windows ✅ |
 | 0.8 | macOS menu bar ✅ |
 | 0.9 | Self-replacement on macOS, a notarised bundle, delivered as a disk image ✅ |
-| 1.0 | Notices at yellow, red and 100 %, bars that follow the thresholds, ready for everyone ✅ |
 
 ## Contributing
 

@@ -23,7 +23,7 @@ and a second one would break every clone that exists by then.
 
 ```powershell
 dotnet build                                      # the whole solution
-dotnet test                                       # 741 tests (Core.Tests + App.Tests)
+dotnet test                                       # 748 tests (Core.Tests + App.Tests)
 dotnet run --project src/ClaudeUsageChecker.App   # run the application
 node build/generate-icons.mjs                     # regenerate the icons
 node build/generate-support-images.mjs            # Buy Me a Coffee SVG -> Avalonia vector image
@@ -77,7 +77,7 @@ Builds into `artifacts/` (centrally through `ArtifactsPath` in
 
 ## Status
 
-Version 0.9.0 released, 1.0.0-beta.1 out as a pre-release for testing; the
+Version 0.9.0 released, 0.9.1-beta.3 out as a pre-release for testing; the
 repository is public and written in English.
 Finished among other things: the application's own sign-in through OAuth with
 PKCE including refresh, update at the push of a button with checksum
@@ -106,7 +106,7 @@ places, an update that replaced itself and then left the Mac with nothing
 running - each was found by a person opening the thing, and each is now pinned
 by a test or by a step in the release workflow.
 
-**1.0.0 brings usage notices**, out first as a pre-release for testing: a window
+**0.9.1 brings usage notices**, out first as a pre-release for testing: a window
 when a limit reaches yellow, red or 100 %, once per limit and stage until it
 resets, remembered in `alerts.json` across a restart. The judging lives in
 `UsageAlertTracker` (Core), the window in `UsageAlertWindow`. It also brings support
@@ -262,10 +262,24 @@ damage would have shown only to whoever ran the application in German. Use
 `-CSDA` (the `A` decodes the arguments) or a dedicated tool.
 `NoTextIsDoublyEncoded` catches it now.
 
-**Tests that press "save" in the settings window need an injected autostart
-switch.** The real route writes to the Run key of the registry - a test without
-`applyAutostart` deletes the autostart entry of the user on whose machine it
-happens to run.
+**The test suite deleted the autostart entry of the machine it ran on - for
+weeks, while this very rule stood here.** The settings window writes the Run key
+of the registry when "save" is pressed, unless the test hands it a switch of its
+own. `RelocationTests.UntickingDoesNotEntailMoving` did not: it unticked, saved,
+and removed the real entry on every run. The settings file kept saying yes -
+the test saved into a temporary one - so the box stayed ticked over an entry
+that was gone. Because the suite runs right before every release, it was
+reported as "an update drops the application from autostart", and the
+counter-check proved otherwise: guard off, that one test class, entry gone.
+
+A rule that has to be remembered at every call gets forgotten once. So now
+`AutostartManager.WritesDisabled` is set by a module initializer in the test
+assembly before any test runs (`AutostartSafety`), and
+`TheTestsCannotWriteTheRealAutostart` checks the registry is untouched. On top,
+the application restores a missing or misdirected entry at every start where
+the settings want autostart and it runs from its installed location
+(`AutostartManager.Restore`) - the settings are the user's word, and the system
+is brought back in line with them, whatever drifted.
 
 **The self-update is the most delicate path in the program.** It downloads an
 executable from the network and starts it. Three conditions secure that - a

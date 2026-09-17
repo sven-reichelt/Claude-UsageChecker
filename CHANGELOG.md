@@ -8,7 +8,7 @@ the versioning [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
-## [1.0.0] – 2026-09-16
+## [0.9.1] – 2026-09-17
 
 ### Added
 - **A notice when a limit reaches yellow, red, or its end.** The icon has
@@ -46,6 +46,16 @@ the versioning [Semantic Versioning](https://semver.org/).
   still showed a limit at ease.
   Below the warning threshold they are now a muted green rather than the orange
   accent, which sat too close to the yellow to tell apart at a glance.
+
+### Fixed
+- **Autostart could go missing while the settings still said yes.** The box
+  stayed ticked over an entry that was gone, and only unticking, saving, ticking
+  and saving again brought it back. The application now checks at every start
+  whether the entry is there and points at the installed program, and puts it
+  back where it is not - whatever removed it. An entry switched off in the task
+  manager is left alone. The one cause found was the project's own test suite,
+  which deleted the entry on the machine it ran on; that can no longer happen
+  either.
 
 ## [0.9.0] – 2026-08-21
 

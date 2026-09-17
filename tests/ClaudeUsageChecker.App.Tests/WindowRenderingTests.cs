@@ -113,7 +113,7 @@ public class WindowRenderingTests : IDisposable
             new SettingsStore(file.Path),
             new AppSettings { Channel = UpdateChannel.PreRelease },
             applyAutostart: _ => { });
-        channel.FindControl<TextBlock>("VersionText")!.Text = T.VersionPreRelease("1.0.0-beta.1");
+        channel.FindControl<TextBlock>("VersionText")!.Text = T.VersionPreRelease("0.9.1-beta.3");
         Capture(channel, $"settings-channel-{code}");
         Capture(new SignInWindow(), $"signin-{code}");
         Capture(new InstallPromptWindow(), $"setup-{code}");

@@ -188,6 +188,15 @@ public partial class App : Application, IDisposable
 
         ErrorGuard.Run("show the changes", ShowReleaseNotesAfterUpdate);
 
+        // Autostart as the settings say, whatever happened to the entry in the
+        // meantime. Only from the permanent location: a copy started from the
+        // downloads folder or a development build must not take the entry over.
+        if (_settings.LaunchAtLogin && SelfInstaller.IsInstalled)
+        {
+            ErrorGuard.Run("restore the autostart entry", () => AutostartManager.Restore(
+                OperatingSystem.IsMacOS() ? SelfInstaller.TargetProgram : SelfInstaller.TargetPath));
+        }
+
         if (SelfInstaller.ShouldOffer && !_settings.InstallPromptShown)
         {
             ErrorGuard.Run("offer the setup", ShowInstallPrompt);

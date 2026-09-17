@@ -8,7 +8,7 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unveröffentlicht]
 
-## [1.0.0] – 2026-09-16
+## [0.9.1] – 2026-09-17
 
 ### Hinzugefügt
 - **Ein Hinweis, wenn ein Limit Gelb, Rot oder sein Ende erreicht.** Das Symbol
@@ -49,6 +49,16 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
   noch ein entspanntes Limit zeigte.
   Unterhalb der Warnschwelle sind sie jetzt gedämpft grün statt im orangen
   Akzent, der zu nah am Gelb lag, um sie auf einen Blick zu unterscheiden.
+
+### Behoben
+- **Der Autostart konnte verschwinden, während die Einstellungen weiter Ja
+  sagten.** Der Haken blieb gesetzt über einem Eintrag, den es nicht mehr gab, und
+  erst Haken raus, speichern, Haken rein, speichern brachte ihn zurück. Die
+  Anwendung prüft jetzt bei jedem Start, ob der Eintrag da ist und auf das
+  installierte Programm zeigt, und setzt ihn andernfalls wieder – gleich, was ihn
+  entfernt hat. Ein im Task-Manager abgeschalteter Eintrag bleibt unberührt. Die
+  eine gefundene Ursache war die Testsuite des Projekts selbst, die den Eintrag
+  auf dem Rechner löschte, auf dem sie lief; auch das kann nicht mehr passieren.
 
 ## [0.9.0] – 2026-08-21
 

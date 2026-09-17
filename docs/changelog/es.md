@@ -8,7 +8,7 @@ versionado [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
-## [1.0.0] – 2026-09-16
+## [0.9.1] – 2026-09-17
 
 ### Añadido
 - **Un aviso cuando un límite llega al amarillo, al rojo o se agota.** El icono
@@ -49,6 +49,17 @@ versionado [Semantic Versioning](https://semver.org/lang/es/).
   el aviso decían rojo mientras la barra aún mostraba un límite holgado.
   Por debajo del umbral de advertencia ahora son de un verde apagado en lugar del
   naranja de acento, demasiado parecido al amarillo para distinguirlos de un vistazo.
+
+### Corregido
+- **El inicio automático podía desaparecer aunque la configuración siguiera
+  diciendo que sí.** La casilla seguía marcada sobre una entrada que ya no existía,
+  y solo desmarcarla, guardar, marcarla y volver a guardar la recuperaba. Ahora la
+  aplicación comprueba en cada inicio si la entrada existe y apunta al programa
+  instalado, y la vuelve a crear si no es así, sea lo que sea lo que la haya
+  quitado. Una entrada desactivada en el administrador de tareas se respeta. La
+  única causa encontrada fue el propio conjunto de pruebas del proyecto, que
+  borraba la entrada del equipo en el que se ejecutaba; eso tampoco puede volver a
+  ocurrir.
 
 ## [0.9.0] – 2026-08-21
 

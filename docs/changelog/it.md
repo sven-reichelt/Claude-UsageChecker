@@ -8,7 +8,7 @@ numerazione [Semantic Versioning](https://semver.org/lang/it/).
 
 ## [Non pubblicato]
 
-## [1.0.0] – 2026-09-16
+## [0.9.1] – 2026-09-17
 
 ### Aggiunto
 - **Un avviso quando un limite arriva al giallo, al rosso o si esaurisce.**
@@ -46,6 +46,16 @@ numerazione [Semantic Versioning](https://semver.org/lang/it/).
   dicevano rosso mentre la barra mostrava ancora un limite tranquillo.
   Sotto la soglia di avviso ora sono di un verde smorzato invece dell'arancione
   d'accento, troppo vicino al giallo per distinguerli a colpo d'occhio.
+
+### Corretto
+- **L'avvio automatico poteva sparire mentre le impostazioni dicevano ancora
+  sì.** La casella restava spuntata su una voce che non esisteva più, e solo
+  togliere la spunta, salvare, rimetterla e salvare di nuovo la ripristinava. Ora
+  l'applicazione controlla a ogni avvio che la voce esista e punti al programma
+  installato, e altrimenti la ripristina, qualunque cosa l'abbia rimossa. Una voce
+  disattivata nella gestione attività viene rispettata. L'unica causa trovata era
+  la suite di test del progetto stesso, che cancellava la voce sul computer su cui
+  girava; nemmeno questo può più succedere.
 
 ## [0.9.0] – 2026-08-21
 

@@ -82,7 +82,10 @@ public class RelocationTests
             {
                 counter.Count++;
                 return new InstallResult(true, "erledigt");
-            });
+            },
+            // Without this, unticking and saving deleted the autostart entry of
+            // whoever ran the suite - see AutostartSafety.
+            applyAutostart: _ => { });
     }
 
     private sealed class Counter
