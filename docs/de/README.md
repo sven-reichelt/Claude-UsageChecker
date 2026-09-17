@@ -455,6 +455,7 @@ Browser und sonst nichts – die Anwendung sendet dabei nichts irgendwohin.
 | 0.7 | Eigenes Menü im Infobereich, im Stil der Fenster ✅ |
 | 0.8 | macOS-Menüleiste ✅ |
 | 0.9 | Selbstaustausch unter macOS, ein beglaubigtes Bündel, ausgeliefert als Disk-Image ✅ |
+| 1.0 | Hinweise bei Gelb, Rot und 100 %, Balken nach den Schwellen, Autostart, der sich selbst repariert ✅ |
 
 ## Lizenz
 

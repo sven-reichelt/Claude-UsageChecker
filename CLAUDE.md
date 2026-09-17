@@ -77,7 +77,7 @@ Builds into `artifacts/` (centrally through `ArtifactsPath` in
 
 ## Status
 
-Version 0.9.0 released, 0.9.1-beta.3 out as a pre-release for testing; the
+Version 1.0.0 released on 2026-09-17, after three pre-releases of 0.9.1; the
 repository is public and written in English.
 Finished among other things: the application's own sign-in through OAuth with
 PKCE including refresh, update at the push of a button with checksum
@@ -106,7 +106,7 @@ places, an update that replaced itself and then left the Mac with nothing
 running - each was found by a person opening the thing, and each is now pinned
 by a test or by a step in the release workflow.
 
-**0.9.1 brings usage notices**, out first as a pre-release for testing: a window
+**1.0.0 brought usage notices**, tested as 0.9.1-beta.1 to beta.3: a window
 when a limit reaches yellow, red or 100 %, once per limit and stage until it
 resets, remembered in `alerts.json` across a restart. The judging lives in
 `UsageAlertTracker` (Core), the window in `UsageAlertWindow`. It also brings support

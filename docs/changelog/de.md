@@ -8,7 +8,7 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unveröffentlicht]
 
-## [0.9.1] – 2026-09-17
+## [1.0.0] – 2026-09-17
 
 ### Hinzugefügt
 - **Ein Hinweis, wenn ein Limit Gelb, Rot oder sein Ende erreicht.** Das Symbol

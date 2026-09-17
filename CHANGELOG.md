@@ -8,7 +8,7 @@ the versioning [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
-## [0.9.1] – 2026-09-17
+## [1.0.0] – 2026-09-17
 
 ### Added
 - **A notice when a limit reaches yellow, red, or its end.** The icon has

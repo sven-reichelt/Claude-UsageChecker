@@ -8,7 +8,7 @@ numerazione [Semantic Versioning](https://semver.org/lang/it/).
 
 ## [Non pubblicato]
 
-## [0.9.1] – 2026-09-17
+## [1.0.0] – 2026-09-17
 
 ### Aggiunto
 - **Un avviso quando un limite arriva al giallo, al rosso o si esaurisce.**

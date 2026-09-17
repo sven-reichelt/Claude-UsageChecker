@@ -8,7 +8,7 @@ numérotation [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
-## [0.9.1] – 2026-09-17
+## [1.0.0] – 2026-09-17
 
 ### Ajouté
 - **Un avertissement quand une limite passe au jaune, au rouge ou s'épuise.**
