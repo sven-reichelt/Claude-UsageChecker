@@ -6,9 +6,12 @@ menu bar, read-only. Reports and contributions are welcome within that scope.
 
 ## Reporting a problem
 
-Use the [issue forms](../../issues/new/choose). They ask for the version, your
-operating system and how the application authenticates, because those three
-decide most cases.
+The [user guide](docs/guide/en.md) has a section on what to do when something
+does not work; it answers the most common reports.
+
+Otherwise use the [issue forms](../../issues/new/choose). They ask for the
+version, your operating system and how the application authenticates, because
+those three decide most cases.
 
 > **Never paste an access token.** Tokens look like `sk-ant-oat01-…` and grant
 > full access to a Claude subscription. `%USERPROFILE%\.claude\.credentials.json`
@@ -57,7 +60,17 @@ whoever happens to use that language.
 
 The same applies to `CHANGELOG.md`: an entry there needs its counterpart in the
 eight files under `docs/changelog/`, because the application shows the changelog
-in the interface language.
+in the interface language. And to the user guide under `docs/guide/`, one file per
+language, whose pictures are drawn by `GuideScreenshots`:
+
+```powershell
+$env:CUC_GUIDE_DIR = "$PWD\docs\guide\images"
+dotnet test tests/ClaudeUsageChecker.App.Tests --filter GuideScreenshots
+```
+
+Everything in those pictures is made up. A picture taken from a real machine
+would carry that machine along - the path of a profile, the expiry of a real
+sign-in - so the screenshots hand in their own figures rather than reading any.
 
 If you do not speak a language, say so in the pull request and leave that file
 alone — a wrong translation is worse than a missing one, which at least falls
@@ -67,7 +80,7 @@ back to English visibly.
 
 ```powershell
 dotnet build                                      # whole solution
-dotnet test                                       # 792 tests
+dotnet test                                       # 846 tests
 dotnet run --project src/ClaudeUsageChecker.App   # run it
 ```
 

@@ -242,6 +242,7 @@ public static class T
     public static string AboutDescription => L["about.description"];
     public static string AboutRepository => L["about.repository"];
     public static string AboutReleaseNotes => L["about.releaseNotes"];
+    public static string AboutGuide => L["about.guide"];
     public static string AboutLicense(string copyright) => L.Format("about.license", copyright);
 
     // Release notes

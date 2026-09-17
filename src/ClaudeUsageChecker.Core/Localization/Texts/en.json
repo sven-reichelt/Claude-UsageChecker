@@ -186,6 +186,7 @@
   "about.description": "Shows the session and weekly limits of a Claude subscription in the system tray. Reads usage figures through its own sign-in and writes nothing back.",
   "about.repository": "Open project page on GitHub",
   "about.releaseNotes": "Show changelog",
+  "about.guide": "Open the user guide",
   "about.license": "{0}. Free software under the GNU General Public License v3 or later - without any warranty.",
 
   "notes.title": "Claude UsageChecker - What's new",

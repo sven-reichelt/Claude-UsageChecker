@@ -186,6 +186,7 @@
   "about.description": "Zeigt Sitzungs- und Wochenlimit des Claude-Abonnements im Infobereich. Liest die Nutzungswerte über die eigene Anmeldung und schreibt keinerlei Daten zurück.",
   "about.repository": "Projektseite auf GitHub öffnen",
   "about.releaseNotes": "Änderungsverlauf anzeigen",
+  "about.guide": "Anleitung öffnen",
   "about.license": "{0}. Freie Software unter der GNU General Public License v3 oder neuer – ohne jede Gewährleistung.",
 
   "notes.title": "Claude UsageChecker - Neuerungen",

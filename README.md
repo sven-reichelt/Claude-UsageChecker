@@ -5,6 +5,13 @@
 
 *Deutsche Fassung: [docs/de/README.md](docs/de/README.md)*
 
+📖 **[User guide](docs/guide/en.md)** – everything the application does, window by
+window, with pictures. Also in
+[Deutsch](docs/guide/de.md), [Español](docs/guide/es.md),
+[Français](docs/guide/fr.md), [Italiano](docs/guide/it.md),
+[Português (BR)](docs/guide/pt-BR.md), [Português (PT)](docs/guide/pt-PT.md),
+[Русский](docs/guide/ru.md) and [简体中文](docs/guide/zh-Hans.md).
+
 Shows the session and weekly limits of a Claude subscription permanently in the
 Windows notification area or the macOS menu bar - independent of a running
 Claude Code session. On Windows a pointer on the icon is enough: session and

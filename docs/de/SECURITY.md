@@ -95,7 +95,8 @@ Entpackungsordner.
 
 Zum vollständigen Entfernen genügen die Zeilen der Tabelle für die jeweilige
 Plattform; es gibt keine weiteren Ablagen, keine Datenbank und keine Spuren in
-anderen Profilen.
+anderen Profilen. Die [Anleitung](../guide/de.md#11-deinstallieren) geht das
+Schritt für Schritt durch.
 
 **Nichts davon verlässt den Rechner.** Es gibt keine Telemetrie, keine
 Nutzungsstatistik und keine Übermittlung von Fehlerberichten.

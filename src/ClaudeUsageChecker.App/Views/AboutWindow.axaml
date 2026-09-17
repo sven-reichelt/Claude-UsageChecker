@@ -35,6 +35,8 @@
                 HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
         <Button x:Name="ReleaseNotesButton"
                 HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+        <Button x:Name="GuideButton"
+                HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
       </StackPanel>
 
       <TextBlock x:Name="RepositoryText" FontSize="11" Opacity="0.6"

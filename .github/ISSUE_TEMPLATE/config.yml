@@ -9,6 +9,8 @@ contact_links:
       Please do not open a public issue. The application handles an OAuth token
       that grants full access to a Claude subscription — report privately.
 
-  - name: Question or idea
-    url: https://github.com/sven-reichelt/Claude-UsageChecker/discussions
-    about: For anything that is not a defect and not yet a concrete request.
+  - name: User guide
+    url: https://github.com/sven-reichelt/Claude-UsageChecker/blob/main/docs/guide/en.md
+    about: >-
+      Every window explained, in nine languages, with a section on what to do
+      when something does not work. Worth a look before opening an issue.

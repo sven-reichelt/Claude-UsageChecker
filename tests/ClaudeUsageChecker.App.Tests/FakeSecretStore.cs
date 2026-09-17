@@ -2,7 +2,7 @@ using ClaudeUsageChecker.Core.Platform;
 
 namespace ClaudeUsageChecker.App.Tests;
 
-/// <summary>Secret-Store im Arbeitsspeicher, damit Tests nichts am System hinterlassen.</summary>
+/// <summary>A secret store in memory, so that tests leave nothing behind on the system.</summary>
 internal sealed class FakeSecretStore : ISecretStore
 {
     private readonly Dictionary<string, string> _entries = [];

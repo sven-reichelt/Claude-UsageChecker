@@ -23,10 +23,14 @@ and a second one would break every clone that exists by then.
 
 ```powershell
 dotnet build                                      # the whole solution
-dotnet test                                       # 792 tests (Core.Tests + App.Tests)
+dotnet test                                       # 846 tests (Core.Tests + App.Tests)
 dotnet run --project src/ClaudeUsageChecker.App   # run the application
 node build/generate-icons.mjs                     # regenerate the icons
 node build/generate-support-images.mjs            # Buy Me a Coffee SVG -> Avalonia vector image
+
+# The pictures of the user guide, one folder per language:
+$env:CUC_GUIDE_DIR = "$PWD\docs\guide\images"
+dotnet test tests/ClaudeUsageChecker.App.Tests --filter GuideScreenshots
 ```
 
 Builds into `artifacts/` (centrally through `ArtifactsPath` in
@@ -77,8 +81,13 @@ Builds into `artifacts/` (centrally through `ArtifactsPath` in
 
 ## Status
 
-Version 1.0.1 released on 2026-09-17 (1.0.0 the same morning, after three
+Version 1.0.2 released on 2026-09-17 (1.0.0 and 1.0.1 the same day, after three
 pre-releases of 0.9.1); the repository is public and written in English.
+
+**1.0.2 brought the user guide**: `docs/guide/<language>.md` in all nine
+languages, with `docs/guide/images/<language>/` drawn by `GuideScreenshots`, and
+**About → Open the user guide** leading to the one matching the interface
+(`AboutWindow.GuideAddress`, checked by `GuideTests`).
 
 **1.0.1 brought automatic updates and switches.** With **Automatic updates** on
 (the default) a version found at startup is installed without asking; off, the
@@ -199,6 +208,13 @@ and leaves every field null - the constructor then fails with a
 (`ManagedDispatcherImpl.RunLoop`), so a test waiting for one runs
 `Dispatcher.UIThread.MainLoop(token)` with a token cancelled by the expected
 event and by a timeout. `ANoticeThatDoesNotWaitClosesByItself` does exactly that.
+
+**A picture of this application carries the machine it was drawn on.** The
+settings show the expiry of a real Claude Code sign-in, the setup window the path
+of a real profile. The guide is public, so `GuideScreenshots` hands in the token,
+the sign-in and the target path rather than reading them - that is what
+`SettingsWindow`'s `readClaudeCodeToken` is for. Whoever adds a scene checks the
+picture for anything that came from the machine rather than from the fixture.
 
 **A text block's bounds say nothing about where its text ends.** In a grid
 column narrower than the text, Avalonia cuts the block to the column and draws

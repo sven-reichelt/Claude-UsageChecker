@@ -6,6 +6,13 @@
 *English version: [README.md](../../README.md) – das ist die maßgebliche Fassung;
 weicht diese hier ab, gilt die englische.*
 
+📖 **[Anleitung](../guide/de.md)** – alles, was die Anwendung tut, Fenster für
+Fenster und mit Bildern. Auch in
+[English](../guide/en.md), [Español](../guide/es.md),
+[Français](../guide/fr.md), [Italiano](../guide/it.md),
+[Português (BR)](../guide/pt-BR.md), [Português (PT)](../guide/pt-PT.md),
+[Русский](../guide/ru.md) und [简体中文](../guide/zh-Hans.md).
+
 Zeigt das Sitzungs- und Wochenlimit des Claude-Abonnements dauerhaft im
 Windows-Infobereich oder in der macOS-Menüleiste an – unabhängig von einer
 laufenden Claude-Code-Sitzung. Unter Windows genügt ein Zeiger auf das Symbol:

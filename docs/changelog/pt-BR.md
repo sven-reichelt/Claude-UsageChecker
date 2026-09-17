@@ -8,6 +8,18 @@ versionamento [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+## [1.0.2] – 2026-09-17
+
+### Adicionado
+- **Um guia de uso, nos nove idiomas.** Ele percorre tudo o que o aplicativo faz,
+  janela por janela e com uma imagem de cada uma: instalação, entrada, ícone,
+  menu, janela de detalhes, avisos, cada configuração, atualizações,
+  desinstalação e o que fazer quando algo não funciona. As imagens são desenhadas
+  em cada idioma a partir de valores de exemplo, então nenhuma contém a conta de
+  ninguém.
+- **Sobre o Claude UsageChecker → Abrir o guia de uso** abre o guia no idioma
+  configurado na interface.
+
 ## [1.0.1] – 2026-09-17
 
 ### Adicionado

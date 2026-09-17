@@ -186,6 +186,7 @@
   "about.description": "在通知区域显示 Claude 订阅的会话限额和每周限额。通过自有登录读取用量数据，不回写任何内容。",
   "about.repository": "在 GitHub 上打开项目页面",
   "about.releaseNotes": "显示更新日志",
+  "about.guide": "打开使用指南",
   "about.license": "{0}。依据 GNU 通用公共许可证第 3 版或更新版本发布的自由软件，不提供任何担保。",
 
   "notes.title": "Claude UsageChecker - 新增内容",

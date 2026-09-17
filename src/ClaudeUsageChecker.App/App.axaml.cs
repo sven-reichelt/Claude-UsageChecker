@@ -394,6 +394,8 @@ public partial class App : Application, IDisposable
         window.RepositoryRequested += (_, address) =>
             ErrorGuard.Run("open the project page", () => OpenInBrowser(address));
         window.SupportRequested += (_, address) => OpenSupportPage(address);
+        window.GuideRequested += (_, address) =>
+            ErrorGuard.Run("open the user guide", () => OpenInBrowser(address));
         window.ReleaseNotesRequested += (_, _) => ErrorGuard.Run(
             "show the changelog", () => ShowReleaseNotes(ChangelogResource.All(), previous: null));
 

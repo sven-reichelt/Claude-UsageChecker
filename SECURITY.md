@@ -92,7 +92,8 @@ The bundle is not a compressed single file, so there is no extraction folder on
 macOS.
 
 To remove everything, the rows of the table for the platform suffice; there are
-no further stores, no database and no traces in other profiles.
+no further stores, no database and no traces in other profiles. The
+[user guide](docs/guide/en.md#11-uninstalling) walks through it step by step.
 
 **None of it leaves the machine.** There is no telemetry, no usage statistics
 and no transmission of crash reports.

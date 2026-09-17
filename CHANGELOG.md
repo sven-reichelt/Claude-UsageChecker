@@ -8,6 +8,18 @@ the versioning [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.2] – 2026-09-17
+
+### Added
+- **A user guide, in all nine languages.** It walks through everything the
+  application does, window by window, with a picture of each - installing,
+  signing in, the icon, the menu, the details, the notices, every setting,
+  updates, uninstalling, and what to do when something does not work. The
+  pictures are drawn in each language from example figures, so none of them
+  carries anybody's account.
+- **About Claude UsageChecker → Open the user guide** opens it in the language
+  the interface is set to.
+
 ## [1.0.1] – 2026-09-17
 
 ### Added

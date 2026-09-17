@@ -24,6 +24,7 @@ public partial class SettingsWindow : Window
     private readonly OAuthTokenStore? _oauthTokenStore;
     private readonly Func<InstallResult>? _relocate;
     private readonly Action<bool> _applyAutostart;
+    private readonly Func<Task<AccessToken?>> _readClaudeCodeToken;
     private AppSettings _settings;
     private int _versionClicks;
 
@@ -42,12 +43,19 @@ public partial class SettingsWindow : Window
         AppSettings settings,
         OAuthTokenStore? oauthTokenStore = null,
         Func<InstallResult>? relocate = null,
-        Action<bool>? applyAutostart = null)
+        Action<bool>? applyAutostart = null,
+        Func<Task<AccessToken?>>? readClaudeCodeToken = null)
     {
         _settingsStore = settingsStore;
         _settings = settings;
         _oauthTokenStore = oauthTokenStore;
         _relocate = relocate;
+
+        // Injectable so that a picture of this window shows no real account: the
+        // screenshots in the user guide would otherwise carry the expiry of the
+        // sign-in of whoever rendered them.
+        _readClaudeCodeToken = readClaudeCodeToken
+            ?? (() => new ClaudeCliTokenProvider().TryGetTokenAsync().AsTask());
 
         // Injectable purely for the tests: the real route writes to the Run key
         // of the registry. A test that presses "save" would otherwise delete the
@@ -188,7 +196,7 @@ public partial class SettingsWindow : Window
 
         try
         {
-            var token = await new ClaudeCliTokenProvider().TryGetTokenAsync().ConfigureAwait(true);
+            var token = await _readClaudeCodeToken().ConfigureAwait(true);
 
             text = token switch
             {

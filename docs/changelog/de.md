@@ -8,6 +8,18 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unveröffentlicht]
 
+## [1.0.2] – 2026-09-17
+
+### Hinzugefügt
+- **Eine Anleitung, in allen neun Sprachen.** Sie geht alles durch, was die
+  Anwendung tut, Fenster für Fenster und mit einem Bild von jedem – Installieren,
+  Anmelden, Symbol, Menü, Detailfenster, Hinweise, jede Einstellung,
+  Aktualisierungen, Deinstallieren und was zu tun ist, wenn etwas nicht
+  funktioniert. Die Bilder werden je Sprache aus Beispielwerten gezeichnet, es
+  steckt also in keinem ein fremdes Konto.
+- **Über Claude UsageChecker → Anleitung öffnen** öffnet sie in der Sprache, auf
+  die die Oberfläche eingestellt ist.
+
 ## [1.0.1] – 2026-09-17
 
 ### Hinzugefügt
@@ -299,7 +311,7 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
   im Inhalt benennt (`scope.model.display_name`). Diese Liste wird jetzt
   bevorzugt gelesen; die alten Felder bleiben als Rückfall. **Jedes künftige
   Modell erscheint dadurch von selbst**, ohne dass hier etwas geändert werden
-  muss. Einzelheiten in [docs/api-research.md](docs/api-research.md).
+  muss. Einzelheiten in [docs/api-research.md](../api-research.md).
 
   Das Symbol im Infobereich bezieht diese Limits ebenfalls ein – bisher wäre es
   grün geblieben, während ein Modellkontingent schon erschöpft war.
@@ -384,11 +396,11 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ### Dokumentation
 - **Vorlagen für Fehlermeldungen und Wünsche** unter `.github/ISSUE_TEMPLATE/`,
-  dazu eine Vorlage für Pull Requests und [CONTRIBUTING.md](CONTRIBUTING.md) –
+  dazu eine Vorlage für Pull Requests und [CONTRIBUTING.md](../../CONTRIBUTING.md) –
   auf Englisch, damit auch außerhalb des deutschsprachigen Raums etwas gemeldet
   werden kann. Die Formulare fragen Fassung, Betriebssystem, Abonnement und
   Tokenquelle ab und warnen ausdrücklich davor, ein Token einzufügen.
-- Die Recherche zur API ([docs/api-research.md](docs/api-research.md)) hält
+- Die Recherche zur API ([docs/api-research.md](../api-research.md)) hält
   das neue Antwortformat fest – einschließlich der Felder, die ungenutzt
   bleiben, und warum.
 
@@ -429,7 +441,7 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
   sich unbegrenzt sammelten. Die Anwendung räumt sie jetzt selbst weg.
 
 ### Dokumentation
-- [SECURITY.md](SECURITY.md) listet vollständig auf, was die Anwendung wo
+- [SECURITY.md](../../SECURITY.md) listet vollständig auf, was die Anwendung wo
   ablegt und was nach einer Deinstallation zurückbliebe.
 
 ## [0.4.0] – 2026-08-19
