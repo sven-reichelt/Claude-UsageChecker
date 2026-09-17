@@ -44,7 +44,7 @@ public class SignInExpiryTests
     [InlineData(HttpStatusCode.TooManyRequests)]
     public async Task ADisturbanceLeavesTheSignInUntouched(HttpStatusCode status)
     {
-        var handler = new OAuthFlowTests.StubHandler((status, """{"error":"nicht erreichbar"}"""));
+        var handler = new OAuthFlowTests.StubHandler((status, """{"error":"unreachable"}"""));
         using var provider = CreateProvider(handler, ExpiringSignIn(), out var store);
 
         var reported = false;
@@ -73,7 +73,7 @@ public class SignInExpiryTests
     }
 
     [Fact]
-    public async Task DieLebensdauerDesRefreshTokensWirdUebernommenWennGemeldet()
+    public async Task TheRefreshTokenLifetimeIsTakenOverWhenReported()
     {
         var handler = new OAuthFlowTests.StubHandler((HttpStatusCode.OK,
             """{"access_token":"a2","refresh_token":"r2","expires_in":28800,"refresh_token_expires_in":2592000}"""));
@@ -85,7 +85,7 @@ public class SignInExpiryTests
     }
 
     [Fact]
-    public async Task OhneAngabeBleibtDieLebensdauerUnbekannt()
+    public async Task WithoutItTheLifetimeStaysUnknown()
     {
         var handler = new OAuthFlowTests.StubHandler((HttpStatusCode.OK,
             """{"access_token":"a2","refresh_token":"r2","expires_in":28800}"""));
@@ -120,7 +120,7 @@ public class SignInExpiryTests
     {
         protected override Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request, CancellationToken cancellationToken) =>
-            throw new HttpRequestException("Netzwerk nicht erreichbar");
+            throw new HttpRequestException("network unreachable");
     }
 
     private sealed class FakeSecretStore : ISecretStore

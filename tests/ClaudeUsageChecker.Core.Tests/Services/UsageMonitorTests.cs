@@ -24,7 +24,7 @@ public class UsageMonitorTests
     {
         var client = new StubClient
         {
-            Failure = new UsageApiException("kein Token", UsageApiFailure.NoToken)
+            Failure = new UsageApiException("no token", UsageApiFailure.NoToken)
         };
         await using var monitor = new UsageMonitor(client);
 
@@ -34,7 +34,7 @@ public class UsageMonitorTests
     }
 
     [Fact]
-    public async Task NachFehlschlagBleibenAlteDatenAlsStaleErhalten()
+    public async Task AfterAFailureEarlierDataStaysAsStale()
     {
         var client = new StubClient { Snapshot = Snapshot(42) };
         await using var monitor = new UsageMonitor(client);

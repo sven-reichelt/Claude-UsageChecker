@@ -19,9 +19,9 @@ public class SettingsFileTests
 
         store.Save(new AppSettings { PollIntervalSeconds = 300 });
 
-        using var geschrieben = JsonDocument.Parse(File.ReadAllText(file.Path));
-        Assert.False(geschrieben.RootElement.TryGetProperty("PollInterval", out _));
-        Assert.True(geschrieben.RootElement.TryGetProperty("pollIntervalSeconds", out _));
+        using var written = JsonDocument.Parse(File.ReadAllText(file.Path));
+        Assert.False(written.RootElement.TryGetProperty("PollInterval", out _));
+        Assert.True(written.RootElement.TryGetProperty("pollIntervalSeconds", out _));
     }
 
     [Fact]
@@ -39,13 +39,13 @@ public class SettingsFileTests
             LaunchAtLogin = true
         });
 
-        var gelesen = store.Load();
+        var read = store.Load();
 
-        Assert.Equal(600, gelesen.PollIntervalSeconds);
-        Assert.Equal(60d, gelesen.WarningThreshold);
-        Assert.Equal(85d, gelesen.CriticalThreshold);
-        Assert.Equal("0.5.0", gelesen.LastRunVersion);
-        Assert.True(gelesen.LaunchAtLogin);
+        Assert.Equal(600, read.PollIntervalSeconds);
+        Assert.Equal(60d, read.WarningThreshold);
+        Assert.Equal(85d, read.CriticalThreshold);
+        Assert.Equal("0.5.0", read.LastRunVersion);
+        Assert.True(read.LaunchAtLogin);
     }
 
     /// <summary>
@@ -65,11 +65,11 @@ public class SettingsFileTests
             }
             """);
 
-        var gelesen = new SettingsStore(file.Path).Load();
+        var read = new SettingsStore(file.Path).Load();
 
-        Assert.Equal(75d, gelesen.WarningThreshold);
-        Assert.Equal(90d, gelesen.CriticalThreshold);
-        Assert.Null(gelesen.LastRunVersion);
+        Assert.Equal(75d, read.WarningThreshold);
+        Assert.Equal(90d, read.CriticalThreshold);
+        Assert.Null(read.LastRunVersion);
     }
 
     private sealed class TemporaryFile : IDisposable

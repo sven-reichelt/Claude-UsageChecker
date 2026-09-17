@@ -168,12 +168,12 @@ public class SelfInstallerTests
     [Fact]
     public void TheQuestionComesOnlyOnce()
     {
-        // Once the flag is set, the question does not return - regardless of
-        // zugestimmt oder abgelehnt wurde.
-        var abgelehnt = new AppSettings { InstallPromptShown = true };
+        // Once the flag is set, the question does not return - whether it was
+        // accepted or declined.
+        var declined = new AppSettings { InstallPromptShown = true };
 
-        Assert.True(abgelehnt.InstallPromptShown);
-        Assert.False(abgelehnt.LaunchAtLogin);
+        Assert.True(declined.InstallPromptShown);
+        Assert.False(declined.LaunchAtLogin);
     }
 
     [Fact]

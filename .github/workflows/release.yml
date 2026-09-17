@@ -533,10 +533,15 @@ jobs:
           shasum -a 256 "$DMG" | sed "s|  .*|  $DMG|" > "$DMG.sha256"
           cat "$DMG.sha256"
 
+      # Kept for a day. The artifact only carries the bundle from this job to the
+      # next one, which attaches it to the release; after that it is dead weight.
+      # With the default of ninety days, twenty-six copies of 45 to 95 MB had
+      # piled up by 1.0.1.
       - name: Hand it over
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: macos-bundle
+          retention-days: 1
           path: |
             ClaudeUsageChecker-macos-arm64.zip
             ClaudeUsageChecker-macos-arm64.zip.sha256

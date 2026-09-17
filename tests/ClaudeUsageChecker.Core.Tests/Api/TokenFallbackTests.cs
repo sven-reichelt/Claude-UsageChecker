@@ -157,10 +157,10 @@ public class TokenFallbackTests
 
     private sealed class ThrowingProvider : ITokenProvider
     {
-        public string Name => "kaputt";
+        public string Name => "broken";
 
         public ValueTask<AccessToken?> TryGetTokenAsync(CancellationToken cancellationToken = default) =>
-            throw new IOException("Source nicht lesbar");
+            throw new IOException("source unreadable");
     }
 
     /// <summary>Returns the prepared responses in order.</summary>

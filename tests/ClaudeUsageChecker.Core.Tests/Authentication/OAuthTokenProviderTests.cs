@@ -11,7 +11,7 @@ namespace ClaudeUsageChecker.Core.Tests.Authentication;
 /// </summary>
 public class OAuthTokenProviderTests
 {
-    private static readonly DateTimeOffset Jetzt = new(2026, 8, 19, 12, 0, 0, TimeSpan.Zero);
+    private static readonly DateTimeOffset Now = new(2026, 8, 19, 12, 0, 0, TimeSpan.Zero);
 
     [Fact]
     public async Task WithoutASignInNothingIsSupplied()
@@ -28,7 +28,7 @@ public class OAuthTokenProviderTests
         {
             AccessToken = "a1",
             RefreshToken = "r1",
-            ExpiresAt = Jetzt.AddHours(1)
+            ExpiresAt = Now.AddHours(1)
         };
         using var provider = CreateProvider(new OAuthFlowTests.StubHandler(), saved, out _);
 
@@ -48,7 +48,7 @@ public class OAuthTokenProviderTests
             AccessToken = "a1",
             RefreshToken = "r1",
             // Expires in two minutes, while the lead time is five.
-            ExpiresAt = Jetzt.AddMinutes(2)
+            ExpiresAt = Now.AddMinutes(2)
         };
         using var provider = CreateProvider(handler, saved, out var store);
 
@@ -69,7 +69,7 @@ public class OAuthTokenProviderTests
         {
             AccessToken = "a1",
             RefreshToken = "r1",
-            ExpiresAt = Jetzt.AddMinutes(2)
+            ExpiresAt = Now.AddMinutes(2)
         };
         using var provider = CreateProvider(handler, saved, out var store);
 
@@ -88,7 +88,7 @@ public class OAuthTokenProviderTests
         {
             AccessToken = "a1",
             RefreshToken = "r1",
-            ExpiresAt = Jetzt.AddMinutes(2)
+            ExpiresAt = Now.AddMinutes(2)
         };
         using var provider = CreateProvider(handler, saved, out _);
 
@@ -103,7 +103,7 @@ public class OAuthTokenProviderTests
         {
             AccessToken = "a1",
             RefreshToken = null,
-            ExpiresAt = Jetzt.AddMinutes(-1)
+            ExpiresAt = Now.AddMinutes(-1)
         };
         using var provider = CreateProvider(new OAuthFlowTests.StubHandler(), saved, out _);
 
@@ -140,17 +140,17 @@ public class OAuthTokenProviderTests
         {
             AccessToken = "a1",
             RefreshToken = "r1",
-            ExpiresAt = Jetzt,
+            ExpiresAt = Now,
             Scope = "user:profile"
         };
 
         store.Write(tokens);
-        var gelesen = store.Read()!;
+        var read = store.Read()!;
 
-        Assert.Equal(tokens.AccessToken, gelesen.AccessToken);
-        Assert.Equal(tokens.RefreshToken, gelesen.RefreshToken);
-        Assert.Equal(tokens.ExpiresAt, gelesen.ExpiresAt);
-        Assert.Equal(tokens.Scope, gelesen.Scope);
+        Assert.Equal(tokens.AccessToken, read.AccessToken);
+        Assert.Equal(tokens.RefreshToken, read.RefreshToken);
+        Assert.Equal(tokens.ExpiresAt, read.ExpiresAt);
+        Assert.Equal(tokens.Scope, read.Scope);
     }
 
     [Fact]
@@ -172,7 +172,7 @@ public class OAuthTokenProviderTests
             store.Write(saved);
         }
 
-        var zeit = new FakeTimeProvider(Jetzt);
+        var zeit = new FakeTimeProvider(Now);
         return new OAuthTokenProvider(
             store,
             new AnthropicOAuthClient(new HttpClient(handler), new OAuthOptions()),

@@ -59,7 +59,7 @@ public class SettingsWindowHeightTests
         var scroller = window.FindControl<ScrollViewer>("ContentScroller")!;
 
         Assert.True(scroller.MaxHeight <= available,
-            $"Die Grenze liegt bei {scroller.MaxHeight:0}, der Arbeitsbereich bei {available:0}.");
+            $"The cap is {scroller.MaxHeight:0}, the working area {available:0}.");
 
         window.Hide();
     }

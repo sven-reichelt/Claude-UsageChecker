@@ -92,11 +92,11 @@ public class ChangelogParserTests
     public void Parse_StripsMarkup()
     {
         var releases = ChangelogParser.Parse(Sample);
-        var behoben = releases.Single(r => r.Version == new Version(0, 4, 2)).Sections[0];
-        var doku = releases.Single(r => r.Version == new Version(0, 4, 2)).Sections[1];
+        var fixedSection = releases.Single(r => r.Version == new Version(0, 4, 2)).Sections[0];
+        var docsSection = releases.Single(r => r.Version == new Version(0, 4, 2)).Sections[1];
 
-        Assert.Equal("Das Abwählen lässt die Anwendung, wo sie ist.", behoben.Entries[1].Text);
-        Assert.Equal("SECURITY.md listet auf, was wo abgelegt wird.", doku.Entries[0].Text);
+        Assert.Equal("Das Abwählen lässt die Anwendung, wo sie ist.", fixedSection.Entries[1].Text);
+        Assert.Equal("SECURITY.md listet auf, was wo abgelegt wird.", docsSection.Entries[0].Text);
     }
 
     [Fact]

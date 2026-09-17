@@ -13,7 +13,7 @@ namespace ClaudeUsageChecker.App.Tests;
 /// <remarks>
 /// An autostart entry pointing into the downloads folder breaks the first time
 /// that folder is cleaned out. Whoever ticks the box expects the application to
-/// danach zuverlaessig startet.
+/// start reliably afterwards.
 /// </remarks>
 public class RelocationTests
 {
@@ -33,7 +33,7 @@ public class RelocationTests
         var window = Create(file, new AppSettings { LaunchAtLogin = true }, out var calls);
 
         window.FindControl<CheckBox>("LaunchAtLoginBox")!.IsChecked = false;
-        Klicke(window, "SaveButton");
+        Click(window, "SaveButton");
 
         // An application once installed stays where it is - only the autostart
         // entry is removed.
@@ -48,14 +48,14 @@ public class RelocationTests
 
         window.FindControl<CheckBox>("LaunchAtLoginBox")!.IsChecked = true;
 
-        var hinweis = window.FindControl<TextBlock>("RelocationHint")!;
+        var hint = window.FindControl<TextBlock>("RelocationHint")!;
 
         // In a development build no move is possible, so no notice either. Where
         // it does appear, it has to name the target path - a surprise would be
         // the worst outcome here.
-        if (hinweis.IsVisible)
+        if (hint.IsVisible)
         {
-            Assert.Contains(SelfInstaller.TargetPath, hinweis.Text!, StringComparison.Ordinal);
+            Assert.Contains(SelfInstaller.TargetPath, hint.Text!, StringComparison.Ordinal);
         }
         else
         {
@@ -63,10 +63,10 @@ public class RelocationTests
         }
     }
 
-    private static void Klicke(Window window, string name)
+    private static void Click(Window window, string name)
     {
-        var knopf = window.FindControl<Button>(name)!;
-        knopf.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
+        var button = window.FindControl<Button>(name)!;
+        button.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
     }
 
     private static SettingsWindow Create(TemporaryFile file, AppSettings settings, out Counter calls)
@@ -81,7 +81,7 @@ public class RelocationTests
             relocate: () =>
             {
                 counter.Count++;
-                return new InstallResult(true, "erledigt");
+                return new InstallResult(true, "done");
             },
             // Without this, unticking and saving deleted the autostart entry of
             // whoever ran the suite - see AutostartSafety.

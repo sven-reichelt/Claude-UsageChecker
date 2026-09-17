@@ -48,34 +48,34 @@ public class UpdateInstallerTests
     [Fact]
     public void WithoutFileAndChecksumNothingIsOffered()
     {
-        var ohneAlles = new UpdateCheckResult { Status = UpdateCheckStatus.UpdateAvailable };
-        var nurDatei = new UpdateCheckResult
+        var withNothing = new UpdateCheckResult { Status = UpdateCheckStatus.UpdateAvailable };
+        var fileOnly = new UpdateCheckResult
         {
             Status = UpdateCheckStatus.UpdateAvailable,
             DownloadUrl = new Uri("https://example.invalid/app.exe")
         };
-        var nurSumme = new UpdateCheckResult
+        var checksumOnly = new UpdateCheckResult
         {
             Status = UpdateCheckStatus.UpdateAvailable,
             ChecksumUrl = new Uri("https://example.invalid/app.exe.sha256")
         };
 
-        Assert.False(ohneAlles.CanInstall);
-        Assert.False(nurDatei.CanInstall);
-        Assert.False(nurSumme.CanInstall);
+        Assert.False(withNothing.CanInstall);
+        Assert.False(fileOnly.CanInstall);
+        Assert.False(checksumOnly.CanInstall);
     }
 
     [Fact]
-    public void MitDateiUndPruefsummeWirdAngeboten()
+    public void CanInstall_WithFileAndChecksum()
     {
-        var vollstaendig = new UpdateCheckResult
+        var complete = new UpdateCheckResult
         {
             Status = UpdateCheckStatus.UpdateAvailable,
             DownloadUrl = new Uri("https://example.invalid/app.exe"),
             ChecksumUrl = new Uri("https://example.invalid/app.exe.sha256")
         };
 
-        Assert.True(vollstaendig.CanInstall);
+        Assert.True(complete.CanInstall);
     }
 
     [Fact]
@@ -133,8 +133,8 @@ public class UpdateInstallerTests
 
     [Theory]
     [InlineData(1234, "--nach-update", "1234")]
-    [InlineData(42, "irgendwas", "--nach-update", "42")]
-    public void DieKennungDerVorgaengerinstanzWirdGelesen(int expected, params string[] args) =>
+    [InlineData(42, "something-else", "--nach-update", "42")]
+    public void TryReadPredecessorId_FindsTheIdAfterTheSwitch(int expected, params string[] args) =>
         Assert.Equal(expected, StartupArguments.TryReadPredecessorId(args));
 
     [Theory]

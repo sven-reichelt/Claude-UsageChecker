@@ -132,7 +132,7 @@ public class ReleaseNotesWindowTests
                     [
                         new ReleaseNoteEntry(
                             "A very long entry that runs over several lines and is meant to "
-                            + "zeigen soll, dass umbrochener Text im CreateWindow bleibt und nicht "
+                            + "show that wrapped text stays inside the window and does not "
                             + "extend past its right edge."),
                         new ReleaseNoteEntry("An indented follow-up paragraph to it.", IsContinuation: true)
                     ]
