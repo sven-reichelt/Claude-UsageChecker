@@ -156,7 +156,13 @@ public class DetailsWindowRenderTests
     /// A limit at ease is green - not the orange accent, which sat too close to
     /// the yellow of the warning to tell apart at a glance.
     /// </summary>
-    [Fact]
+    /// <remarks>
+    /// On the Avalonia thread although it opens no window: a brush is an Avalonia
+    /// object and may only be created there. As a plain fact it passed whenever
+    /// xUnit happened to pick that thread - here and twice on the CI - and failed
+    /// on the release commit of 1.0.0 with "Call from invalid thread".
+    /// </remarks>
+    [AvaloniaFact]
     public void ALimitAtEaseIsGreen()
     {
         var colour = DetailsWindow.BrushFor(UsageAlertLevel.Normal).Color;
