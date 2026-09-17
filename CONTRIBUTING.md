@@ -1,8 +1,8 @@
 ﻿# Contributing
 
 Claude UsageChecker is a hobby project with a narrow purpose: show the usage
-limits of a Claude subscription in the Windows system tray, read-only. Reports
-and contributions are welcome within that scope.
+limits of a Claude subscription in the Windows notification area and the macOS
+menu bar, read-only. Reports and contributions are welcome within that scope.
 
 ## Reporting a problem
 
@@ -12,8 +12,8 @@ decide most cases.
 
 > **Never paste an access token.** Tokens look like `sk-ant-oat01-…` and grant
 > full access to a Claude subscription. `%USERPROFILE%\.claude\.credentials.json`
-> holds one — do not attach it. `crash.log` and `settings.json` contain no
-> tokens and are safe to share.
+> holds one on Windows — do not attach it. `crash.log`, `settings.json` and
+> `alerts.json` contain no tokens and are safe to share.
 
 Found a **security vulnerability**? Do not open a public issue — use
 [Security Advisories](https://github.com/sven-reichelt/Claude-UsageChecker/security/advisories/new).
@@ -67,14 +67,14 @@ back to English visibly.
 
 ```powershell
 dotnet build                                      # whole solution
-dotnet test                                       # 619 tests
+dotnet test                                       # 792 tests
 dotnet run --project src/ClaudeUsageChecker.App   # run it
 ```
 
 Output goes to `artifacts/`, not to per-project `bin/obj` folders.
 
-Requires the [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0) and
-Windows and macOS.
+Requires the [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0) on
+Windows or macOS.
 
 ## Project layout
 
@@ -105,8 +105,14 @@ reasoning is in [SECURITY.md](SECURITY.md) and [CLAUDE.md](CLAUDE.md).
    would claim rights over an account that it never needed.
 6. **No personal data in the repository.** Not in test data, screenshots or
    sample output either.
-7. **The self-update verifies its SHA-256 checksum.** Nothing is executed
-   without it. It is the only safeguard that path has.
+7. **The self-update verifies its SHA-256 checksum**, and on macOS the
+   signature as well. Nothing is executed without them. Since automatic updates
+   install without a click, they are all that stands between a published release
+   and every machine running it.
+8. **Tests never touch the machine they run on.** No registry, no launch agent,
+   no settings of the developer. Autostart writes are switched off for the whole
+   test assembly (`AutostartSafety`), because one test that forgot it deleted the
+   autostart entry of whoever ran the suite, for weeks.
 
 ## Testing
 

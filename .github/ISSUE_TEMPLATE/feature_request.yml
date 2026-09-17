@@ -6,7 +6,7 @@ body:
     attributes:
       value: |
         This is a hobby project with a deliberately narrow scope: show the usage
-        limits of a Claude subscription in the system tray, read-only. Suggestions
+        limits of a Claude subscription in the notification area or menu bar, read-only. Suggestions
         that fit that purpose are welcome — please say what you are trying to
         achieve, not only what should be built.
 

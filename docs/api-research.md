@@ -222,8 +222,9 @@ inference rights alone. The token of the interactive sign-in
    the token chain only moved on for an *empty* source, not for a *rejected* one.
    The call now tries the next source on HTTP 401/403. Covered by
    `TokenFallbackTests`.
-3. The settings check an entered token against the endpoint before storing it and
-   turn it down with the reason, rather than filing it away in silence.
+3. The settings checked an entered token against the endpoint before storing it
+   and turned it down with the reason, rather than filing it away in silence.
+   Since 0.6 there is no field to enter one at all - see "Withdrawn" above.
 
 ## Chosen: an OAuth flow of our own, with PKCE
 

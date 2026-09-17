@@ -7,14 +7,16 @@
 weicht diese hier ab, gilt die englische.*
 
 Zeigt das Sitzungs- und Wochenlimit des Claude-Abonnements dauerhaft im
-Windows-Infobereich an – unabhängig von einer laufenden Claude-Code-Sitzung.
-Ein Zeiger auf das Symbol genügt: Sitzung und Wochenlimit stehen mit Auslastung,
-Reset-Uhrzeit und Restzeit im Tooltip. Das Kontextmenü listet **alle** gemeldeten
-Limits auf, ein Klick öffnet die Detailansicht mit Fortschrittsbalken.
+Windows-Infobereich oder in der macOS-Menüleiste an – unabhängig von einer
+laufenden Claude-Code-Sitzung. Unter Windows genügt ein Zeiger auf das Symbol:
+Sitzung und Wochenlimit stehen mit Auslastung, Reset-Uhrzeit und Restzeit im
+Tooltip. Das Menü listet **alle** gemeldeten Limits auf, die Detailansicht zeigt
+sie mit Fortschrittsbalken. Erreicht ein Limit Gelb, Rot oder sein Ende, sagt ein
+Hinweis das – samt der Uhrzeit, zu der es zurückgesetzt wird.
 
 Mit eigener Anmeldung läuft sie unabhängig von Claude Code – bestätigt auf einem
-Rechner ohne Claude-Code-Installation. Sie läuft unter Windows und, seit 0.8.0,
-in der macOS-Menüleiste.
+Rechner ohne Claude-Code-Installation. Sie hält sich selbst aktuell und spricht
+neun Sprachen.
 
 ## Funktionsumfang
 
@@ -30,8 +32,8 @@ in der macOS-Menüleiste.
 | Ein Hinweis bei Gelb, Rot und 100 %, mit der Rücksetzzeit | ✅ |
 | Neun Sprachen, samt übersetztem Änderungsverlauf | ✅ |
 | Übersicht der Neuerungen nach einer Aktualisierung | ✅ |
-| Token verschlüsselt in der Windows-Anmeldeinformationsverwaltung | ✅ |
-| Dauerhafte Einrichtung samt Autostart, auf Nachfrage | ✅ |
+| Token verschlüsselt in der Anmeldeinformationsverwaltung (Windows) bzw. im Schlüsselbund (macOS) | ✅ |
+| Dauerhafte Einrichtung samt Autostart, auf Nachfrage – beim Start wiederhergestellt, falls der Eintrag fehlt | ✅ |
 | Nur eine Instanz je Anmeldesitzung | ✅ |
 | Eigene Anmeldung per OAuth mit PKCE – unabhängig von Claude Code | ✅ |
 | Selbsttätige Erneuerung des eigenen Tokens | ✅ |
@@ -40,6 +42,7 @@ in der macOS-Menüleiste.
 | macOS-Menüleiste, Schlüsselbund und Autostart | ✅ |
 | Hell, dunkel oder wie das System | ✅ |
 | Beide Anmeldungen auf einen Blick in den Einstellungen | ✅ |
+| Schalter in den Einstellungen, so wie iOS sie zeichnet | ✅ |
 
 ## Datenquelle
 
@@ -172,8 +175,9 @@ gefunden* –, und das fragt es bei jedem heruntergeladenen Programm; die zweite
 Hälfte dieses Satzes ist die Beglaubigung, die antwortet. Einmal **Öffnen**,
 danach nie wieder.
 
-Ab 0.9.0 erneuert sich die Anwendung auch unter macOS auf Knopfdruck; diesen Weg
-geht nur die erste Einrichtung.
+Diesen Weg geht nur die erste Einrichtung. Danach aktualisiert sich die Anwendung
+unter macOS genauso selbst wie unter Windows – siehe
+[Aktualisierungen](#aktualisierungen).
 
 **Das `.dmg` ist die Einrichtung; das `.zip` ist kein zweiter Weg dorthin.**
 Das Zip liegt jeder Veröffentlichung zu genau einem Zweck bei: Die Anwendung
@@ -239,9 +243,9 @@ angemeldet ist. Die Quellen werden der Reihe nach durchprobiert:
 | Reihenfolge | Quelle | Anmerkung |
 | --- | --- | --- |
 | 1 | Eigene Anmeldung (`ClaudeUsageChecker:OAuth`) | empfohlen, erneuert sich selbst |
-| 2 | Von Hand hinterlegtes Token | Sonderfall, muss `user:profile` tragen |
+| 2 | Von einer Fassung vor 0.6 hinterlegtes Token (`ClaudeUsageChecker:OAuthToken`) | wird noch gelesen, nicht mehr eingegeben |
 | 3 | Umgebungsvariable `CLAUDE_CODE_OAUTH_TOKEN` | vor allem für Entwicklung |
-| 4 | `%USERPROFILE%\.claude\.credentials.json` | Token von Claude Code |
+| 4 | Token von Claude Code | unter Windows `%USERPROFILE%\.claude\.credentials.json`, unter macOS der Schlüsselbundeintrag `Claude Code-credentials` |
 
 Wird ein Token von der API abgelehnt, rückt die Anwendung zur nächsten Quelle
 vor. Eine untaugliche Quelle legt sie also nicht lahm.
@@ -251,8 +255,9 @@ vor. Eine untaugliche Quelle legt sie also nicht lahm.
 > `/v1/messages`, tragen aber den Geltungsbereich `user:profile` nicht. Der
 > Nutzungsendpunkt weist sie mit HTTP 403 ab:
 > `OAuth token does not meet scope requirement user:profile`.
-> Die Einstellungen prüfen ein eingegebenes Token deshalb vor dem Speichern und
-> lehnen es mit dieser Begründung ab. Getestet am 19.08.2026.
+> Getestet am 19.08.2026. Deshalb wurde das Feld zum Eingeben eines Tokens von
+> Hand wieder entfernt: Taugliche Tokens sind nur die, die die Anwendung selbst
+> findet oder selbst beschafft.
 
 Quelle 4 wird **nur gelesen**. Die Anwendung erneuert dieses Token nie und
 schreibt nichts in die Anmeldedaten von Claude Code zurück. Das eigene Token
@@ -275,26 +280,31 @@ Claude-UsageChecker/
 │   │   ├── Authentication/          Tokenquellen, darin OAuth/ für den eigenen Fluss
 │   │   ├── Configuration/           Optionen und JSON-Kontext
 │   │   ├── Formatting/              Tooltip- und Detailtexte
+│   │   ├── Localization/            Sprachdateien und Textzugriff
 │   │   ├── Models/                  Domänenmodell und API-DTOs
 │   │   ├── Platform/                Secret-Store, Credential-Reader
-│   │   └── Services/                Abrufschleife und Zustandsmodell
+│   │   ├── Release/                 Changelog-Parser
+│   │   └── Services/                Abrufschleife, Zustandsmodell, wann ein Hinweis fällig ist
 │   └── ClaudeUsageChecker.App/      Avalonia-Oberfläche
-│       ├── Services/                Aktualisierung, Autostart
-│       ├── Settings/                Benutzereinstellungen
+│       ├── Services/                Aktualisierung und wann sie eingespielt wird, Autostart, Einrichtung
+│       ├── Settings/                Benutzereinstellungen, gemerkte Hinweise
 │       ├── Tray/                    Infobereich-Symbol und Menü
-│       └── Views/                   Detail-, Einstellungs- und Anmeldefenster
+│       └── Views/                   Fenster, Hinweise, Support-Buttons, Schalter-Stil
 ├── tests/
 │   ├── ClaudeUsageChecker.Core.Tests/   Logik, Formatierung, Tokenkette
 │   └── ClaudeUsageChecker.App.Tests/    Kopflose UI-Tests (Avalonia.Headless)
-├── build/                           Werkzeuge (Symbolgenerator)
+├── build/                           Werkzeuge (Generatoren für Symbole und Support-Bild)
 ├── assets/icons/                    Erzeugte Symbole
-└── docs/                            Recherche und Architektur
+├── assets/support/                  Buttons für Buy Me a Coffee und Ko-fi
+└── docs/                            Recherche, Changelog-Übersetzungen, deutsche Doku
 ```
 
-Symbole werden aus Code erzeugt statt binär eingecheckt:
+Symbole werden aus Code erzeugt statt binär eingecheckt, und der Buy-Me-a-Coffee-
+Button wird aus SVG in Vektorgeometrie umgewandelt, die Avalonia zeichnen kann:
 
 ```powershell
 node build/generate-icons.mjs
+node build/generate-support-images.mjs
 ```
 
 ## Veröffentlichen
@@ -302,8 +312,8 @@ node build/generate-icons.mjs
 Eine Marke setzen genügt:
 
 ```powershell
-git tag v0.2.0
-git push origin v0.2.0
+git tag v1.0.2
+git push origin v1.0.2
 ```
 
 Der Ablauf `.github/workflows/release.yml` baut beide Plattformen: eine
@@ -317,6 +327,12 @@ heraus kommt ein **Entwurf** der Veröffentlichung. Erst das Freigeben von Hand
 macht sie für die Aktualisierungsprüfung sichtbar – so geht nichts ungeprüft
 hinaus.
 
+**Vor der Freigabe die Prüfsummen des Entwurfs von Hand nachrechnen.** Seit
+1.0.1 wird eine freigegebene Veröffentlichung beim nächsten Start auf jedem
+Rechner mit automatischem Update eingespielt – dies ist also der letzte Punkt,
+an dem jemand hinsieht. Eine Summe mit sich selbst zu vergleichen beweist
+nichts; die Dateien laden und selbst rechnen.
+
 Zwei dieser Prüfungen gibt es, weil ihr Fehlen einem Menschen aufgefallen ist
 und keiner Maschine. Das Starten des gebauten Pakets hat unter macOS einen
 Absturz gefangen, den die ganze grüne Testsuite übersehen hatte. Und **„Would a
@@ -325,8 +341,9 @@ double-click do?"** hängt das Image ein, packt das Zip aus und fragt `codesign`
 richtete sich an das Bündel, das auf dem Läufer lag, und das lädt niemand
 herunter.
 
-Eine Marke darf eine Kennung tragen – `v0.9.0-beta.1` –, dann wird daraus eine
-Vorabversion. Die erreicht nur, wer danach gefragt hat, und GitHub lässt sie
+Eine Marke darf eine Kennung tragen – `v1.1.0-beta.1` –, dann wird daraus eine
+Vorabversion. Kennungen werden Teil für Teil gezählt, also `beta.1` schreiben,
+nicht `beta1`. Die erreicht nur, wer danach gefragt hat, und GitHub lässt sie
 aus „Latest" heraus.
 
 Das Paket ist getrimmt und komprimiert. Gemessen gegen die unveränderte Fassung:
@@ -342,19 +359,23 @@ und übersetzt werden. Die Einstellungen stehen in der Projektdatei, ein lokales
 `dotnet publish -c Release -r win-x64 --self-contained -p:PublishSingleFile=true`
 liefert dasselbe Ergebnis.
 
-Das Paket ist nicht signiert – bewusst, denn es ist ein Hobbyprojekt. Windows
-SmartScreen meldet deshalb beim ersten Start einen unbekannten Herausgeber; über
-**Weitere Informationen → Trotzdem ausführen** bestätigen.
+Das Windows-Paket ist nicht signiert – bewusst, denn ein Zertifikat kostet einige
+hundert Euro im Jahr, und es ist ein Hobbyprojekt. Windows SmartScreen meldet
+deshalb beim ersten Start einen unbekannten Herausgeber; über **Weitere
+Informationen → Trotzdem ausführen** bestätigen. Das macOS-Bündel ist signiert
+und beglaubigt.
 
 ## Aktualisierungen
 
 Die Prüfung läuft gegen die GitHub-Releases dieses Repositorys
 (`GitHubReleaseUpdateService`, hinter der austauschbaren Schnittstelle
-`IUpdateService`). Sie erfolgt beim Start – sofern in den Einstellungen aktiviert –
-und jederzeit über **Auf Aktualisierungen prüfen …** im Kontextmenü.
+`IUpdateService`). Sie erfolgt beim Start, alle zwei Stunden im Hintergrund und
+jederzeit über **Auf Aktualisierungen prüfen …** im Menü – was mit einer
+gefundenen Version geschieht, steht unten unter
+[Automatisches Update](#automatisches-update).
 
-Das Ergebnis erscheint in der Detailansicht. Bei einer neueren Version stehen
-dort zwei Schaltflächen:
+Von Hand angestoßen, erscheint das Ergebnis in der Detailansicht. Bei einer
+neueren Version stehen dort zwei Schaltflächen:
 
 * **Jetzt einspielen und neu starten** – lädt die neue Fassung, prüft ihre
   SHA-256-Summe gegen die veröffentlichte, ersetzt die laufende Datei und
@@ -480,7 +501,7 @@ Browser und sonst nichts – die Anwendung sendet dabei nichts irgendwohin.
 | 0.7 | Eigenes Menü im Infobereich, im Stil der Fenster ✅ |
 | 0.8 | macOS-Menüleiste ✅ |
 | 0.9 | Selbstaustausch unter macOS, ein beglaubigtes Bündel, ausgeliefert als Disk-Image ✅ |
-| 1.0 | Hinweise bei Gelb, Rot und 100 %, Balken nach den Schwellen, Autostart, der sich selbst repariert ✅ |
+| 1.0 | Hinweise bei Gelb, Rot und 100 %, Support-Buttons, Autostart, der sich selbst repariert; 1.0.1 automatisches Update und Schalter ✅ |
 
 ## Lizenz
 

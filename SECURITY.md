@@ -40,17 +40,23 @@ Two separate entries:
 | Entry | Content |
 | --- | --- |
 | `ClaudeUsageChecker:OAuth` | The application's own sign-in (access and refresh token) |
-| `ClaudeUsageChecker:OAuthToken` | A manually stored single token (special case) |
+| `ClaudeUsageChecker:OAuthToken` | A single token stored by a version before 0.6 - still read, no longer written |
 
-The settings file `%LOCALAPPDATA%\ClaudeUsageChecker\settings.json` holds
+On macOS each is a generic password in the login keychain, with the entry name as
+its service and `ClaudeUsageChecker` as its account.
+
+The settings file - `%LOCALAPPDATA%\ClaudeUsageChecker\settings.json` on Windows,
+`~/Library/Application Support/ClaudeUsageChecker/settings.json` on macOS - holds
 behaviour settings only, and never secrets.
 
 ### 2a. What the application stores where - in full
 
+**Windows**
+
 | Location | Content | Remains after uninstall |
 | --- | --- | --- |
 | Credential Manager, `ClaudeUsageChecker:OAuth` | the application's own sign-in (access and refresh token) | yes |
-| Credential Manager, `ClaudeUsageChecker:OAuthToken` | manually stored single token | yes |
+| Credential Manager, `ClaudeUsageChecker:OAuthToken` | single token from a version before 0.6, if any | yes |
 | `%LOCALAPPDATA%\ClaudeUsageChecker\settings.json` | behaviour settings, no secrets | yes |
 | `%LOCALAPPDATA%\ClaudeUsageChecker\alerts.json` | which usage notices have been shown: a stage and a reset time per limit | yes |
 | `%LOCALAPPDATA%\ClaudeUsageChecker\crash.log` | local crash reports | yes |
@@ -67,8 +73,26 @@ version would get a folder of its own - some 16 MB accumulating with every
 update. The application therefore clears away the folders of earlier versions
 itself.
 
-To remove everything, the rows of the table suffice; there are no further
-stores, no database and no traces in other profiles.
+**macOS**
+
+| Location | Content | Remains after uninstall |
+| --- | --- | --- |
+| Login keychain, service `ClaudeUsageChecker:OAuth` | the application's own sign-in (access and refresh token) | yes |
+| Login keychain, service `ClaudeUsageChecker:OAuthToken` | single token from a version before 0.6, if any | yes |
+| `~/Library/Application Support/ClaudeUsageChecker/settings.json` | behaviour settings, no secrets | yes |
+| `~/Library/Application Support/ClaudeUsageChecker/alerts.json` | which usage notices have been shown: a stage and a reset time per limit | yes |
+| `~/Library/Application Support/ClaudeUsageChecker/crash.log` | local crash reports | yes |
+| `/Applications/ClaudeUsageChecker.app` | the application itself, after setup | yes |
+| `~/Library/LaunchAgents/de.sven-reichelt.claudeusagechecker.plist` | autostart at login | yes |
+| Temporary folder: `ClaudeUsageChecker-<id>.zip` | the downloaded update | deleted immediately |
+| Beside the bundle: `.ClaudeUsageChecker-update-<id>` | the update, unpacked and checked before it is put in place | deleted immediately |
+| Beside the bundle: `ClaudeUsageChecker.app.alt` | the replaced version after an update | deleted on the next start |
+
+The bundle is not a compressed single file, so there is no extraction folder on
+macOS.
+
+To remove everything, the rows of the table for the platform suffice; there are
+no further stores, no database and no traces in other profiles.
 
 **None of it leaves the machine.** There is no telemetry, no usage statistics
 and no transmission of crash reports.
@@ -78,7 +102,7 @@ and no transmission of crash reports.
 A strict distinction applies here:
 
 **Credentials of Claude Code** (`%USERPROFILE%\.claude\.credentials.json` or the
-macOS keychain) are only ever **read**. The application writes nothing back
+macOS keychain entry `Claude Code-credentials`) are only ever **read**. The application writes nothing back
 there and does not refresh those tokens. The reason: Anthropic rotates refresh
 tokens - a refresh by this application would invalidate the sign-in of the
 Claude Code installation. The `refreshToken` is therefore not even read into a
@@ -111,24 +135,28 @@ Both live in separate entries of the secret store and are never mixed.
 
 ### 5. Frugal network communication
 
-Exactly these counterparts are contacted:
+Exactly these counterparts are contacted by the application itself:
 
 | Target | Purpose | Data transmitted |
 | --- | --- | --- |
 | `api.anthropic.com/api/oauth/usage` | fetch the usage status | the bearer token only |
-| `claude.ai/oauth/authorize` | sign-in page, only in the user's browser | – |
 | `platform.claude.com/v1/oauth/token` | exchange the code, refresh tokens | code, PKCE verifier or refresh token |
-| `api.github.com` (optional) | version check | none, just a GET |
+| `api.github.com` | version check at startup and every two hours | none, just a GET |
+| `github.com` and GitHub's file servers | download an update and its checksum, only when installing | none, just a GET |
+
+Opened in the user's browser, and only after a click, never by the application
+itself: the sign-in page on `claude.ai`, the project and release pages on
+`github.com`, and the support pages on `buymeacoffee.com` and `ko-fi.com`.
 
 There is no telemetry, no crash reporting to third parties and no analytics.
-Crash reports are written locally to
-`%LOCALAPPDATA%\ClaudeUsageChecker\crash.log` and stay there.
+Crash reports are written to `crash.log` beside the settings (see 2a) and stay
+there.
 
 ### 6. Updates: downloaded code only with verified provenance
 
-The application can replace itself at the push of a button. In doing so it
-downloads an executable from the network and starts it - the most delicate
-operation in the whole program. Originally that was deliberately ruled out; the
+The application can replace itself - at the push of a button, or at startup
+where automatic updates are on. In doing so it downloads an executable from the
+network and starts it - the most delicate operation in the whole program. Originally that was deliberately ruled out; the
 decision was reversed because a notice that has to be acted on by hand tends to
 be left lying around, and the application then runs out of date.
 
@@ -221,5 +249,9 @@ or directly to the repository owner.
 - [ ] `git log -p` searched for token patterns (`sk-ant-`, `oat01`, `Bearer `)
 - [ ] No file from `%USERPROFILE%\.claude\` in the repository
 - [ ] Screenshots contain no account data
-- [ ] `settings.json` and `crash.log` not committed
+- [ ] `settings.json`, `alerts.json` and `crash.log` not committed
 - [ ] Dependencies checked (`dotnet list package --vulnerable`)
+- [ ] CI green on every job for the very commit the tag goes on
+- [ ] Checksums of the draft recomputed from the downloaded files before
+      publishing - with automatic updates, publishing is installing
+- [ ] Two-factor authentication still on for the GitHub account

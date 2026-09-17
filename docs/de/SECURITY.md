@@ -42,17 +42,23 @@ Zwei getrennte Einträge:
 | Eintrag | Inhalt |
 | --- | --- |
 | `ClaudeUsageChecker:OAuth` | Eigene Anmeldung (Access- und Refresh-Token) |
-| `ClaudeUsageChecker:OAuthToken` | Von Hand hinterlegtes Einzeltoken (Sonderfall) |
+| `ClaudeUsageChecker:OAuthToken` | Von einer Fassung vor 0.6 hinterlegtes Einzeltoken – wird noch gelesen, nicht mehr geschrieben |
 
-Die Einstellungsdatei `%LOCALAPPDATA%\ClaudeUsageChecker\settings.json` enthält
-ausschließlich Verhaltenseinstellungen und niemals Geheimnisse.
+Unter macOS ist jeder davon ein generisches Kennwort im Anmeldeschlüsselbund, mit
+dem Eintragsnamen als Dienst und `ClaudeUsageChecker` als Account.
+
+Die Einstellungsdatei – unter Windows `%LOCALAPPDATA%\ClaudeUsageChecker\settings.json`,
+unter macOS `~/Library/Application Support/ClaudeUsageChecker/settings.json` –
+enthält ausschließlich Verhaltenseinstellungen und niemals Geheimnisse.
 
 ### 2a. Was die Anwendung wo ablegt – vollständig
+
+**Windows**
 
 | Ort | Inhalt | Bleibt nach Deinstallation |
 | --- | --- | --- |
 | Anmeldeinformationsverwaltung, `ClaudeUsageChecker:OAuth` | eigene Anmeldung (Access- und Refresh-Token) | ja |
-| Anmeldeinformationsverwaltung, `ClaudeUsageChecker:OAuthToken` | von Hand hinterlegtes Einzeltoken | ja |
+| Anmeldeinformationsverwaltung, `ClaudeUsageChecker:OAuthToken` | Einzeltoken aus einer Fassung vor 0.6, falls vorhanden | ja |
 | `%LOCALAPPDATA%\ClaudeUsageChecker\settings.json` | Verhaltenseinstellungen, keine Geheimnisse | ja |
 | `%LOCALAPPDATA%\ClaudeUsageChecker\alerts.json` | welche Nutzungshinweise schon gezeigt wurden: je Limit eine Stufe und eine Rücksetzzeit | ja |
 | `%LOCALAPPDATA%\ClaudeUsageChecker\crash.log` | lokale Fehlerberichte | ja |
@@ -69,8 +75,27 @@ hängt, bekäme jede Fassung einen eigenen Ordner – rund 16 MB, die sich mit
 jedem Update sammelten. Die Anwendung räumt die Ordner früherer Fassungen
 deshalb selbst weg.
 
-Zum vollständigen Entfernen genügen die Zeilen der Tabelle; es gibt keine
-weiteren Ablagen, keine Datenbank und keine Spuren in anderen Profilen.
+**macOS**
+
+| Ort | Inhalt | Bleibt nach Deinstallation |
+| --- | --- | --- |
+| Anmeldeschlüsselbund, Dienst `ClaudeUsageChecker:OAuth` | eigene Anmeldung (Access- und Refresh-Token) | ja |
+| Anmeldeschlüsselbund, Dienst `ClaudeUsageChecker:OAuthToken` | Einzeltoken aus einer Fassung vor 0.6, falls vorhanden | ja |
+| `~/Library/Application Support/ClaudeUsageChecker/settings.json` | Verhaltenseinstellungen, keine Geheimnisse | ja |
+| `~/Library/Application Support/ClaudeUsageChecker/alerts.json` | welche Nutzungshinweise schon gezeigt wurden: je Limit eine Stufe und eine Rücksetzzeit | ja |
+| `~/Library/Application Support/ClaudeUsageChecker/crash.log` | lokale Fehlerberichte | ja |
+| `/Applications/ClaudeUsageChecker.app` | die Anwendung selbst, nach Einrichtung | ja |
+| `~/Library/LaunchAgents/de.sven-reichelt.claudeusagechecker.plist` | Start bei der Anmeldung | ja |
+| Temporärordner: `ClaudeUsageChecker-<Kennung>.zip` | das geladene Update | wird sofort gelöscht |
+| Neben dem Bündel: `.ClaudeUsageChecker-update-<Kennung>` | das Update, ausgepackt und geprüft, bevor es an seinen Platz kommt | wird sofort gelöscht |
+| Neben dem Bündel: `ClaudeUsageChecker.app.alt` | ersetzte Fassung nach einem Update | wird beim nächsten Start gelöscht |
+
+Das Bündel ist keine komprimierte Einzeldatei, unter macOS gibt es also keinen
+Entpackungsordner.
+
+Zum vollständigen Entfernen genügen die Zeilen der Tabelle für die jeweilige
+Plattform; es gibt keine weiteren Ablagen, keine Datenbank und keine Spuren in
+anderen Profilen.
 
 **Nichts davon verlässt den Rechner.** Es gibt keine Telemetrie, keine
 Nutzungsstatistik und keine Übermittlung von Fehlerberichten.
@@ -80,7 +105,8 @@ Nutzungsstatistik und keine Übermittlung von Fehlerberichten.
 Hier ist streng zu trennen:
 
 **Anmeldedaten von Claude Code** (`%USERPROFILE%\.claude\.credentials.json` bzw.
-macOS-Schlüsselbund) werden ausschließlich **gelesen**. Die Anwendung schreibt
+der macOS-Schlüsselbundeintrag `Claude Code-credentials`) werden ausschließlich
+**gelesen**. Die Anwendung schreibt
 dort nichts zurück und erneuert diese Tokens nicht. Der Grund: Anthropic rotiert
 Refresh-Tokens – eine Erneuerung durch diese Anwendung würde die Anmeldung der
 Claude-Code-Installation entwerten. Der `refreshToken` wird deshalb nicht einmal
@@ -114,24 +140,28 @@ Ein Test (`ToString_DoesNotGiveAwayTheTokenValue`) sichert das ab.
 
 ### 5. Sparsame Netzwerkkommunikation
 
-Es werden genau zwei Gegenstellen kontaktiert:
+Genau diese Gegenstellen kontaktiert die Anwendung selbst:
 
 | Ziel | Zweck | Übertragene Daten |
 | --- | --- | --- |
 | `api.anthropic.com/api/oauth/usage` | Nutzungsstand abrufen | nur das Bearer-Token |
-| `claude.ai/oauth/authorize` | Anmeldeseite, nur im Browser des Nutzers | – |
 | `platform.claude.com/v1/oauth/token` | Code tauschen, Token erneuern | Code, PKCE-Verifier bzw. Refresh-Token |
-| `api.github.com` (optional) | Versionsprüfung | keine, nur ein GET |
+| `api.github.com` | Versionsprüfung beim Start und alle zwei Stunden | keine, nur ein GET |
+| `github.com` und die Dateiserver von GitHub | Update und Prüfsumme laden, nur beim Einspielen | keine, nur ein GET |
+
+Im Browser des Nutzers geöffnet, und nur nach einem Klick, nie von der Anwendung
+selbst: die Anmeldeseite auf `claude.ai`, Projekt- und Release-Seite auf
+`github.com` und die Unterstützer-Seiten auf `buymeacoffee.com` und `ko-fi.com`.
 
 Es gibt keine Telemetrie, keine Absturzberichte an Dritte und keine Analytik.
-Absturzberichte werden lokal nach
-`%LOCALAPPDATA%\ClaudeUsageChecker\crash.log` geschrieben und bleiben dort.
+Absturzberichte werden nach `crash.log` neben den Einstellungen geschrieben
+(siehe 2a) und bleiben dort.
 
 ### 6. Aktualisierungen: heruntergeladener Code nur mit geprüfter Herkunft
 
-Die Anwendung kann sich auf Knopfdruck selbst ersetzen. Sie lädt dabei eine
-ausführbare Datei aus dem Netz und startet sie – der heikelste Vorgang im
-gesamten Programm. Ursprünglich war das bewusst ausgeschlossen; die Entscheidung
+Die Anwendung kann sich selbst ersetzen – auf Knopfdruck, oder beim Start, wenn
+das automatische Update an ist. Sie lädt dabei eine ausführbare Datei aus dem
+Netz und startet sie – der heikelste Vorgang im gesamten Programm. Ursprünglich war das bewusst ausgeschlossen; die Entscheidung
 wurde umgekehrt, weil ein Hinweis, den man von Hand abarbeiten muss, in der
 Praxis liegen bleibt und die Anwendung dann veraltet läuft.
 
@@ -231,5 +261,9 @@ oder direkt an den Repository-Inhaber.
 - [ ] `git log -p` nach Tokenmustern durchsucht (`sk-ant-`, `oat01`, `Bearer `)
 - [ ] Keine Datei aus `%USERPROFILE%\.claude\` im Repository
 - [ ] Screenshots enthalten keine Kontodaten
-- [ ] `settings.json` und `crash.log` nicht eingecheckt
+- [ ] `settings.json`, `alerts.json` und `crash.log` nicht eingecheckt
 - [ ] Abhängigkeiten geprüft (`dotnet list package --vulnerable`)
+- [ ] CI auf allen Jobs grün für genau den Commit, auf den die Marke kommt
+- [ ] Prüfsummen des Entwurfs vor der Freigabe an den geladenen Dateien
+      nachgerechnet – mit automatischem Update heißt Freigeben Einspielen
+- [ ] Zwei-Faktor-Anmeldung auf dem GitHub-Konto weiterhin an

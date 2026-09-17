@@ -6,14 +6,16 @@
 *Deutsche Fassung: [docs/de/README.md](docs/de/README.md)*
 
 Shows the session and weekly limits of a Claude subscription permanently in the
-Windows notification area - independent of a running Claude Code session. A
-pointer on the icon is enough: session and weekly limit appear with their usage,
-reset time and remaining time in the tooltip. The context menu lists **every**
-reported limit, and a click opens the details window with progress bars.
+Windows notification area or the macOS menu bar - independent of a running
+Claude Code session. On Windows a pointer on the icon is enough: session and
+weekly limit appear with their usage, reset time and remaining time in the
+tooltip. The menu lists **every** reported limit, and the details window shows
+them with progress bars. When a limit reaches yellow, red or its end, a notice
+says so, with the time it resets.
 
 With its own sign-in it runs independently of Claude Code - confirmed on a
-machine without a Claude Code installation. It runs on Windows and, since 0.8.0,
-in the macOS menu bar.
+machine without a Claude Code installation. It keeps itself up to date, and it
+speaks nine languages.
 
 ## Features
 
@@ -29,8 +31,8 @@ in the macOS menu bar.
 | A notice at yellow, red and 100 %, with the reset time | ✅ |
 | Nine languages, changelog included | ✅ |
 | Summary of changes after an update | ✅ |
-| Token encrypted in the Windows Credential Manager | ✅ |
-| Permanent setup with autostart, on request | ✅ |
+| Token encrypted in the Credential Manager (Windows) or the keychain (macOS) | ✅ |
+| Permanent setup with autostart, on request - restored at startup if the entry goes missing | ✅ |
 | Only one instance per login session | ✅ |
 | Own sign-in through OAuth with PKCE - independent of Claude Code | ✅ |
 | Automatic refresh of the application's own token | ✅ |
@@ -39,6 +41,7 @@ in the macOS menu bar.
 | macOS menu bar, keychain and autostart | ✅ |
 | Light, dark, or whatever the system says | ✅ |
 | Both sign-ins at a glance in the settings | ✅ |
+| Switches in the settings, the way iOS draws them | ✅ |
 
 ## Data source
 
@@ -167,8 +170,8 @@ for malicious software and none was detected* - which is what it asks of every
 downloaded application, and the second half of that sentence is the notarisation
 answering. **Open**, once, and never again.
 
-From 0.9.0 on, updates happen at the push of a button on macOS too; only the
-first installation goes this way.
+Only the first installation goes this way. After that the application updates
+itself on macOS just as on Windows - see [Updates](#updates).
 
 **The `.dmg` is the installation; the `.zip` is not a second way to do it.**
 The zip is attached to every release for one purpose: the application downloads
@@ -232,9 +235,9 @@ is signed in. The sources are tried in order:
 | Order | Source | Note |
 | --- | --- | --- |
 | 1 | Own sign-in (`ClaudeUsageChecker:OAuth`) | recommended, refreshes itself |
-| 2 | Manually stored token | special case, has to carry `user:profile` |
+| 2 | Token stored by a version before 0.6 (`ClaudeUsageChecker:OAuthToken`) | still read, no longer entered |
 | 3 | Environment variable `CLAUDE_CODE_OAUTH_TOKEN` | mainly for development |
-| 4 | `%USERPROFILE%\.claude\.credentials.json` | token of Claude Code |
+| 4 | Token of Claude Code | `%USERPROFILE%\.claude\.credentials.json` on Windows, the keychain entry `Claude Code-credentials` on macOS |
 
 If the API rejects a token, the application moves on to the next source. An
 unusable source therefore does not paralyse it.
@@ -244,8 +247,9 @@ unusable source therefore does not paralyse it.
 > `/v1/messages`, but do not carry the `user:profile` scope. The usage endpoint
 > rejects them with HTTP 403:
 > `OAuth token does not meet scope requirement user:profile`.
-> The settings therefore check an entered token before storing it and turn it
-> down with that reason. Tested on 2026-08-19.
+> Tested on 2026-08-19. That is why the field for entering a token by hand was
+> removed again: the only tokens that work are the ones the application finds or
+> obtains by itself.
 
 Source 4 is **only read**. The application never refreshes that token and writes
 nothing back into the credentials of Claude Code. Its own token, by contrast, it
@@ -272,24 +276,27 @@ Claude-UsageChecker/
 │   │   ├── Models/                  Domain model and API DTOs
 │   │   ├── Platform/                Secret store, credential reader
 │   │   ├── Release/                 Changelog parser
-│   │   └── Services/                Polling loop and state model
+│   │   └── Services/                Polling loop, state model, when a notice is due
 │   └── ClaudeUsageChecker.App/      Avalonia interface
-│       ├── Services/                Updates, autostart
-│       ├── Settings/                User settings
+│       ├── Services/                Updates and when to install them, autostart, setup
+│       ├── Settings/                User settings, remembered notices
 │       ├── Tray/                    Tray icon and menu
-│       └── Views/                   Details, settings, sign-in and about windows
+│       └── Views/                   Windows, notices, support buttons, switch style
 ├── tests/
 │   ├── ClaudeUsageChecker.Core.Tests/   Logic, formatting, token chain
 │   └── ClaudeUsageChecker.App.Tests/    Headless UI tests (Avalonia.Headless)
-├── build/                           Tooling (icon generator)
+├── build/                           Tooling (icon and support image generators)
 ├── assets/icons/                    Generated icons
+├── assets/support/                  Buy Me a Coffee and Ko-fi buttons
 └── docs/                            Research, changelog translations, German docs
 ```
 
-Icons are generated from code rather than committed as binaries:
+Icons are generated from code rather than committed as binaries, and the
+Buy Me a Coffee button is turned from SVG into vector geometry Avalonia can draw:
 
 ```powershell
 node build/generate-icons.mjs
+node build/generate-support-images.mjs
 ```
 
 ## Releasing
@@ -297,8 +304,8 @@ node build/generate-icons.mjs
 Pushing a tag is enough:
 
 ```powershell
-git tag v0.2.0
-git push origin v0.2.0
+git tag v1.0.2
+git push origin v1.0.2
 ```
 
 The workflow `.github/workflows/release.yml` builds both platforms: a
@@ -310,6 +317,12 @@ size, started once to see that it comes up at all, and given a SHA-256 sum; the
 result is a **draft** release. Only publishing it by hand makes it visible to
 the update check - that way nothing goes out unchecked.
 
+**Recompute the checksums of the draft by hand before publishing it.** Since
+1.0.1 a published release is installed automatically at the next start on every
+machine with automatic updates on, so this is the last point at which anybody
+looks. Comparing a sum with itself proves nothing; download the files and hash
+them.
+
 Two of those checks exist because their absence was found by a person rather
 than a machine. Starting the built package caught a crash on macOS that the
 whole green test suite had missed. And **"Would a double-click do?"** mounts the
@@ -317,8 +330,8 @@ image and unpacks the zip and asks `codesign`, `stapler` and `spctl` about what
 comes out - because every check before it was asked of the bundle lying on the
 runner, and that one nobody downloads.
 
-A tag may carry a label - `v0.9.0-beta.1` - which makes the release a
-pre-release. Those reach only whoever asked for them, and GitHub leaves them
+A tag may carry a label - `v1.1.0-beta.1` - which makes the release a
+pre-release. Labels are counted part by part, so write `beta.1`, not `beta1`. Those reach only whoever asked for them, and GitHub leaves them
 out of "latest".
 
 The package is trimmed and compressed. Measured against the unmodified build:
@@ -334,19 +347,21 @@ loaded and compiled either. The settings live in the project file, so a local
 `dotnet publish -c Release -r win-x64 --self-contained -p:PublishSingleFile=true`
 produces the same result.
 
-The package is not signed - deliberately, because this is a hobby project.
-Windows SmartScreen therefore reports an unknown publisher on the first start;
-confirm through **More info → Run anyway**.
+The Windows package is not signed - deliberately, because a certificate costs a
+few hundred euros a year and this is a hobby project. Windows SmartScreen
+therefore reports an unknown publisher on the first start; confirm through
+**More info → Run anyway**. The macOS bundle is signed and notarised.
 
 ## Updates
 
 The check runs against the GitHub releases of this repository
 (`GitHubReleaseUpdateService`, behind the interchangeable interface
-`IUpdateService`). It happens at startup - where enabled in the settings - and at
-any time through **Check for updates …** in the context menu.
+`IUpdateService`). It happens at startup, every two hours in the background, and
+at any time through **Check for updates …** in the menu - how a version found is
+dealt with is described under [Automatic updates](#automatic-updates) below.
 
-The result appears in the details window. For a newer version two buttons show
-there:
+Asked for by hand, the result appears in the details window. For a newer version
+two buttons show there:
 
 * **Install now and restart** – downloads the new version, verifies its SHA-256
   sum against the published one, replaces the running file and restarts. One
@@ -462,7 +477,7 @@ page in the browser and nothing else - the application sends nothing anywhere.
 | 0.7 | Its own menu in the notification area, in the style of the windows ✅ |
 | 0.8 | macOS menu bar ✅ |
 | 0.9 | Self-replacement on macOS, a notarised bundle, delivered as a disk image ✅ |
-| 1.0 | Notices at yellow, red and 100 %, bars that follow the thresholds, autostart that repairs itself ✅ |
+| 1.0 | Notices at yellow, red and 100 %, support buttons, autostart that repairs itself; 1.0.1 automatic updates and switches ✅ |
 
 ## Contributing
 
