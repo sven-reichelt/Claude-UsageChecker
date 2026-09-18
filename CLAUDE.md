@@ -23,7 +23,7 @@ and a second one would break every clone that exists by then.
 
 ```powershell
 dotnet build                                      # the whole solution
-dotnet test                                       # 887 tests (Core.Tests + App.Tests)
+dotnet test                                       # 889 tests (Core.Tests + App.Tests)
 dotnet run --project src/ClaudeUsageChecker.App   # run the application
 node build/generate-icons.mjs                     # regenerate the icons
 node build/generate-support-images.mjs            # Buy Me a Coffee SVG -> Avalonia vector image
@@ -81,8 +81,9 @@ Builds into `artifacts/` (centrally through `ArtifactsPath` in
 
 ## Status
 
-Version 1.1.0 released on 2026-09-18; before it 1.0.0, 1.0.1 and 1.0.2 on
-2026-09-17, after three pre-releases of 0.9.1. The repository is public and
+Version 1.1.1 released on 2026-09-19 (the settings in small type: headings 12,
+the rest 10, Cancel and Save 12, switches and fields sized to match); 1.1.0 on
+2026-09-18; before it 1.0.0, 1.0.1 and 1.0.2 on 2026-09-17, after three pre-releases of 0.9.1. The repository is public and
 written in English.
 
 **1.1.0 brought the plan.** The menu (under the usage), the details window (under
@@ -239,6 +240,16 @@ account the server reported as Max 5× - written at sign-in, never updated. The
 field had been mapped for months, unused, waiting for someone to trust it. The
 plan comes from the profile endpoint; ask the server, not a copy of what it said
 once.
+
+**A style on a control does not reach the controls inside its template.**
+The Fluent theme builds number fields, pickers and check boxes 32 high, for text
+in 14. Setting `MinHeight` on a `NumericUpDown` changed nothing visible: the
+field is three controls deep, and the `ButtonSpinner` inside it carries the same
+minimum on its own, not bound to the field's. It takes `NumericUpDown /template/
+ButtonSpinner`. Conversely the inner `TextBox` gets its padding by template
+binding, which beats a style - so padding is set on the field. Found by reading
+Avalonia's `NumericUpDown.xaml` and `ButtonSpinner.xaml` after the first attempt
+missed; `TheFieldsAndSwitchesFitTheirType` measures the result.
 
 **Failures in tray actions otherwise end the application.** Without a window an
 exception travels all the way to the message loop and the process disappears

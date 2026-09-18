@@ -7,7 +7,11 @@
 
        Still a CheckBox underneath - IsChecked, the labels from the language
        files and every test that finds these controls by name stay exactly as
-       they were. Only the picture changes. -->
+       they were. Only the picture changes.
+
+       36 by 20 rather than the 44 by 26 it started at: the settings are set
+       in small type, and a switch that towered over its label looked like the
+       main thing in the row rather than the answer to it. -->
 
   <Styles.Resources>
     <ResourceDictionary>
@@ -25,6 +29,10 @@
   </Styles.Resources>
 
   <Style Selector="CheckBox.switch">
+    <!-- The theme gives every check box a minimum height of 32 for its tick
+         box. A switch 20 high then sat in a row half again as tall, and the
+         list of switches looked spaced out rather than listed. -->
+    <Setter Property="MinHeight" Value="0" />
     <Setter Property="HorizontalAlignment" Value="Stretch" />
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="Cursor" Value="Hand" />
@@ -39,7 +47,7 @@
                             Margin="0,0,12,0" />
 
           <Border x:Name="Track" Grid.Column="1"
-                  Width="44" Height="26" CornerRadius="13"
+                  Width="36" Height="20" CornerRadius="10"
                   VerticalAlignment="Center"
                   Background="{DynamicResource SwitchTrackOffBrush}">
             <Border.Transitions>
@@ -49,7 +57,7 @@
             </Border.Transitions>
 
             <Border x:Name="Knob"
-                    Width="22" Height="22" CornerRadius="11"
+                    Width="16" Height="16" CornerRadius="8"
                     Margin="2" HorizontalAlignment="Left"
                     Background="White"
                     BoxShadow="0 1 3 0 #40000000"
@@ -75,7 +83,7 @@
   </Style>
 
   <Style Selector="CheckBox.switch:checked /template/ Border#Knob">
-    <Setter Property="RenderTransform" Value="translateX(18px)" />
+    <Setter Property="RenderTransform" Value="translateX(16px)" />
   </Style>
 
   <Style Selector="CheckBox.switch:disabled">

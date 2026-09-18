@@ -8,6 +8,16 @@ versionado [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+## [1.1.1] – 2026-09-19
+
+### Cambiado
+- **La configuración en letra pequeña, y en un solo tamaño.** Títulos en 12, todo
+  lo demás en 10 – etiquetas, indicaciones, interruptores, campos numéricos,
+  listas –; solo *Cancelar* y *Guardar* se quedan en 12. Hasta ahora las
+  etiquetas eran pequeñas, pero los interruptores, campos y listas salían más
+  grandes, por descuido y no a propósito. Interruptores y campos se han reducido
+  con la letra, y la ventana es unos 140 píxeles más baja.
+
 ## [1.1.0] – 2026-09-18
 
 ### Añadido

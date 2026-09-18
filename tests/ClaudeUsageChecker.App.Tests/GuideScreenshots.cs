@@ -88,7 +88,7 @@ public class GuideScreenshots : IDisposable
 
         Capture(Update(), code, "07-update");
         Capture(WhatsNew(), code, "08-whats-new");
-        Capture(new AboutWindow(App.RepositoryUri, new ProgramVersion(new Version(1, 1, 0))), code, "09-about");
+        Capture(new AboutWindow(App.RepositoryUri, new ProgramVersion(new Version(1, 1, 1))), code, "09-about");
     }
 
     private static InstallPromptWindow Setup()
@@ -111,7 +111,7 @@ public class GuideScreenshots : IDisposable
                 (T.TrayRefreshNow, () => { }),
                 (T.TraySettings, () => { }),
                 (T.TrayCheckForUpdates, () => { }),
-                (T.TrayAbout("1.1.0"), () => { }),
+                (T.TrayAbout("1.1.1"), () => { }),
                 (T.TrayExit, () => { })
             ]);
 
@@ -164,11 +164,11 @@ public class GuideScreenshots : IDisposable
         new UpdateCheckResult
         {
             Status = UpdateCheckStatus.UpdateAvailable,
-            AvailableVersion = new ProgramVersion(new Version(1, 1, 1)),
-            ReleasePage = new Uri("https://example.invalid/releases/v1.1.1"),
+            AvailableVersion = new ProgramVersion(new Version(1, 1, 2)),
+            ReleasePage = new Uri("https://example.invalid/releases/v1.1.2"),
             DownloadUrl = new Uri("https://example.invalid/ClaudeUsageChecker.exe"),
             ChecksumUrl = new Uri("https://example.invalid/ClaudeUsageChecker.exe.sha256"),
-            Message = T.UpdateAvailable("1.1.1", "1.1.0")
+            Message = T.UpdateAvailable("1.1.2", "1.1.1")
         },
         canInstall: true);
 

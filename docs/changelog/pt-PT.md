@@ -8,6 +8,16 @@ numeração [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+## [1.1.1] – 2026-09-19
+
+### Alterado
+- **As definições em letra pequena, e num só tamanho.** Títulos em 12, tudo o
+  resto em 10 – rótulos, indicações, interruptores, campos numéricos, listas –;
+  apenas *Cancelar* e *Guardar* ficam em 12. Até agora os rótulos eram pequenos,
+  mas interruptores, campos e listas saíam maiores, por descuido e não de
+  propósito. Interruptores e campos encolheram com a letra, e a janela ficou cerca
+  de 140 píxeis mais baixa.
+
 ## [1.1.0] – 2026-09-18
 
 ### Adicionado

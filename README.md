@@ -494,7 +494,7 @@ page in the browser and nothing else - the application sends nothing anywhere.
 | 0.8 | macOS menu bar ✅ |
 | 0.9 | Self-replacement on macOS, a notarised bundle, delivered as a disk image ✅ |
 | 1.0 | Notices at yellow, red and 100 %, support buttons, autostart that repairs itself; 1.0.1 automatic updates and switches ✅ |
-| 1.1 | The plan in the menu, the details and the settings ✅ |
+| 1.1 | The plan in the menu, the details and the settings; 1.1.1 the settings in small type ✅ |
 
 ## Contributing
 

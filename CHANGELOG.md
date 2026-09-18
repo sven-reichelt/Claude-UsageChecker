@@ -8,6 +8,16 @@ the versioning [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.1.1] – 2026-09-19
+
+### Changed
+- **The settings in small type, and in one size of it.** Headings in 12,
+  everything else in 10 - labels, hints, switches, number fields, pickers -
+  with only *Cancel* and *Save* kept at 12. Until now the labels were small
+  while the switches, fields and pickers came out larger, by accident rather
+  than by design. The switches and fields shrank along with the type, and the
+  window is some 140 pixels shorter.
+
 ## [1.1.0] – 2026-09-18
 
 ### Added

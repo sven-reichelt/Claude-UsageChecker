@@ -8,6 +8,16 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unveröffentlicht]
 
+## [1.1.1] – 2026-09-19
+
+### Geändert
+- **Die Einstellungen in kleiner Schrift, und in einer Größe.** Überschriften in
+  12, alles andere in 10 – Beschriftungen, Hinweise, Schalter, Zahlenfelder,
+  Auswahllisten –, nur *Abbrechen* und *Speichern* bleiben bei 12. Bisher waren
+  die Beschriftungen klein, Schalter, Felder und Auswahllisten aber größer, aus
+  Versehen und nicht mit Absicht. Schalter und Felder sind mit der Schrift
+  geschrumpft, das Fenster ist gut 140 Pixel niedriger.
+
 ## [1.1.0] – 2026-09-18
 
 ### Hinzugefügt

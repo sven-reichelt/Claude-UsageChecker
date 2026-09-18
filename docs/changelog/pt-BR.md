@@ -8,6 +8,16 @@ versionamento [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+## [1.1.1] – 2026-09-19
+
+### Alterado
+- **As configurações em letra pequena, e num só tamanho.** Títulos em 12, todo o
+  resto em 10 – rótulos, dicas, interruptores, campos numéricos, listas –; só
+  *Cancelar* e *Salvar* continuam em 12. Até agora os rótulos eram pequenos, mas
+  interruptores, campos e listas saíam maiores, por descuido e não de propósito.
+  Interruptores e campos diminuíram junto com a letra, e a janela ficou uns 140
+  pixels mais baixa.
+
 ## [1.1.0] – 2026-09-18
 
 ### Adicionado

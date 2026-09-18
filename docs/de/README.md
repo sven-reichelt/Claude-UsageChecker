@@ -520,7 +520,7 @@ Browser und sonst nichts – die Anwendung sendet dabei nichts irgendwohin.
 | 0.8 | macOS-Menüleiste ✅ |
 | 0.9 | Selbstaustausch unter macOS, ein beglaubigtes Bündel, ausgeliefert als Disk-Image ✅ |
 | 1.0 | Hinweise bei Gelb, Rot und 100 %, Support-Buttons, Autostart, der sich selbst repariert; 1.0.1 automatisches Update und Schalter ✅ |
-| 1.1 | Der Plan im Menü, in den Details und in den Einstellungen ✅ |
+| 1.1 | Der Plan im Menü, in den Details und in den Einstellungen; 1.1.1 die Einstellungen in kleiner Schrift ✅ |
 
 ## Lizenz
 

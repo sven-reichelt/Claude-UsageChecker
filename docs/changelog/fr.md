@@ -8,6 +8,16 @@ numérotation [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+## [1.1.1] – 2026-09-19
+
+### Modifié
+- **Les paramètres en petits caractères, et d'une seule taille.** Titres en 12,
+  tout le reste en 10 – libellés, indications, interrupteurs, champs numériques,
+  listes – ; seuls *Annuler* et *Enregistrer* restent en 12. Jusqu'ici les
+  libellés étaient petits, mais les interrupteurs, champs et listes sortaient plus
+  grands, par mégarde et non par choix. Interrupteurs et champs ont rétréci avec
+  le texte, et la fenêtre a perdu quelque 140 pixels de hauteur.
+
 ## [1.1.0] – 2026-09-18
 
 ### Ajouté

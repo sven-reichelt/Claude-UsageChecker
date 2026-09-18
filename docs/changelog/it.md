@@ -8,6 +8,16 @@ numerazione [Semantic Versioning](https://semver.org/lang/it/).
 
 ## [Non pubblicato]
 
+## [1.1.1] – 2026-09-19
+
+### Modificato
+- **Le impostazioni in caratteri piccoli, e di una sola misura.** Titoli in 12,
+  tutto il resto in 10 – etichette, indicazioni, interruttori, campi numerici,
+  elenchi –; solo *Annulla* e *Salva* restano in 12. Finora le etichette erano
+  piccole, ma interruttori, campi ed elenchi risultavano più grandi, per svista e
+  non per scelta. Interruttori e campi si sono ridotti insieme al testo, e la
+  finestra è più bassa di circa 140 pixel.
+
 ## [1.1.0] – 2026-09-18
 
 ### Aggiunto
