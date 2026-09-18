@@ -122,6 +122,9 @@ utilização adicional, se estiver ativada. Por baixo:
 No macOS o menu tem ainda **Mostrar detalhes …**, e os dois botões de apoio
 aparecem como entradas de texto.
 
+A última linha por baixo dos limites indica o seu **plano** – por exemplo,
+*Claude Max 5×*.
+
 ## 6. A janela de detalhes
 
 ![A janela de detalhes](images/pt-PT/04-details.png)
@@ -139,6 +142,9 @@ As barras usam as cores dos seus limiares: verde abaixo do amarelo, depois amare
 depois vermelho. No fundo indica-se quando os valores foram obtidos e de onde vem o
 acesso. **Atualizar** obtém-nos de novo. A janela fecha ao clicar noutro sítio ou ao
 premir Esc.
+
+Por baixo da linha com a hora e a origem aparece o seu **plano**, por exemplo
+*Claude Max 5×*: o plano da conta a que estes valores pertencem.
 
 ## 7. Avisos
 
@@ -168,6 +174,9 @@ As alterações aplicam-se ao clicar em **Guardar**; **Cancelar** descarta-as.
 Em cima: se o Claude Code tem sessão iniciada nesta máquina e se o início de sessão
 próprio da aplicação funciona — sempre ambos, seja qual for o que está em uso. Por
 baixo, **Iniciar sessão …** e **Terminar sessão** para o início de sessão próprio.
+
+Por baixo das duas sessões aparece o seu **plano**, por exemplo *Claude Max 5×*, logo
+que os valores tenham sido obtidos.
 
 ### Comportamento
 

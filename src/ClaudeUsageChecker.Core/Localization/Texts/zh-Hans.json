@@ -51,6 +51,7 @@
   "extra.usedOfLimitLong": "已使用 {1} 中的 {0}",
   "extra.usedOnly": "已使用 {0}",
   "extra.limitOnly": "每月上限：{0}",
+  "plan.line": "套餐：{0}",
 
   "duration.now": "即将",
   "duration.daysHours": "{0} 天 {1} 小时",
@@ -81,6 +82,7 @@
   "settings.accountNotSignedIn": "未登录",
   "settings.accountExpired": "已过期",
   "settings.accountNoStore": "没有安全存储",
+  "settings.accountPlan": "套餐",
   "settings.signInSection": "内置登录（推荐）",
   "settings.signInButton": "登录 ...",
   "settings.signOutButton": "退出登录",

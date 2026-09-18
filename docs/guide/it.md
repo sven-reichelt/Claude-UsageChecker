@@ -123,6 +123,8 @@ l'utilizzo aggiuntivo, se attivo. Sotto:
 Su macOS il menu contiene inoltre **Mostra dettagli …**, e i due pulsanti di
 sostegno compaiono come voci di testo.
 
+L'ultima riga sotto i limiti indica il tuo **piano**, ad esempio *Claude Max 5×*.
+
 ## 6. La finestra dei dettagli
 
 ![La finestra dei dettagli](images/it/04-details.png)
@@ -141,6 +143,9 @@ Le barre prendono i colori delle tue soglie: verde sotto il giallo, poi giallo, 
 rosso. In fondo si legge quando i valori sono stati recuperati e da dove viene
 l'accesso. **Aggiorna** li richiede di nuovo. La finestra si chiude facendo clic
 altrove o premendo Esc.
+
+Sotto la riga con l'ora e l'origine compare il tuo **piano**, ad esempio
+*Claude Max 5×*: il piano dell'account a cui appartengono questi valori.
 
 ## 7. Avvisi
 
@@ -171,6 +176,9 @@ Le modifiche hanno effetto con **Salva**; **Annulla** le scarta.
 In alto: se Claude Code è connesso su questa macchina e se funziona l'accesso
 proprio dell'applicazione — sempre entrambi, qualunque sia quello in uso. Sotto,
 **Accedi …** e **Esci** per l'accesso proprio.
+
+Sotto i due accessi compare il tuo **piano**, ad esempio *Claude Max 5×*, non appena
+i valori sono stati recuperati.
 
 ### Comportamento
 

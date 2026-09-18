@@ -125,6 +125,8 @@ Unter macOS steht dort zusätzlich **Details anzeigen …**, und die beiden
 Unterstützen-Buttons erscheinen als Einträge **Einen Kaffee spendieren …** und
 **Auf Ko-fi unterstützen …**.
 
+Die letzte Zeile unter den Limits nennt deinen **Plan** – etwa *Claude Max 5×*.
+
 ## 6. Das Detailfenster
 
 ![Das Detailfenster](images/de/04-details.png)
@@ -142,6 +144,9 @@ Die Balken nehmen die Farben deiner Schwellen: grün unterhalb von Gelb, dann Ge
 dann Rot. Unten steht, wann die Werte geholt wurden und woher das Zugriffsrecht
 stammt. **Aktualisieren** holt sie neu. Das Fenster schließt sich, wenn du
 woandershin klickst oder Escape drückst.
+
+Unter der Zeile mit Zeit und Quelle steht dein **Plan**, etwa *Claude Max 5×*: der
+Plan des Kontos, zu dem diese Werte gehören.
 
 ## 7. Hinweise
 
@@ -171,6 +176,9 @@ Wie nachdrücklich er ist, entscheidest du in den [Einstellungen](#hinweise).
 Ganz oben: ob Claude Code auf diesem Rechner angemeldet ist und ob die eigene
 Anmeldung funktioniert – immer beide, gleich welche gerade benutzt wird. Darunter
 **Anmelden …** und **Abmelden** für die eigene Anmeldung.
+
+Unter den beiden Anmeldungen steht dein **Plan**, etwa *Claude Max 5×*, sobald die
+Werte einmal abgerufen wurden.
 
 ### Verhalten
 

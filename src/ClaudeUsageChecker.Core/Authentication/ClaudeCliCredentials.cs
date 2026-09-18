@@ -21,8 +21,10 @@ internal sealed class ClaudeCliOAuth
     [JsonPropertyName("expiresAt")]
     public long? ExpiresAt { get; set; }
 
-    [JsonPropertyName("subscriptionType")]
-    public string? SubscriptionType { get; set; }
-
     // refreshToken is deliberately NOT mapped: this application refreshes no tokens.
+    //
+    // Neither is subscriptionType. It is written once, when Claude Code signs in,
+    // and not kept up to date: on 2026-09-18 it said "pro" for an account the
+    // profile endpoint reported as Max 5x. The plan comes from that endpoint
+    // (AnthropicProfileClient), not from here.
 }

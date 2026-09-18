@@ -51,6 +51,7 @@
   "extra.usedOfLimitLong": "{0} de {1} utilizados",
   "extra.usedOnly": "{0} utilizados",
   "extra.limitOnly": "Limite mensal: {0}",
+  "plan.line": "Plano: {0}",
 
   "duration.now": "já",
   "duration.daysHours": "{0} d {1} h",
@@ -81,6 +82,7 @@
   "settings.accountNotSignedIn": "sessão não iniciada",
   "settings.accountExpired": "expirada",
   "settings.accountNoStore": "sem armazenamento seguro",
+  "settings.accountPlan": "Plano",
   "settings.signInSection": "Início de sessão próprio (recomendado)",
   "settings.signInButton": "Iniciar sessão ...",
   "settings.signOutButton": "Terminar sessão",

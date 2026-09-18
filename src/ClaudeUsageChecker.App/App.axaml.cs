@@ -137,7 +137,11 @@ public partial class App : Application, IDisposable
         _oauthTokenProvider.SignInExpired += (_, reason) => Dispatcher.UIThread.Post(
             () => ErrorGuard.Run("notice about expired sign-in", () => ShowSignInExpired(reason)));
 
-        var apiClient = new AnthropicUsageApiClient(_usageHttpClient, BuildTokenProviders(), options);
+        // The plan is asked of the same host with the same token, so it shares
+        // the client of the usage call.
+        var apiClient = new AnthropicUsageApiClient(
+            _usageHttpClient, BuildTokenProviders(), options,
+            planSource: new AnthropicProfileClient(_usageHttpClient, options));
 
         // The thresholds are none of the monitor's business - it fetches values
         // and does not judge them. Judging happens in TrayIconSeverityResolver,
@@ -545,7 +549,8 @@ public partial class App : Application, IDisposable
             _settingsStore,
             _settings,
             _oauthTokenStore,
-            InstallPermanently);
+            InstallPermanently,
+            plan: _monitor?.State.Snapshot?.Plan);
 
         window.SettingsChanged += (_, settings) =>
         {

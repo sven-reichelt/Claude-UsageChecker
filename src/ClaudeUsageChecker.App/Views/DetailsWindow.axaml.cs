@@ -104,6 +104,11 @@ public partial class DetailsWindow : Window
         FooterText.Text = state.Snapshot is { } snapshot
             ? T.DetailsFooter(snapshot.RetrievedAt.ToLocalTime(), SourceName(snapshot.TokenSource))
             : T.DetailsNoDataYet;
+
+        // Under the source, because the plan belongs to it: it is the plan of the
+        // account whose token fetched these figures.
+        PlanText.Text = UsageFormatter.ToPlanLine(state.Snapshot?.Plan);
+        PlanText.IsVisible = PlanText.Text is not null;
     }
 
     /// <summary>

@@ -121,6 +121,8 @@ modelo y el uso adicional, si está activado. Debajo:
 En macOS el menú incluye además **Mostrar detalles …**, y los dos botones de apoyo
 aparecen como entradas de texto.
 
+La última línea bajo los límites indica tu **plan**; por ejemplo, *Claude Max 5×*.
+
 ## 6. La ventana de detalles
 
 ![La ventana de detalles](images/es/04-details.png)
@@ -139,6 +141,9 @@ Las barras toman el color de tus umbrales: verde por debajo del amarillo, luego
 amarillo y luego rojo. Al pie se indica cuándo se obtuvieron las cifras y de dónde
 viene el acceso. **Actualizar** las vuelve a pedir. La ventana se cierra al hacer
 clic en otro sitio o al pulsar Escape.
+
+Bajo la línea con la hora y el origen aparece tu **plan**, por ejemplo
+*Claude Max 5×*: el plan de la cuenta a la que pertenecen estas cifras.
 
 ## 7. Avisos
 
@@ -169,6 +174,9 @@ Los cambios se aplican al pulsar **Guardar**; **Cancelar** los descarta.
 Arriba: si Claude Code tiene la sesión iniciada en este equipo y si funciona el
 inicio de sesión propio de la aplicación; siempre ambos, se use el que se use.
 Debajo, **Iniciar sesión …** y **Cerrar sesión** para el inicio propio.
+
+Bajo los dos inicios de sesión aparece tu **plan**, por ejemplo *Claude Max 5×*, en
+cuanto se han obtenido las cifras.
 
 ### Comportamiento
 

@@ -25,8 +25,8 @@ public sealed class TrayIconController : IDisposable
 {
     /// <summary>
     /// How many status lines the menu is expected to show: session, weekly
-    /// total, the extra usage, and room for up to five model-specific weekly
-    /// limits.
+    /// total, the extra usage, the plan, and room for up to five model-specific
+    /// weekly limits.
     /// </summary>
     /// <remarks>
     /// Not a hard limit any more - the menu is a window and shows whatever it is
@@ -34,7 +34,7 @@ public sealed class TrayIconController : IDisposable
     /// listed a dozen limits would have stopped being a menu, and
     /// <c>ThereAreEnoughSlotsForEveryReportedLimit</c> would say so.
     /// </remarks>
-    internal const int StatusSlotCount = 8;
+    internal const int StatusSlotCount = 9;
 
     private readonly UsageMonitor _monitor;
     private readonly Func<AppSettings> _settings;
@@ -208,7 +208,19 @@ public sealed class TrayIconController : IDisposable
             lines.Add(extra);
         }
 
-        return lines.Count == 0 ? [T.TrayNoLimits] : lines;
+        if (lines.Count == 0)
+        {
+            lines.Add(T.TrayNoLimits);
+        }
+
+        // Last, under the figures it explains: the plan says why the limits are
+        // as large as they are, not how far they have been used.
+        if (UsageFormatter.ToPlanLine(snapshot.Plan) is { } plan)
+        {
+            lines.Add(plan);
+        }
+
+        return lines;
     }
 
     public void Dispose()

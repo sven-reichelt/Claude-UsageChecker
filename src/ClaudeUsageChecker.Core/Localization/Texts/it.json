@@ -51,6 +51,7 @@
   "extra.usedOfLimitLong": "{0} di {1} utilizzati",
   "extra.usedOnly": "{0} utilizzati",
   "extra.limitOnly": "Limite mensile: {0}",
+  "plan.line": "Piano: {0}",
 
   "duration.now": "subito",
   "duration.daysHours": "{0} g {1} h",
@@ -81,6 +82,7 @@
   "settings.accountNotSignedIn": "non effettuato",
   "settings.accountExpired": "scaduto",
   "settings.accountNoStore": "nessun archivio sicuro",
+  "settings.accountPlan": "Piano",
   "settings.signInSection": "Accesso integrato (consigliato)",
   "settings.signInButton": "Accedi ...",
   "settings.signOutButton": "Disconnetti",

@@ -8,6 +8,19 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unveröffentlicht]
 
+## [1.1.0] – 2026-09-18
+
+### Hinzugefügt
+- **Der Plan, dort wo er hingehört.** Das Menü nennt ihn unter der Nutzung, das
+  Detailfenster unter Stand und Quelle, die Einstellungen unter den beiden
+  Anmeldungen – etwa „Claude Max 5×“. Er wird mit demselben Token gelesen wie
+  die Zahlen, ist also immer der Plan des Kontos, für das sie zählen – und wird
+  nicht bei jeder Aktualisierung neu erfragt. Von der Antwort des Servers
+  wird nur der Plan gelesen – nicht Name und E-Mail-Adresse, die mitkommen.
+  Gesehen ist bisher nur Max 5×; Pro, Max 20×, Team und Enterprise sollten
+  genauso erscheinen, und Unerwartetes wird so gezeigt, wie es kommt, statt
+  verschluckt.
+
 ## [1.0.2] – 2026-09-17
 
 ### Hinzugefügt

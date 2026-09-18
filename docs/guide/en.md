@@ -121,6 +121,8 @@ extra usage, where enabled. Below:
 On macOS the menu also has **Show details …**, and the two support buttons appear
 as the entries **Buy me a coffee …** and **Support on Ko-fi …**.
 
+The last line under the limits names your **plan** – *Claude Max 5×*, for example.
+
 ## 6. The details window
 
 ![The details window](images/en/04-details.png)
@@ -138,6 +140,9 @@ The bars take their colours from your thresholds: green below yellow, then yello
 then red. The foot says when the figures were fetched and where the access came
 from. **Refresh** fetches them anew. The window closes when you click elsewhere or
 press Escape.
+
+Under the line with the time and the source stands your **plan**, for example
+*Claude Max 5×*: the plan of the account these figures belong to.
 
 ## 7. Notices
 
@@ -167,6 +172,9 @@ Changes take effect when you click **Save**; **Cancel** discards them.
 At the top: whether Claude Code is signed in on this machine, and whether the
 application's own sign-in works - always both, whichever is in use. Below it,
 **Sign in …** and **Sign out** for the application's own sign-in.
+
+Under the two sign-ins stands your **plan**, for example *Claude Max 5×*, once the
+figures have been fetched.
 
 ### Behaviour
 

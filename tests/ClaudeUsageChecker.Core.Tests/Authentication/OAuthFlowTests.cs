@@ -184,7 +184,7 @@ public class OAuthFlowTests
             var index = RequestCount++;
             if (index >= responses.Length)
             {
-                throw new InvalidOperationException($"Unerwartete Anfrage Nr. {index + 1}.");
+                throw new InvalidOperationException($"Unexpected request no. {index + 1}.");
             }
 
             var (status, body) = responses[index];

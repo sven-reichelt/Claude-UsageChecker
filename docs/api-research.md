@@ -148,6 +148,66 @@ like that in the percentage alone and says nothing about it, so a share that
 looks harmless during the promotion is a larger share of a smaller limit the day
 after.
 
+### Addendum 2026-09-18: the plan, from `GET /api/oauth/profile`
+
+The usage endpoint never says which plan it is counting for. The profile
+endpoint does, and it asks for nothing more than the `user:profile` scope the
+usage call already needs. Measured with **both** routes to a token on the same
+Max account - the application's own sign-in, holding `user:profile` and nothing
+else, and Claude Code's token - and both answered HTTP 200 with the same values:
+
+```
+GET https://api.anthropic.com/api/oauth/profile
+Authorization: Bearer <token>
+anthropic-beta: oauth-2025-04-20
+User-Agent: claude-code/<version>
+
+→ {
+    "account":      { "uuid", "full_name", "display_name", "email",
+                      "has_claude_max": true, "has_claude_pro": false, "created_at" },
+    "organization": { "uuid", "name",
+                      "organization_type": "claude_max",
+                      "billing_type": "stripe_subscription",
+                      "rate_limit_tier": "default_claude_max_5x",
+                      "seat_tier": null,
+                      "has_extra_usage_enabled": false,
+                      "subscription_status": "active",
+                      "subscription_created_at", … },
+    "application":  { "uuid", "name", "slug" },
+    "enabled_plugins": []
+  }
+```
+
+* **`rate_limit_tier` is the only field that tells Max 5x from Max 20x.**
+  `organization_type` says `claude_max` for both, presumably.
+* Read are `organization_type`, `rate_limit_tier`, `has_claude_max` and
+  `has_claude_pro` - **nothing else.** The answer also carries the account
+  holder's name, e-mail address and identifiers; they are not mapped, so they
+  cannot be logged or kept by mistake (`TheProfileCarriesNothingPersonal`).
+* The plan is asked once per token, not once per poll, and with the very token
+  that fetched the figures - so the plan shown belongs to the account those
+  figures count for. After a failure the question rests for an hour.
+
+**Only Max 5x has been measured.** What Pro, Max 20x, Team and Enterprise send
+is assumed: `claude_pro`, `claude_team` and `claude_enterprise` for the type,
+`default_claude_max_20x` for the larger Max. The display does not depend on
+those guesses being right - it drops `claude_`, capitalises the rest and turns a
+trailing `_20x` into "20×", so an answer nobody predicted still comes out
+readable. `PlanFormatterTests` names each assumption as one; the first real
+answer that contradicts one is where to correct it.
+
+**Do not take the plan from Claude Code's credentials.** `.credentials.json`
+carries a `subscriptionType`, and on the same day it said `"pro"` for the
+account the profile endpoint reported as Max 5x - with `rateLimitTier:
+"default_claude_ai"` beside it. The field is written when Claude Code signs in
+and evidently not kept up to date; the subscription on that account was created
+after that sign-in. The application stopped mapping it.
+
+The same file carries `refreshTokenExpiresAt`, which bears on the open question
+of how long a sign-in lasts: on this machine it lay some 28 days after the
+expiry of the current access token. That is Claude Code's sign-in, not this
+application's, and a single observation - but the first figure there is.
+
 ### Pitfalls
 
 | Observation | Consequence in the design |

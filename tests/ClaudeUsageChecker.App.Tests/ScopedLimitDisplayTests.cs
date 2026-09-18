@@ -75,7 +75,7 @@ public class ScopedLimitDisplayTests
 
     private static readonly DateTimeOffset Now = new(2026, 8, 19, 21, 0, 0, TimeSpan.Zero);
 
-    private static UsageState State(params string[] modelle) => new()
+    private static UsageState State(params string[] models) => new()
     {
         Kind = UsageStateKind.Ready,
         Snapshot = new UsageSnapshot
@@ -84,9 +84,10 @@ public class ScopedLimitDisplayTests
             Weekly = new UsageWindow(18, Now.AddDays(3)),
             ScopedWeekly =
             [
-                .. modelle.Select(m => new ScopedUsageWindow(m, new UsageWindow(2, Now.AddDays(3))))
+                .. models.Select(m => new ScopedUsageWindow(m, new UsageWindow(2, Now.AddDays(3))))
             ],
             ExtraUsage = new ExtraUsage(true, 50m, 12m, 24d),
+            Plan = new SubscriptionPlan("claude_max", "default_claude_max_20x"),
             RetrievedAt = Now
         }
     };

@@ -75,7 +75,7 @@ public class WindowRenderingTests : IDisposable
 
             Capture(BuildDetails(), "dark-details");
             Capture(
-                new SettingsWindow(new SettingsStore(file.Path), new AppSettings(), applyAutostart: _ => { }),
+                new SettingsWindow(new SettingsStore(file.Path), new AppSettings(), applyAutostart: _ => { }, plan: Max),
                 "dark-settings");
             Capture(new SignInWindow(), "dark-signin");
             Capture(new InstallPromptWindow(), "dark-setup");
@@ -103,7 +103,7 @@ public class WindowRenderingTests : IDisposable
 
         Capture(BuildDetails(), $"details-{code}");
         Capture(
-            new SettingsWindow(new SettingsStore(file.Path), new AppSettings(), applyAutostart: _ => { }),
+            new SettingsWindow(new SettingsStore(file.Path), new AppSettings(), applyAutostart: _ => { }, plan: Max),
             $"settings-{code}");
 
         // The same window with the section for testers unfolded - the one state
@@ -113,7 +113,8 @@ public class WindowRenderingTests : IDisposable
         var channel = new SettingsWindow(
             new SettingsStore(file.Path),
             new AppSettings { Channel = UpdateChannel.PreRelease },
-            applyAutostart: _ => { });
+            applyAutostart: _ => { },
+            plan: Max);
         channel.FindControl<TextBlock>("VersionText")!.Text = T.VersionPreRelease("1.0.1-beta.1");
         Capture(channel, $"settings-channel-{code}");
         Capture(new SignInWindow(), $"signin-{code}");
@@ -173,6 +174,9 @@ public class WindowRenderingTests : IDisposable
         Capture(window, "details-thresholds-20-35");
     }
 
+    /// <summary>The plan measured on 2026-09-18 - the "×" has to draw in every language.</summary>
+    private static readonly SubscriptionPlan Max = new("claude_max", "default_claude_max_5x", HasClaudeMax: true);
+
     private static DetailsWindow BuildDetails()
     {
         var window = new DetailsWindow();
@@ -195,6 +199,7 @@ public class WindowRenderingTests : IDisposable
                 ExtraUsage = new ExtraUsage(
                     IsEnabled: true, Used: 22.76m, Limit: 50m, Utilization: 46d,
                     Currency: "EUR", Decimals: 2),
+                Plan = Max,
                 RetrievedAt = now,
                 TokenSource = TokenSource.OAuth
             }

@@ -94,6 +94,10 @@ public static class T
     public static string ExtraUsedOnly(string used) => L.Format("extra.usedOnly", used);
     public static string ExtraMonthlyLimit(string limit) => L.Format("extra.limitOnly", limit);
 
+    // Plan - the name arrives finished ("Claude Max 5×"): it is a product name
+    // and the same in every language.
+    public static string PlanLine(string name) => L.Format("plan.line", name);
+
     // Durations
     public static string DurationNow => L["duration.now"];
     public static string DurationDaysHours(int days, int hours) => L.Format("duration.daysHours", days, hours);
@@ -130,6 +134,7 @@ public static class T
     public static string SettingsAccountNotSignedIn => L["settings.accountNotSignedIn"];
     public static string SettingsAccountExpired => L["settings.accountExpired"];
     public static string SettingsAccountNoStore => L["settings.accountNoStore"];
+    public static string SettingsAccountPlan => L["settings.accountPlan"];
     public static string SettingsSignInSection => L["settings.signInSection"];
     public static string SettingsSignIn => L["settings.signInButton"];
     public static string SettingsSignOut => L["settings.signOutButton"];

@@ -8,6 +8,18 @@ the versioning [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.1.0] – 2026-09-18
+
+### Added
+- **The plan, where it belongs.** The menu names it under the usage, the details
+  window under the time and source, the settings under the two sign-ins -
+  "Claude Max 5×", say. It is read with the same token as the figures, so it is
+  always the plan of the account they count for - and not asked afresh on
+  every refresh. Of what the server answers, only the plan is
+  read - not the name or e-mail address that come with it. Only Max 5× has been
+  seen so far; Pro, Max 20×, Team and Enterprise are expected to show up the same
+  way, and anything unexpected is shown as it comes rather than hidden.
+
 ## [1.0.2] – 2026-09-17
 
 ### Added

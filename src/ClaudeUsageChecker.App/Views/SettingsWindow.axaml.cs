@@ -8,6 +8,7 @@ using ClaudeUsageChecker.App.Settings;
 using ClaudeUsageChecker.Core.Authentication;
 using ClaudeUsageChecker.Core.Localization;
 using ClaudeUsageChecker.Core.Authentication.OAuth;
+using ClaudeUsageChecker.Core.Formatting;
 using ClaudeUsageChecker.Core.Models;
 using ClaudeUsageChecker.Core.Platform;
 using ClaudeUsageChecker.Core.Services;
@@ -25,6 +26,7 @@ public partial class SettingsWindow : Window
     private readonly Func<InstallResult>? _relocate;
     private readonly Action<bool> _applyAutostart;
     private readonly Func<Task<AccessToken?>> _readClaudeCodeToken;
+    private readonly SubscriptionPlan? _plan;
     private AppSettings _settings;
     private int _versionClicks;
 
@@ -44,12 +46,14 @@ public partial class SettingsWindow : Window
         OAuthTokenStore? oauthTokenStore = null,
         Func<InstallResult>? relocate = null,
         Action<bool>? applyAutostart = null,
-        Func<Task<AccessToken?>>? readClaudeCodeToken = null)
+        Func<Task<AccessToken?>>? readClaudeCodeToken = null,
+        SubscriptionPlan? plan = null)
     {
         _settingsStore = settingsStore;
         _settings = settings;
         _oauthTokenStore = oauthTokenStore;
         _relocate = relocate;
+        _plan = plan;
 
         // Injectable so that a picture of this window shows no real account: the
         // screenshots in the user guide would otherwise carry the expiry of the
@@ -165,6 +169,13 @@ public partial class SettingsWindow : Window
     {
         AccountOwnStatus.Text = DescribeOwnSignIn();
 
+        // Taken from the last figures fetched rather than asked afresh: it is the
+        // plan of the account those figures belong to, and the window opens
+        // without a network call.
+        var planName = PlanFormatter.Name(_plan);
+        AccountPlanStatus.Text = planName;
+        AccountPlanLabel.IsVisible = AccountPlanStatus.IsVisible = planName is not null;
+
         // The token of a Claude Code installation sits in a file or in the
         // keychain, so asking costs a read. It is done off the interface and
         // written in when the answer arrives.
@@ -250,6 +261,7 @@ public partial class SettingsWindow : Window
         AccountsHeading.Text = T.SettingsAccountsSection;
         AccountCliLabel.Text = T.SourceClaudeCli;
         AccountOwnLabel.Text = T.SettingsAccountOwn;
+        AccountPlanLabel.Text = T.SettingsAccountPlan;
 
         SignInHeading.Text = T.SettingsSignInSection;
         SignInButton.Content = T.SettingsSignIn;

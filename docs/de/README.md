@@ -34,6 +34,7 @@ neun Sprachen.
 | Farbcodiertes Infobereich-Symbol (normal / angespannt / kritisch) | ✅ |
 | Detailfenster mit Fortschrittsbalken und Reset-Uhrzeit | ✅ |
 | Zusatzkontingent, sofern im Abo aktiviert | ✅ |
+| Der Plan – Pro, Max 5×, Max 20×, Team, Enterprise – im Menü, in den Details und in den Einstellungen | ✅ |
 | Alle Limits im Kontextmenü | ✅ |
 | Einstellbare Schwellen für Gelb und Rot | ✅ |
 | Ein Hinweis bei Gelb, Rot und 100 %, mit der Rücksetzzeit | ✅ |
@@ -95,8 +96,18 @@ Details und die verworfenen Alternativen stehen in
 
 ### Unterschiede zwischen Pro und Max
 
-Es gibt keine Plan-Erkennung. Jedes Fenster, das die API als `null` meldet, wird
-schlicht weggelassen – die Anzeige richtet sich allein danach, was zurückkommt.
+Der Plan wird **angezeigt, nicht verwendet**: Menü, Detailfenster und
+Einstellungen nennen ihn – „Claude Max 5×“ –, aber die Anzeige hängt nicht von
+ihm ab. Jedes Fenster, das die API als `null` meldet, wird schlicht
+weggelassen, gleich bei welchem Plan; die Anzeige richtet sich allein danach,
+was zurückkommt.
+
+Der Name kommt aus `GET /api/oauth/profile`, das nicht mehr verlangt als den
+Bereich `user:profile`, den der Nutzungsabruf ohnehin hat. Gemessen ist bisher
+nur Max 5×; für Pro, Max 20×, Team und Enterprise ist dasselbe Muster
+angenommen, und eine Antwort, die niemand vorhergesehen hat, wird trotzdem
+lesbar angezeigt statt verschluckt. Einzelheiten in
+[`docs/api-research.md`](../api-research.md).
 
 | Fenster | Pro | Max |
 | --- | --- | --- |
@@ -509,6 +520,7 @@ Browser und sonst nichts – die Anwendung sendet dabei nichts irgendwohin.
 | 0.8 | macOS-Menüleiste ✅ |
 | 0.9 | Selbstaustausch unter macOS, ein beglaubigtes Bündel, ausgeliefert als Disk-Image ✅ |
 | 1.0 | Hinweise bei Gelb, Rot und 100 %, Support-Buttons, Autostart, der sich selbst repariert; 1.0.1 automatisches Update und Schalter ✅ |
+| 1.1 | Der Plan im Menü, in den Details und in den Einstellungen ✅ |
 
 ## Lizenz
 

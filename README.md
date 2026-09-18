@@ -33,6 +33,7 @@ speaks nine languages.
 | Colour-coded tray icon (normal / strained / critical) | ✅ |
 | Details window with progress bars and reset times | ✅ |
 | Extra usage, where enabled on the subscription | ✅ |
+| The plan - Pro, Max 5×, Max 20×, Team, Enterprise - in the menu, the details and the settings | ✅ |
 | Every limit in the context menu | ✅ |
 | Configurable thresholds for yellow and red | ✅ |
 | A notice at yellow, red and 100 %, with the reset time | ✅ |
@@ -94,8 +95,16 @@ Details and the alternatives that were discarded are in
 
 ### Differences between Pro and Max
 
-There is no plan detection. Every window the API reports as `null` is simply
-left out - the display follows nothing but what comes back.
+The plan is **shown, not used**: the menu, the details window and the settings
+name it - "Claude Max 5×" - but the display does not depend on it. Every window
+the API reports as `null` is simply left out, whatever the plan; the display
+follows nothing but what comes back.
+
+The name comes from `GET /api/oauth/profile`, which needs no more than the
+`user:profile` scope the usage call already has. Only Max 5× has been measured
+so far; Pro, Max 20×, Team and Enterprise are assumed to follow the same pattern,
+and an answer nobody predicted is still shown in readable form rather than
+hidden. Details in [`docs/api-research.md`](docs/api-research.md).
 
 | Window | Pro | Max |
 | --- | --- | --- |
@@ -485,6 +494,7 @@ page in the browser and nothing else - the application sends nothing anywhere.
 | 0.8 | macOS menu bar ✅ |
 | 0.9 | Self-replacement on macOS, a notarised bundle, delivered as a disk image ✅ |
 | 1.0 | Notices at yellow, red and 100 %, support buttons, autostart that repairs itself; 1.0.1 automatic updates and switches ✅ |
+| 1.1 | The plan in the menu, the details and the settings ✅ |
 
 ## Contributing
 

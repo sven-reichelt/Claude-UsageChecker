@@ -14,5 +14,6 @@ namespace ClaudeUsageChecker.Core;
     ReadCommentHandling = JsonCommentHandling.Skip,
     NumberHandling = JsonNumberHandling.AllowReadingFromString)]
 [JsonSerializable(typeof(UsageResponseDto))]
+[JsonSerializable(typeof(ProfileResponseDto))]
 [JsonSerializable(typeof(ClaudeCliCredentials))]
 internal sealed partial class ClaudeUsageJsonContext : JsonSerializerContext;

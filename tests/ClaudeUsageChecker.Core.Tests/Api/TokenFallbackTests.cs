@@ -58,7 +58,7 @@ public class TokenFallbackTests
         var handler = new StubHandler((HttpStatusCode.OK, UsageJson));
 
         var snapshot = await CreateClient(handler,
-            Leer("secret-store"),
+            Empty("secret-store"),
             Source("claude-cli", TokenSource.ClaudeCli)).GetUsageAsync();
 
         Assert.Equal(TokenSource.ClaudeCli, snapshot.TokenSource);
@@ -100,7 +100,7 @@ public class TokenFallbackTests
     {
         var handler = new StubHandler();
 
-        var client = CreateClient(handler, Leer("secret-store"), Leer("claude-cli"));
+        var client = CreateClient(handler, Empty("secret-store"), Empty("claude-cli"));
 
         var ex = await Assert.ThrowsAsync<UsageApiException>(() => client.GetUsageAsync());
 
@@ -145,7 +145,7 @@ public class TokenFallbackTests
     private static ITokenProvider Source(string name, TokenSource source) =>
         new StubProvider(name, new AccessToken($"token-{name}", source));
 
-    private static ITokenProvider Leer(string name) => new StubProvider(name, null);
+    private static ITokenProvider Empty(string name) => new StubProvider(name, null);
 
     private sealed class StubProvider(string name, AccessToken? token) : ITokenProvider
     {
@@ -174,7 +174,7 @@ public class TokenFallbackTests
             var index = RequestCount++;
             if (index >= responses.Length)
             {
-                throw new InvalidOperationException($"Unerwartete Anfrage Nr. {index + 1}.");
+                throw new InvalidOperationException($"Unexpected request no. {index + 1}.");
             }
 
             var (status, body) = responses[index];

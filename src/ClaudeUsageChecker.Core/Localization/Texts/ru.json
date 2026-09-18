@@ -51,6 +51,7 @@
   "extra.usedOfLimitLong": "израсходовано {0} из {1}",
   "extra.usedOnly": "израсходовано {0}",
   "extra.limitOnly": "Месячный лимит: {0}",
+  "plan.line": "Тариф: {0}",
 
   "duration.now": "сейчас",
   "duration.daysHours": "{0} дн {1} ч",
@@ -81,6 +82,7 @@
   "settings.accountNotSignedIn": "не выполнен",
   "settings.accountExpired": "истёк",
   "settings.accountNoStore": "нет защищённого хранилища",
+  "settings.accountPlan": "Тариф",
   "settings.signInSection": "Собственный вход (рекомендуется)",
   "settings.signInButton": "Войти ...",
   "settings.signOutButton": "Выйти",

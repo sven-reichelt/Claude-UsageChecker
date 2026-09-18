@@ -81,8 +81,9 @@ public class LayoutInEveryLanguageTests : IDisposable
 
         using var file = new TemporaryFile();
         var window = new SettingsWindow(
-            new SettingsStore(file.Path), new AppSettings(), applyAutostart: _ => { });
+            new SettingsStore(file.Path), new AppSettings(), applyAutostart: _ => { }, plan: LongestPlan);
 
+        Assert.True(window.FindControl<TextBlock>("AccountPlanStatus")!.IsVisible);
         AssertFits(window, code);
     }
 
@@ -104,7 +105,8 @@ public class LayoutInEveryLanguageTests : IDisposable
         var window = new SettingsWindow(
             new SettingsStore(file.Path),
             new AppSettings { Channel = UpdateChannel.PreRelease },
-            applyAutostart: _ => { });
+            applyAutostart: _ => { },
+            plan: LongestPlan);
 
         Assert.True(window.FindControl<StackPanel>("ChannelSection")!.IsVisible);
 
@@ -335,6 +337,15 @@ public class LayoutInEveryLanguageTests : IDisposable
             + $"the window is {window.Width:0} wide.");
     }
 
+    /// <summary>
+    /// "Claude Enterprise 20×" - <b>not a plan that exists</b>. Enterprise has no
+    /// multiplier; only Max does. It is made up to be longer than any real plan
+    /// name, so that the plan line in the menu, the footer of the details window
+    /// and the settings is measured at its worst in every language.
+    /// </summary>
+    internal static readonly SubscriptionPlan LongestPlan =
+        new("claude_enterprise", "default_claude_enterprise_20x");
+
     private static UsageState ReadyState(ExtraUsage? extraUsage = null)
     {
         var now = DateTimeOffset.UtcNow;
@@ -348,6 +359,7 @@ public class LayoutInEveryLanguageTests : IDisposable
                 Weekly = new UsageWindow(18, now.AddDays(3)),
                 ScopedWeekly = [new ScopedUsageWindow("Fable", new UsageWindow(2, now.AddDays(3)))],
                 ExtraUsage = extraUsage,
+                Plan = LongestPlan,
                 RetrievedAt = now,
                 TokenSource = TokenSource.OAuth
             }

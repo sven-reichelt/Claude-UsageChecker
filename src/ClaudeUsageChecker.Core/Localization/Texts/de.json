@@ -51,6 +51,7 @@
   "extra.usedOfLimitLong": "{0} von {1} verbraucht",
   "extra.usedOnly": "{0} verbraucht",
   "extra.limitOnly": "Monatsgrenze: {0}",
+  "plan.line": "Plan: {0}",
 
   "duration.now": "gleich",
   "duration.daysHours": "{0} Tg {1} Std",
@@ -81,6 +82,7 @@
   "settings.accountNotSignedIn": "nicht angemeldet",
   "settings.accountExpired": "abgelaufen",
   "settings.accountNoStore": "kein sicherer Speicher",
+  "settings.accountPlan": "Plan",
   "settings.signInSection": "Eigene Anmeldung (empfohlen)",
   "settings.signInButton": "Anmelden ...",
   "settings.signOutButton": "Abmelden",

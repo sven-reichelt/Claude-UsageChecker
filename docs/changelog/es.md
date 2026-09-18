@@ -8,6 +8,19 @@ versionado [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+## [1.1.0] – 2026-09-18
+
+### Añadido
+- **El plan, donde corresponde.** El menú lo muestra bajo el uso, la ventana de
+  detalles bajo la hora y el origen, y la configuración bajo los dos inicios de
+  sesión: por ejemplo, «Claude Max 5×». Se lee con el mismo token que las cifras,
+  así que siempre es el plan de la cuenta a la que corresponden, y no se vuelve
+  a consultar en cada actualización. De la respuesta del servidor
+  solo se lee el plan, no el nombre ni la dirección de correo que la acompañan.
+  Hasta ahora solo se ha visto Max 5×; se espera que Pro, Max 20×, Team y
+  Enterprise aparezcan igual, y lo inesperado se muestra tal como llega en lugar
+  de ocultarse.
+
 ## [1.0.2] – 2026-09-17
 
 ### Añadido

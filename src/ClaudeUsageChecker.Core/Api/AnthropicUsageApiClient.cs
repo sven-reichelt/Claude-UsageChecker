@@ -27,7 +27,8 @@ public sealed class AnthropicUsageApiClient(
     IReadOnlyList<ITokenProvider> tokenProviders,
     UsageApiOptions? options = null,
     TimeProvider? timeProvider = null,
-    ILogger<AnthropicUsageApiClient>? logger = null) : IUsageApiClient
+    ILogger<AnthropicUsageApiClient>? logger = null,
+    ISubscriptionPlanSource? planSource = null) : IUsageApiClient
 {
     private readonly IReadOnlyList<ITokenProvider> _tokenProviders =
         tokenProviders ?? throw new ArgumentNullException(nameof(tokenProviders));
@@ -54,7 +55,18 @@ public sealed class AnthropicUsageApiClient(
 
             try
             {
-                return await FetchAsync(token, cancellationToken).ConfigureAwait(false);
+                var snapshot = await FetchAsync(token, cancellationToken).ConfigureAwait(false);
+
+                // Asked only once the figures are in, and with the very token
+                // that fetched them: the plan shown then belongs to the account
+                // those figures count for. A token the usage endpoint turned
+                // away never gets this far.
+                return planSource is null
+                    ? snapshot
+                    : snapshot with
+                    {
+                        Plan = await planSource.GetPlanAsync(token, cancellationToken).ConfigureAwait(false)
+                    };
             }
             catch (UsageApiException ex) when (ex.Failure == UsageApiFailure.Unauthorized)
             {
@@ -311,32 +323,32 @@ public sealed class AnthropicUsageApiClient(
     {
         if (dto.Limits is { Count: > 0 } limits)
         {
-            var ausListe = limits
+            var fromList = limits
                 .Where(l => string.Equals(l.Kind, "weekly_scoped", StringComparison.OrdinalIgnoreCase))
                 .Select(l => (Name: l.Scope?.Model?.DisplayName, Window: MapLimit(l)))
                 .Where(e => !string.IsNullOrWhiteSpace(e.Name) && e.Window is not null)
                 .Select(e => new ScopedUsageWindow(e.Name!, e.Window!))
                 .ToList();
 
-            if (ausListe.Count > 0)
+            if (fromList.Count > 0)
             {
-                return ausListe;
+                return fromList;
             }
         }
 
-        var ausEinzelfeldern = new List<ScopedUsageWindow>(2);
+        var fromFields = new List<ScopedUsageWindow>(2);
 
         if (MapWindow(dto.SevenDayOpus) is { } opus)
         {
-            ausEinzelfeldern.Add(new ScopedUsageWindow("Opus", opus));
+            fromFields.Add(new ScopedUsageWindow("Opus", opus));
         }
 
         if (MapWindow(dto.SevenDaySonnet) is { } sonnet)
         {
-            ausEinzelfeldern.Add(new ScopedUsageWindow("Sonnet", sonnet));
+            fromFields.Add(new ScopedUsageWindow("Sonnet", sonnet));
         }
 
-        return ausEinzelfeldern;
+        return fromFields;
     }
 
     private static UsageWindow? MapLimit(LimitDto dto) =>

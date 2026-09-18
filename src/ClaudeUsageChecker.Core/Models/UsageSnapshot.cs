@@ -32,6 +32,13 @@ public sealed record UsageSnapshot
     /// <summary>Which source the token used came from.</summary>
     public Authentication.TokenSource TokenSource { get; init; } = Authentication.TokenSource.ClaudeCli;
 
+    /// <summary>
+    /// The plan of the account the figures belong to - read with the same token,
+    /// so the two cannot come from different accounts. Null where it could not
+    /// be told.
+    /// </summary>
+    public SubscriptionPlan? Plan { get; init; }
+
     /// <summary>Every reported window in display order, without labels.</summary>
     public IEnumerable<UsageWindow> AllWindows()
     {

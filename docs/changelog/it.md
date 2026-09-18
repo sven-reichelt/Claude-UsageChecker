@@ -8,6 +8,19 @@ numerazione [Semantic Versioning](https://semver.org/lang/it/).
 
 ## [Non pubblicato]
 
+## [1.1.0] – 2026-09-18
+
+### Aggiunto
+- **Il piano, dove deve stare.** Il menu lo indica sotto l'utilizzo, la finestra
+  dei dettagli sotto l'ora e l'origine, le impostazioni sotto i due accessi – ad
+  esempio «Claude Max 5×». Viene letto con lo stesso token dei valori, quindi è
+  sempre il piano dell'account a cui si riferiscono, e non viene richiesto di
+  nuovo a ogni aggiornamento. Della risposta del server si legge solo
+  il piano, non il nome né l'indirizzo e-mail che la accompagnano. Finora si è
+  visto solo Max 5×; Pro, Max 20×, Team ed Enterprise dovrebbero comparire allo
+  stesso modo, e ciò che è inatteso viene mostrato così com'è invece di essere
+  nascosto.
+
 ## [1.0.2] – 2026-09-17
 
 ### Aggiunto

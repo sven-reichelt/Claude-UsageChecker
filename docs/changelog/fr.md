@@ -8,6 +8,18 @@ numérotation [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+## [1.1.0] – 2026-09-18
+
+### Ajouté
+- **Le forfait, là où il a sa place.** Le menu l'indique sous l'utilisation, la
+  fenêtre de détails sous l'heure et la source, les paramètres sous les deux
+  connexions – par exemple « Claude Max 5× ». Il est lu avec le même jeton que
+  les chiffres : c'est donc toujours le forfait du compte auquel ils se
+  rapportent, et il n'est pas redemandé à chaque actualisation. De la réponse du serveur, seul le forfait est lu – ni le nom ni
+  l'adresse e-mail qui l'accompagnent. Seul Max 5× a été observé jusqu'ici ;
+  Pro, Max 20×, Team et Enterprise devraient apparaître de la même façon, et
+  l'inattendu est affiché tel quel plutôt que masqué.
+
 ## [1.0.2] – 2026-09-17
 
 ### Ajouté

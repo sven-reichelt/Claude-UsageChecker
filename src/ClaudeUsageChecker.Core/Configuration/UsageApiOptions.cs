@@ -10,6 +10,12 @@ public sealed class UsageApiOptions
     public string UsagePath { get; init; } = "api/oauth/usage";
 
     /// <summary>
+    /// Path of the profile endpoint, which names the plan. Same scope, same
+    /// headers as the usage call.
+    /// </summary>
+    public string ProfilePath { get; init; } = "api/oauth/profile";
+
+    /// <summary>
     /// Value of the User-Agent header. Mandatory: without a Claude Code user
     /// agent the endpoint answers HTTP 429 permanently.
     /// </summary>

@@ -146,6 +146,7 @@ Genau diese Gegenstellen kontaktiert die Anwendung selbst:
 | Ziel | Zweck | Übertragene Daten |
 | --- | --- | --- |
 | `api.anthropic.com/api/oauth/usage` | Nutzungsstand abrufen | nur das Bearer-Token |
+| `api.anthropic.com/api/oauth/profile` | den Plan lesen, einmal je Token | nur das Bearer-Token; von der Antwort wird nur der Plan gelesen, nicht Name und E-Mail-Adresse, die sie ebenfalls enthält |
 | `platform.claude.com/v1/oauth/token` | Code tauschen, Token erneuern | Code, PKCE-Verifier bzw. Refresh-Token |
 | `api.github.com` | Versionsprüfung beim Start und alle zwei Stunden | keine, nur ein GET |
 | `github.com` und die Dateiserver von GitHub | Update und Prüfsumme laden, nur beim Einspielen | keine, nur ein GET |

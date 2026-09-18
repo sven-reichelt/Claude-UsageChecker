@@ -126,6 +126,9 @@ En dessous :
 Sous macOS, le menu comporte en plus **Afficher les détails …**, et les deux boutons
 de soutien apparaissent sous forme d'entrées de texte.
 
+La dernière ligne sous les limites indique votre **forfait** – par exemple
+*Claude Max 5×*.
+
 ## 6. La fenêtre de détails
 
 ![La fenêtre de détails](images/fr/04-details.png)
@@ -144,6 +147,9 @@ Les barres prennent les couleurs de vos seuils : vert sous le jaune, puis jaune,
 puis rouge. En bas s'affichent l'heure à laquelle les chiffres ont été récupérés et
 la provenance de l'accès. **Actualiser** les redemande. La fenêtre se ferme si vous
 cliquez ailleurs ou appuyez sur Échap.
+
+Sous la ligne indiquant l'heure et la provenance figure votre **forfait**, par
+exemple *Claude Max 5×* : le forfait du compte auquel ces chiffres se rapportent.
 
 ## 7. Avertissements
 
@@ -174,6 +180,9 @@ Les modifications prennent effet avec **Enregistrer** ; **Annuler** les abandonn
 En haut : si Claude Code est connecté sur cette machine et si la connexion propre à
 l'application fonctionne — toujours les deux, quelle que soit celle utilisée. En
 dessous, **Se connecter …** et **Se déconnecter** pour la connexion propre.
+
+Sous les deux connexions figure votre **forfait**, par exemple *Claude Max 5×*, dès
+que les chiffres ont été récupérés.
 
 ### Comportement
 

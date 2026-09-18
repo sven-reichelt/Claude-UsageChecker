@@ -141,6 +141,7 @@ Exactly these counterparts are contacted by the application itself:
 | Target | Purpose | Data transmitted |
 | --- | --- | --- |
 | `api.anthropic.com/api/oauth/usage` | fetch the usage status | the bearer token only |
+| `api.anthropic.com/api/oauth/profile` | read the plan, once per token | the bearer token only; of the answer only the plan is read, not the name or e-mail address it also carries |
 | `platform.claude.com/v1/oauth/token` | exchange the code, refresh tokens | code, PKCE verifier or refresh token |
 | `api.github.com` | version check at startup and every two hours | none, just a GET |
 | `github.com` and GitHub's file servers | download an update and its checksum, only when installing | none, just a GET |

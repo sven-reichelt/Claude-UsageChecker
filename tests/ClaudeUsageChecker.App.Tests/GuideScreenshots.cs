@@ -88,7 +88,7 @@ public class GuideScreenshots : IDisposable
 
         Capture(Update(), code, "07-update");
         Capture(WhatsNew(), code, "08-whats-new");
-        Capture(new AboutWindow(App.RepositoryUri, new ProgramVersion(new Version(1, 0, 2))), code, "09-about");
+        Capture(new AboutWindow(App.RepositoryUri, new ProgramVersion(new Version(1, 1, 0))), code, "09-about");
     }
 
     private static InstallPromptWindow Setup()
@@ -111,7 +111,7 @@ public class GuideScreenshots : IDisposable
                 (T.TrayRefreshNow, () => { }),
                 (T.TraySettings, () => { }),
                 (T.TrayCheckForUpdates, () => { }),
-                (T.TrayAbout("1.0.2"), () => { }),
+                (T.TrayAbout("1.1.0"), () => { }),
                 (T.TrayExit, () => { })
             ]);
 
@@ -156,18 +156,19 @@ public class GuideScreenshots : IDisposable
             ownSignIn,
             applyAutostart: _ => { },
             readClaudeCodeToken: () => Task.FromResult<AccessToken?>(
-                new AccessToken("example", TokenSource.ClaudeCli, now.AddHours(5).AddMinutes(20))));
+                new AccessToken("example", TokenSource.ClaudeCli, now.AddHours(5).AddMinutes(20))),
+            plan: ExamplePlan);
     }
 
     private static UpdateAvailableWindow Update() => new(
         new UpdateCheckResult
         {
             Status = UpdateCheckStatus.UpdateAvailable,
-            AvailableVersion = new ProgramVersion(new Version(1, 0, 3)),
-            ReleasePage = new Uri("https://example.invalid/releases/v1.0.3"),
+            AvailableVersion = new ProgramVersion(new Version(1, 1, 1)),
+            ReleasePage = new Uri("https://example.invalid/releases/v1.1.1"),
             DownloadUrl = new Uri("https://example.invalid/ClaudeUsageChecker.exe"),
             ChecksumUrl = new Uri("https://example.invalid/ClaudeUsageChecker.exe.sha256"),
-            Message = T.UpdateAvailable("1.0.3", "1.0.2")
+            Message = T.UpdateAvailable("1.1.1", "1.1.0")
         },
         canInstall: true);
 
@@ -175,15 +176,21 @@ public class GuideScreenshots : IDisposable
     {
         var window = new ReleaseNotesWindow();
         window.Render(
-            ChangelogResource.Only(new Version(1, 0, 1)),
-            new ProgramVersion(new Version(1, 0, 0)),
+            ChangelogResource.Only(new Version(1, 1, 0)),
+            new ProgramVersion(new Version(1, 0, 2)),
             ChangelogResource.IsTranslated,
-            new ProgramVersion(new Version(1, 0, 1)));
+            new ProgramVersion(new Version(1, 1, 0)));
 
         return window;
     }
 
     private static OAuthTokenStore SignedOutStore() => new(new FakeSecretStore());
+
+    /// <summary>
+    /// The one plan that has been measured, so the pictures show nothing assumed.
+    /// </summary>
+    private static readonly SubscriptionPlan ExamplePlan =
+        new("claude_max", "default_claude_max_5x", HasClaudeMax: true);
 
     /// <summary>A week well under way: the session at ease, the week in the yellow.</summary>
     private static UsageState State(DateTimeOffset now) => new()
@@ -197,6 +204,7 @@ public class GuideScreenshots : IDisposable
             ExtraUsage = new ExtraUsage(
                 IsEnabled: true, Used: 12.40m, Limit: 50m, Utilization: 25d,
                 Currency: "EUR", Decimals: 2),
+            Plan = ExamplePlan,
             RetrievedAt = now,
             TokenSource = TokenSource.OAuth
         }

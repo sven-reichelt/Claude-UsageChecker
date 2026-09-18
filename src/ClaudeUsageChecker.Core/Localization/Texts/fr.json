@@ -51,6 +51,7 @@
   "extra.usedOfLimitLong": "{0} sur {1} utilisés",
   "extra.usedOnly": "{0} utilisés",
   "extra.limitOnly": "Plafond mensuel : {0}",
+  "plan.line": "Forfait : {0}",
 
   "duration.now": "maintenant",
   "duration.daysHours": "{0} j {1} h",
@@ -81,6 +82,7 @@
   "settings.accountNotSignedIn": "non connecté",
   "settings.accountExpired": "expirée",
   "settings.accountNoStore": "aucun stockage sécurisé",
+  "settings.accountPlan": "Forfait",
   "settings.signInSection": "Connexion intégrée (recommandé)",
   "settings.signInButton": "Se connecter ...",
   "settings.signOutButton": "Se déconnecter",

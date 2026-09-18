@@ -168,6 +168,13 @@ public static class UsageFormatter
 
 
     /// <summary>
+    /// The line naming the plan, for example "Plan: Claude Max 5×". Null where
+    /// the plan is not known - no line is better than a guessed one.
+    /// </summary>
+    public static string? ToPlanLine(SubscriptionPlan? plan) =>
+        PlanFormatter.Name(plan) is { } name ? T.PlanLine(name) : null;
+
+    /// <summary>
     /// Writes an amount with the currency and the number of places the API named
     /// for this account - EUR here, USD or BRL elsewhere.
     /// </summary>

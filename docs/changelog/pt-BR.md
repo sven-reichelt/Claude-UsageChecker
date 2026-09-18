@@ -8,6 +8,18 @@ versionamento [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+## [1.1.0] – 2026-09-18
+
+### Adicionado
+- **O plano, onde ele pertence.** O menu o mostra abaixo do uso, a janela de
+  detalhes abaixo do horário e da origem, as configurações abaixo dos dois
+  logins – por exemplo, "Claude Max 5×". Ele é lido com o mesmo token dos
+  números, então é sempre o plano da conta a que eles se referem, e não é
+  consultado de novo a cada atualização. Da resposta do servidor, só o plano é
+  lido – não o nome nem o endereço de e-mail que vêm junto. Até agora só o Max 5×
+  foi visto; Pro, Max 20×, Team e Enterprise devem aparecer da mesma forma, e o
+  inesperado é mostrado como chega em vez de ser escondido.
+
 ## [1.0.2] – 2026-09-17
 
 ### Adicionado

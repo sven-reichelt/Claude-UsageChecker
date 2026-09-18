@@ -23,7 +23,7 @@ and a second one would break every clone that exists by then.
 
 ```powershell
 dotnet build                                      # the whole solution
-dotnet test                                       # 846 tests (Core.Tests + App.Tests)
+dotnet test                                       # 887 tests (Core.Tests + App.Tests)
 dotnet run --project src/ClaudeUsageChecker.App   # run the application
 node build/generate-icons.mjs                     # regenerate the icons
 node build/generate-support-images.mjs            # Buy Me a Coffee SVG -> Avalonia vector image
@@ -81,8 +81,17 @@ Builds into `artifacts/` (centrally through `ArtifactsPath` in
 
 ## Status
 
-Version 1.0.2 released on 2026-09-17 (1.0.0 and 1.0.1 the same day, after three
-pre-releases of 0.9.1); the repository is public and written in English.
+Version 1.1.0 released on 2026-09-18; before it 1.0.0, 1.0.1 and 1.0.2 on
+2026-09-17, after three pre-releases of 0.9.1. The repository is public and
+written in English.
+
+**1.1.0 brought the plan.** The menu (under the usage), the details window (under
+time and source) and the settings (under the sign-ins) name it - "Claude Max 5×".
+It comes from `GET /api/oauth/profile` (`AnthropicProfileClient`), asked with
+the same token that fetched the figures, once per token, and only the plan is
+mapped out of an answer that also carries name and e-mail. Only Max 5× is
+measured; Pro, Max 20×, Team and Enterprise are assumptions, named as such in
+`PlanFormatterTests`. Details in [docs/api-research.md](docs/api-research.md).
 
 **1.0.2 brought the user guide**: `docs/guide/<language>.md` in all nine
 languages, with `docs/guide/images/<language>/` drawn by `GuideScreenshots`, and
@@ -223,6 +232,13 @@ the settings ran under the support buttons that way, and a test comparing block
 bounds stayed green even against the broken layout - its counter-check is what
 showed it. Measure `TextLayout.Width` for where the text really ends;
 `TheSettingsFooterKeepsTheVersionClearOfTheButtons` does.
+
+**A field that sounds authoritative can be a snapshot.** Claude Code's
+`.credentials.json` carries `subscriptionType`, and it said `"pro"` for an
+account the server reported as Max 5× - written at sign-in, never updated. The
+field had been mapped for months, unused, waiting for someone to trust it. The
+plan comes from the profile endpoint; ask the server, not a copy of what it said
+once.
 
 **Failures in tray actions otherwise end the application.** Without a window an
 exception travels all the way to the message loop and the process disappears
