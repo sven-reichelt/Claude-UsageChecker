@@ -251,6 +251,46 @@ field had been mapped for months, unused, waiting for someone to trust it. The
 plan comes from the profile endpoint; ask the server, not a copy of what it said
 once.
 
+**A `TextBox` sets its caret after your handler, not before.** Clicking the
+sign-in address is meant to select and copy all of it. A tunnelling
+`PointerPressed` handler runs first and is therefore useless: the `TextBox`
+handles the press afterwards, puts the caret where the pointer was, and the
+`SelectAll` is gone. It has to run after the control, which means bubbling -
+and with `handledEventsToo: true`, since the control may mark the event
+handled. The test saw it immediately; reasoning about the route did not.
+`ClickingTheAddressCopiesAllOfIt` pins it.
+
+**Only the authorization request created last can be redeemed.** Every press of
+a button in step 1 of the sign-in used to create a fresh one, which threw away
+the code verifier of the previous. Opening the page twice was enough to leave a
+page whose code was refused with no explanation. The window therefore keeps one
+request until it has been redeemed (`PrepareRequest`). This had stood unnoticed
+for as long as there was one button; adding a second would have made it the
+normal case, since copying the address and then opening the browser invalidates
+what was just copied. **A second way into an existing path turns its latent
+faults into everyday ones.**
+
+**A release can be stopped by an Apple agreement, and it looks like a broken
+pipeline.** `notarytool submit` answered `HTTP status code: 403. A required
+agreement is missing or has expired.` eight seconds in, for 1.1.2-beta.1 -
+Apple had put new terms into effect since the previous release. Nothing in the
+workflow or the certificate was wrong. Two things make it worse than it sounds:
+the Windows job hangs off the macOS one through `needs: macos`, so an Apple
+account state blocks the platform that has nothing to do with Apple; and
+accepting the agreement does not take effect at once - the first run after
+signing failed identically, the third went through. Check the developer portal
+(only the Account Holder may sign), **App Store Connect → Business**, which
+holds agreements the portal does not show, and the membership's expiry. Then
+wait rather than rerun. A rerun is cheap, though: build and signing take about
+ninety seconds and the 403 comes straight after - the 45-minute wait only
+happens once Apple accepts the submission.
+
+**A cancelled job is not a failed one.** The first run for `v1.1.2` ended after
+fifteen minutes as "cancelled", with `log not found` - no log was ever
+uploaded. That is GitHub losing the runner, not a fault to be found: the same
+commit had built and been notarised minutes earlier. Rerunning was the whole
+fix. Read the conclusion word before looking for a cause.
+
 **A style on a control does not reach the controls inside its template.**
 The Fluent theme builds number fields, pickers and check boxes 32 high, for text
 in 14. Setting `MinHeight` on a `NumericUpDown` changed nothing visible: the
