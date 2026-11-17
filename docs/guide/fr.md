@@ -75,7 +75,11 @@ elle essaie les deux :
 Pour vous connecter, ouvrez **Paramètres** et cliquez sur **Se connecter …** :
 
 1. Cliquez sur **Ouvrir la page de connexion dans le navigateur**. claude.ai
-   s'ouvre ; accordez l'accès là-bas.
+   s'ouvre ; accordez l'accès là-bas. Pour un autre navigateur, un autre profil
+   ou un autre appareil, **Copier seulement l'adresse** remet l'adresse sans
+   ouvrir le navigateur – et un clic sur l'adresse elle-même la copie en entier.
+   Les deux chemins mènent à la même connexion, l'étape 2 suit donc dans les deux
+   cas.
 2. La page affiche un code. Copiez-le, collez-le dans le champ et cliquez sur
    **Terminer la connexion**.
 

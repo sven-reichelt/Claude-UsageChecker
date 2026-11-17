@@ -8,6 +8,26 @@ numerazione [Semantic Versioning](https://semver.org/lang/it/).
 
 ## [Non pubblicato]
 
+## [1.1.2] – 2026-11-17
+
+### Aggiunto
+- **Una seconda strada nel passo 1 dell'accesso integrato.** Accanto ad *Apri la
+  pagina di accesso nel browser* ora c'è *Copia solo l'indirizzo*: consegna
+  l'indirizzo di accesso e lascia stare il browser, per un altro browser, un
+  altro profilo o un dispositivo su cui l'applicazione non gira affatto. Un clic
+  sull'indirizzo stesso lo copia per intero, invece di farlo selezionare a mano
+  in un campo alto due righe. Entrambe le strade portano allo stesso accesso, e a
+  entrambe segue l'incollare il codice nel passo 2.
+
+### Corretto
+- **L'indirizzo consegnato resta quello che funziona.** Ogni pressione del
+  pulsante del passo 1 creava una nuova richiesta di autorizzazione, e solo
+  l'ultima è riscattabile. Bastava quindi aprire la pagina due volte per
+  ritrovarsi con una pagina il cui codice veniva rifiutato senza una parola – e
+  con due pulsanti sarebbe diventato il caso normale, perché copiare l'indirizzo
+  e poi aprire il browser avrebbe invalidato quanto appena copiato. Ora la
+  richiesta resta valida finché non è stata riscattata.
+
 ## [1.1.1] – 2026-09-19
 
 ### Modificato

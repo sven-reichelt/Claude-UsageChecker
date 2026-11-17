@@ -8,6 +8,26 @@ versionado [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+## [1.1.2] – 2026-11-17
+
+### Añadido
+- **Un segundo camino por el paso 1 del inicio de sesión propio.** Junto a *Abrir
+  la página de inicio de sesión en el navegador* está ahora *Copiar solo la
+  dirección*: entrega la dirección de acceso y deja el navegador en paz, para
+  otro navegador, otro perfil o un dispositivo en el que la aplicación ni
+  siquiera se ejecuta. Al hacer clic en la propia dirección se copia completa, en
+  lugar de tener que marcarla a mano en un campo de dos líneas de alto. Ambos
+  caminos llevan al mismo inicio de sesión, así que a los dos les sigue pegar el
+  código en el paso 2.
+
+### Corregido
+- **La dirección entregada sigue siendo la que funciona.** Cada pulsación del
+  botón del paso 1 creaba una nueva solicitud de autorización, y solo la última
+  puede canjearse. Bastaba con abrir la página dos veces para quedarse con una
+  página cuyo código se rechazaba en silencio, y con dos botones eso habría sido
+  lo normal: copiar la dirección y abrir después el navegador habría invalidado
+  lo recién copiado. Ahora la solicitud se mantiene hasta haberse canjeado.
+
 ## [1.1.1] – 2026-09-19
 
 ### Cambiado

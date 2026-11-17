@@ -1,5 +1,9 @@
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
+using Avalonia.Input.Platform;
+using Avalonia.Interactivity;
+using Avalonia.Threading;
 using ClaudeUsageChecker.App.Settings;
 using ClaudeUsageChecker.App.Views;
 using ClaudeUsageChecker.Core.Authentication.OAuth;
@@ -14,9 +18,87 @@ public class SignInWindowTests
     {
         var window = new SignInWindow(CreateOAuthClient(), CreateTokenStore(out _));
 
+        Assert.NotNull(window.FindControl<Button>("CopyAddressButton"));
         Assert.NotNull(window.FindControl<Button>("OpenBrowserButton"));
         Assert.NotNull(window.FindControl<TextBox>("CodeBox"));
         Assert.NotNull(window.FindControl<Button>("CompleteButton"));
+    }
+
+    [AvaloniaFact]
+    public async Task CopyingTheAddressHandsOverTheWholeAddressAndOpensStepTwo()
+    {
+        var window = new SignInWindow(CreateOAuthClient(), CreateTokenStore(out _));
+        window.Show();
+
+        Press(window, "CopyAddressButton");
+
+        var address = window.FindControl<TextBox>("UrlBox")!.Text!;
+        Assert.StartsWith("https://", address, StringComparison.Ordinal);
+        Assert.Contains("code_challenge", address, StringComparison.Ordinal);
+
+        // The second way through step 1 has to reach step 2 as well: whoever
+        // opens the page elsewhere still pastes the code here.
+        Assert.True(window.FindControl<Button>("CompleteButton")!.IsEnabled);
+        Assert.Equal(address, await Clipboard(window).ConfigureAwait(true));
+
+        window.Close();
+    }
+
+    [AvaloniaFact]
+    public void BothWaysThroughStepOneShareOneAuthorizationRequest()
+    {
+        var window = new SignInWindow(CreateOAuthClient(), CreateTokenStore(out _));
+        window.Show();
+
+        Press(window, "CopyAddressButton");
+        var copied = window.FindControl<TextBox>("UrlBox")!.Text;
+
+        Press(window, "OpenBrowserButton");
+
+        // Every request carries its own code verifier, and only the last one
+        // created can be redeemed. A second one would silently turn the
+        // address just copied into a dead end.
+        Assert.Equal(copied, window.FindControl<TextBox>("UrlBox")!.Text);
+
+        window.Close();
+    }
+
+    [AvaloniaFact]
+    public async Task ClickingTheAddressCopiesAllOfIt()
+    {
+        var window = new SignInWindow(CreateOAuthClient(), CreateTokenStore(out _));
+        window.Show();
+
+        Press(window, "OpenBrowserButton");
+        var address = window.FindControl<TextBox>("UrlBox")!.Text!;
+
+        var box = window.FindControl<TextBox>("UrlBox")!;
+        box.RaiseEvent(new PointerPressedEventArgs(
+            box, new Pointer(1, PointerType.Mouse, true), box, default,
+            0, new PointerPointProperties(RawInputModifiers.None, PointerUpdateKind.LeftButtonPressed),
+            KeyModifiers.None));
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(address, box.SelectedText);
+        Assert.Equal(address, await Clipboard(window).ConfigureAwait(true));
+
+        window.Close();
+    }
+
+    private static void Press(Window window, string name)
+    {
+        window.FindControl<Button>(name)!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+
+        // The copying is asynchronous; its continuation runs as a dispatcher job.
+        Dispatcher.UIThread.RunJobs();
+    }
+
+    private static async Task<string?> Clipboard(Window window)
+    {
+        var clipboard = TopLevel.GetTopLevel(window)?.Clipboard;
+        Assert.NotNull(clipboard);
+
+        return await clipboard.TryGetTextAsync().ConfigureAwait(true);
     }
 
     [AvaloniaFact]

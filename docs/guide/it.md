@@ -74,7 +74,10 @@ due e le prova entrambe:
 Per accedere apri **Impostazioni** e fai clic su **Accedi …**:
 
 1. Fai clic su **Apri la pagina di accesso nel browser**. Si apre claude.ai;
-   concedi lì l'accesso.
+   concedi lì l'accesso. Per un altro browser, un altro profilo o un altro
+   dispositivo, **Copia solo l'indirizzo** consegna l'indirizzo senza aprire il
+   browser, e un clic sull'indirizzo stesso lo copia per intero. Entrambe le
+   strade portano allo stesso accesso, quindi a entrambe segue il passo 2.
 2. La pagina mostra un codice. Copialo, incollalo nel campo e fai clic su
    **Completa l'accesso**.
 

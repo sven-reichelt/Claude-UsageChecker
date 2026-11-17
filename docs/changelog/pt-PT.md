@@ -8,6 +8,26 @@ numeração [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+## [1.1.2] – 2026-11-17
+
+### Adicionado
+- **Um segundo caminho pelo passo 1 do início de sessão próprio.** Ao lado de
+  *Abrir a página de início de sessão no navegador* está agora *Copiar só o
+  endereço*: entrega o endereço de início de sessão e deixa o navegador em paz –
+  para outro navegador, outro perfil ou um aparelho onde a aplicação nem sequer
+  corre. Um clique no próprio endereço copia-o por inteiro, em vez de o deixar
+  marcar à mão num campo com duas linhas de altura. Os dois caminhos levam ao
+  mesmo início de sessão, pelo que a seguir a qualquer um deles vem colar o
+  código no passo 2.
+
+### Corrigido
+- **O endereço entregue continua a ser o que funciona.** Cada clique no botão do
+  passo 1 criava um novo pedido de autorização, e só o último pode ser resgatado.
+  Bastava abrir a página duas vezes para ficar com uma página cujo código era
+  recusado sem uma palavra – e com dois botões isso teria passado a ser o caso
+  normal, porque copiar o endereço e abrir depois o navegador invalidaria o que
+  acabara de ser copiado. O pedido mantém-se agora até ter sido resgatado.
+
 ## [1.1.1] – 2026-09-19
 
 ### Alterado

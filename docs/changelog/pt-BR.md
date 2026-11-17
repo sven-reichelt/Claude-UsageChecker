@@ -8,6 +8,25 @@ versionamento [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+## [1.1.2] – 2026-11-17
+
+### Adicionado
+- **Um segundo caminho pelo passo 1 do login próprio.** Ao lado de *Abrir a
+  página de login no navegador* agora está *Copiar só o endereço*: entrega o
+  endereço de login e deixa o navegador em paz – para outro navegador, outro
+  perfil ou um aparelho em que o aplicativo nem roda. Um clique no próprio
+  endereço copia ele por inteiro, em vez de deixar que seja marcado na mão num
+  campo de duas linhas de altura. Os dois caminhos levam ao mesmo login, então
+  depois de qualquer um deles vem colar o código no passo 2.
+
+### Corrigido
+- **O endereço entregue continua sendo o que funciona.** Cada clique no botão do
+  passo 1 criava um novo pedido de autorização, e só o último pode ser resgatado.
+  Abrir a página duas vezes já bastava para ficar com uma página cujo código era
+  recusado sem aviso – e com dois botões isso teria virado o caso comum, porque
+  copiar o endereço e depois abrir o navegador invalidaria o que acabara de ser
+  copiado. Agora o pedido permanece até ter sido resgatado.
+
 ## [1.1.1] – 2026-09-19
 
 ### Alterado

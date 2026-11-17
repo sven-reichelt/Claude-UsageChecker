@@ -74,7 +74,10 @@ tenta ambos:
 Para iniciar sessão, abra **Definições** e clique em **Iniciar sessão …**:
 
 1. Clique em **Abrir a página de início de sessão no navegador**. Abre o claude.ai;
-   conceda aí o acesso.
+   conceda aí o acesso. Para outro navegador, outro perfil ou outro dispositivo,
+   **Copiar só o endereço** entrega o endereço sem abrir o navegador – e um
+   clique no próprio endereço copia-o por inteiro. Os dois caminhos levam ao
+   mesmo início de sessão, por isso o passo 2 segue-se a qualquer um deles.
 2. A página mostra um código. Copie-o, cole-o no campo e clique em **Concluir o
    início de sessão**.
 

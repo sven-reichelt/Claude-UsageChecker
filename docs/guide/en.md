@@ -73,7 +73,10 @@ tries both:
 To sign in, open **Settings** and click **Sign in …**:
 
 1. Click **Open sign-in page in browser**. claude.ai opens; approve the access
-   there.
+   there. For a different browser, another profile or another device,
+   **Copy address only** hands over the address instead and leaves the browser
+   alone - and a click on the address itself copies it in full. Both ways lead
+   to the same sign-in, so step 2 follows either of them.
 2. The page shows a code. Copy it, paste it into the field and click **Complete
    sign-in**.
 

@@ -74,7 +74,10 @@ os dois:
 Para entrar, abra **Configurações** e clique em **Entrar …**:
 
 1. Clique em **Abrir a página de login no navegador**. O claude.ai abre; conceda o
-   acesso ali.
+   acesso ali. Para outro navegador, outro perfil ou outro dispositivo, **Copiar
+   só o endereço** entrega o endereço sem abrir o navegador – e um clique no
+   próprio endereço copia ele por inteiro. Os dois caminhos levam ao mesmo login,
+   então o passo 2 vem depois de qualquer um deles.
 2. A página mostra um código. Copie-o, cole-o no campo e clique em **Concluir o
    login**.
 

@@ -8,6 +8,26 @@ the versioning [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.1.2] – 2026-11-17
+
+### Added
+- **A second way through step 1 of the own sign-in.** Beside *Open sign-in page
+  in browser* there is now *Copy address only*: it hands the sign-in address
+  over and leaves the browser alone - for a different browser, another profile,
+  or a device the application does not run on. A click on the address itself
+  copies all of it, rather than leaving it to be marked by hand in a field two
+  lines high. Both ways lead to the same sign-in, so either of them is followed
+  by pasting the code in step 2.
+
+### Fixed
+- **The address handed out stays the one that works.** Every press of the button
+  in step 1 created a fresh authorization request, and only the most recent one
+  can be redeemed. Opening the page twice was therefore enough to leave a page
+  whose code was quietly refused - and with two buttons that would have been the
+  normal case, since copying the address and then opening the browser would have
+  invalidated what was just copied. The request now stands until it has been
+  redeemed.
+
 ## [1.1.1] – 2026-09-19
 
 ### Changed

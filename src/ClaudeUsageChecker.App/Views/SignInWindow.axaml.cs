@@ -2,6 +2,8 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
 using ClaudeUsageChecker.Core.Authentication.OAuth;
 using ClaudeUsageChecker.Core.Localization;
 
@@ -39,9 +41,21 @@ public partial class SignInWindow : Window
         Opened += (_, _) => ScreenFit.Apply(this);
         ApplyTexts();
 
+        CopyAddressButton.Click += (_, _) => CopyAddress();
         OpenBrowserButton.Click += (_, _) => StartSignIn();
         CompleteButton.Click += (_, _) => CompleteSignIn();
         CloseButton.Click += (_, _) => Close();
+
+        // Bubbling and explicitly also for handled events: a TextBox handles
+        // the press in its own template and puts the caret where the pointer
+        // was, which undoes a selection made before that. So this has to run
+        // after it, not before - a tunnelling handler had its SelectAll
+        // wiped out again.
+        UrlBox.AddHandler(
+            InputElement.PointerPressedEvent,
+            (_, _) => CopyWholeAddress(),
+            RoutingStrategies.Bubble,
+            handledEventsToo: true);
 
         CompleteButton.IsEnabled = false;
         UpdateSignedInState();
@@ -54,6 +68,7 @@ public partial class SignInWindow : Window
         Heading.Text = T.SignInHeading;
         Intro.Text = T.SignInIntro;
         Step1.Text = T.SignInStep1;
+        CopyAddressButton.Content = T.SignInCopyAddress;
         OpenBrowserButton.Content = T.SignInOpenBrowser;
         UrlHint.Text = T.SignInUrlHint;
         Step2.Text = T.SignInStep2;
@@ -74,26 +89,113 @@ public partial class SignInWindow : Window
                 vorhanden.ExpiresAt?.ToLocalTime() ?? default, vorhanden.Scope ?? T.Unknown);
     }
 
-    private void StartSignIn()
+    /// <summary>
+    /// Makes sure there is an authorization request and returns its address,
+    /// or <c>null</c> if signing in is not available here.
+    /// </summary>
+    /// <remarks>
+    /// An existing request is reused rather than replaced. Every request
+    /// carries its own code verifier, and only the last one created can be
+    /// redeemed - so creating a second one would quietly invalidate the
+    /// address that was just copied or just opened in a browser.
+    /// </remarks>
+    private string? PrepareRequest()
     {
         if (_oauthClient is null)
         {
             StatusText.Text = T.SignInUnavailable;
+            return null;
+        }
+
+        _pendingRequest ??= _oauthClient.CreateAuthorizationRequest();
+
+        var address = _pendingRequest.Url.ToString();
+        UrlBox.Text = address;
+        CompleteButton.IsEnabled = true;
+
+        return address;
+    }
+
+    private void StartSignIn()
+    {
+        if (PrepareRequest() is not { } address)
+        {
             return;
         }
 
-        _pendingRequest = _oauthClient.CreateAuthorizationRequest();
-        UrlBox.Text = _pendingRequest.Url.ToString();
-        CompleteButton.IsEnabled = true;
         StatusText.Text = T.SignInGrantInBrowser;
 
         try
         {
-            Process.Start(new ProcessStartInfo(_pendingRequest.Url.ToString()) { UseShellExecute = true });
+            Process.Start(new ProcessStartInfo(address) { UseShellExecute = true });
         }
         catch (Exception ex) when (ex is System.ComponentModel.Win32Exception or InvalidOperationException)
         {
             StatusText.Text = T.SignInBrowserFailed;
+        }
+    }
+
+    /// <summary>
+    /// The second way through step 1: hand over the address and leave the
+    /// browser alone - for a different browser, another profile or another
+    /// device.
+    /// </summary>
+    private async void CopyAddress()
+    {
+        if (PrepareRequest() is not { } address)
+        {
+            return;
+        }
+
+        StatusText.Text = await CopyToClipboard(address).ConfigureAwait(true)
+            ? T.SignInAddressCopied
+            : T.SignInCopyFailed;
+    }
+
+    /// <summary>Copies the whole address when the field is clicked, not the part under the pointer.</summary>
+    private async void CopyWholeAddress()
+    {
+        var address = UrlBox.Text;
+        if (string.IsNullOrEmpty(address))
+        {
+            return;
+        }
+
+        // Selecting all of it is the visible part of the answer: it shows
+        // what went to the clipboard.
+        UrlBox.SelectAll();
+
+        StatusText.Text = await CopyToClipboard(address).ConfigureAwait(true)
+            ? T.SignInAddressCopied
+            : T.SignInCopyFailed;
+    }
+
+    /// <summary>
+    /// Writes text to the clipboard and says whether it worked.
+    /// </summary>
+    /// <remarks>
+    /// Both callers are event handlers, and an exception out of an
+    /// <c>async void</c> has no one to catch it - so nothing is allowed to
+    /// escape here. There is no clipboard at all on some platforms and in
+    /// tests.
+    /// </remarks>
+    private async Task<bool> CopyToClipboard(string text)
+    {
+        try
+        {
+            var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
+            if (clipboard is null)
+            {
+                return false;
+            }
+
+            await clipboard.SetTextAsync(text).ConfigureAwait(true);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            CrashReporter.Write(ex, "Copying the sign-in address to the clipboard");
+            return false;
         }
     }
 

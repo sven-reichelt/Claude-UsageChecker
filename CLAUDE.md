@@ -81,10 +81,20 @@ Builds into `artifacts/` (centrally through `ArtifactsPath` in
 
 ## Status
 
-Version 1.1.1 released on 2026-09-19 (the settings in small type: headings 12,
+Version 1.1.2 released on 2026-11-17 (step 1 of the own sign-in offers *Copy
+address only* beside opening the browser, and the address copies itself on a
+click); 1.1.1 on 2026-09-19 (the settings in small type: headings 12,
 the rest 10, Cancel and Save 12, switches and fields sized to match); 1.1.0 on
 2026-09-18; before it 1.0.0, 1.0.1 and 1.0.2 on 2026-09-17, after three pre-releases of 0.9.1. The repository is public and
 written in English.
+
+**1.1.2 gave step 1 a second way out.** `SignInWindow` keeps one
+`AuthorizationRequest` until it has been redeemed instead of making a new one
+per press - only the most recent one can be exchanged, so a second press used to
+invalidate the address just handed out. The clipboard is reached through
+`TopLevel.GetTopLevel(this)?.Clipboard`, the first use of it in the project; the
+handler on the address field bubbles with `handledEventsToo`, because the
+`TextBox` sets the caret itself and would undo a selection made before it.
 
 **1.1.0 brought the plan.** The menu (under the usage), the details window (under
 time and source) and the settings (under the sign-ins) name it - "Claude Max 5×".

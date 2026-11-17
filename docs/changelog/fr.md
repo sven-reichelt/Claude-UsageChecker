@@ -8,6 +8,27 @@ numérotation [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+## [1.1.2] – 2026-11-17
+
+### Ajouté
+- **Un deuxième chemin dans l'étape 1 de la connexion intégrée.** À côté
+  d'*Ouvrir la page de connexion dans le navigateur* se trouve désormais *Copier
+  seulement l'adresse* : elle remet l'adresse de connexion et laisse le
+  navigateur tranquille – pour un autre navigateur, un autre profil ou un
+  appareil sur lequel l'application ne tourne même pas. Un clic sur l'adresse
+  elle-même la copie en entier, au lieu de la laisser sélectionner à la main dans
+  un champ haut de deux lignes. Les deux chemins mènent à la même connexion :
+  dans les deux cas, le code se colle à l'étape 2.
+
+### Corrigé
+- **L'adresse remise reste celle qui fonctionne.** Chaque appui sur le bouton de
+  l'étape 1 créait une nouvelle demande d'autorisation, et seule la dernière est
+  échangeable. Ouvrir la page deux fois suffisait donc à se retrouver devant une
+  page dont le code était refusé sans un mot – et avec deux boutons, cela serait
+  devenu le cas normal, puisque copier l'adresse puis ouvrir le navigateur aurait
+  invalidé ce qui venait d'être copié. La demande tient maintenant jusqu'à son
+  échange.
+
 ## [1.1.1] – 2026-09-19
 
 ### Modifié

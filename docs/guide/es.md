@@ -73,7 +73,10 @@ La aplicación necesita permiso para leer tu uso. Hay dos caminos y prueba los d
 Para iniciar sesión, abre **Configuración** y pulsa **Iniciar sesión …**:
 
 1. Pulsa **Abrir la página de inicio de sesión en el navegador**. Se abre claude.ai;
-   concede allí el acceso.
+   concede allí el acceso. Para otro navegador, otro perfil u otro dispositivo,
+   **Copiar solo la dirección** entrega la dirección sin abrir el navegador, y al
+   hacer clic en la dirección se copia completa. Ambos caminos llevan al mismo
+   inicio de sesión, así que a los dos les sigue el paso 2.
 2. La página muestra un código. Cópialo, pégalo en el campo y pulsa **Completar el
    inicio de sesión**.
 

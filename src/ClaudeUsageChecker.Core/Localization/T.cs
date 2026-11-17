@@ -199,6 +199,7 @@ public static class T
     public static string SignInHeading => L["signin.heading"];
     public static string SignInIntro => L["signin.intro"];
     public static string SignInStep1 => L["signin.step1"];
+    public static string SignInCopyAddress => L["signin.copyAddress"];
     public static string SignInOpenBrowser => L["signin.openBrowser"];
     public static string SignInUrlHint => L["signin.urlHint"];
     public static string SignInStep2 => L["signin.step2"];
@@ -210,6 +211,8 @@ public static class T
     public static string SignInUnavailable => L["signin.unavailable"];
     public static string SignInGrantInBrowser => L["signin.grantInBrowser"];
     public static string SignInBrowserFailed => L["signin.browserFailed"];
+    public static string SignInAddressCopied => L["signin.addressCopied"];
+    public static string SignInCopyFailed => L["signin.copyFailed"];
     public static string SignInOpenPageFirst => L["signin.openPageFirst"];
     public static string SignInPasteCode => L["signin.pasteCode"];
     public static string SignInRedeeming => L["signin.redeeming"];

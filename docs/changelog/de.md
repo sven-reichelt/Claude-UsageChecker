@@ -8,6 +8,26 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unveröffentlicht]
 
+## [1.1.2] – 2026-11-17
+
+### Hinzugefügt
+- **Ein zweiter Weg durch Schritt 1 der eigenen Anmeldung.** Neben *Anmeldeseite
+  im Browser öffnen* steht jetzt *Nur Adresse kopieren*: gibt die Anmeldeadresse
+  heraus und lässt den Browser in Ruhe – für einen anderen Browser, ein anderes
+  Profil oder ein Gerät, auf dem die Anwendung gar nicht läuft. Ein Klick auf die
+  Adresse selbst kopiert sie vollständig, statt sie in einem zwei Zeilen hohen
+  Feld von Hand markieren zu lassen. Beide Wege führen zu derselben Anmeldung,
+  auf beide folgt also das Einfügen des Codes in Schritt 2.
+
+### Behoben
+- **Die herausgegebene Adresse bleibt die, die funktioniert.** Jeder Druck auf
+  den Knopf in Schritt 1 erzeugte eine neue Autorisierungsanfrage, und einlösbar
+  ist nur die jeweils letzte. Zweimal die Seite zu öffnen genügte deshalb, um
+  eine Seite stehen zu haben, deren Code stillschweigend abgewiesen wurde – und
+  mit zwei Knöpfen wäre das der Normalfall geworden, denn Adresse kopieren und
+  danach den Browser öffnen hätte das gerade Kopierte ungültig gemacht. Die
+  Anfrage bleibt jetzt stehen, bis sie eingelöst ist.
+
 ## [1.1.1] – 2026-09-19
 
 ### Geändert

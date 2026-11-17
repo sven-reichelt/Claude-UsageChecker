@@ -75,7 +75,11 @@ zwei Wege, und sie probiert beide:
 Zum Anmelden die **Einstellungen** öffnen und auf **Anmelden …** klicken:
 
 1. Auf **Anmeldeseite im Browser öffnen** klicken. claude.ai öffnet sich, dort die
-   Freigabe erteilen.
+   Freigabe erteilen. Für einen anderen Browser, ein anderes Profil oder ein
+   anderes Gerät gibt **Nur Adresse kopieren** stattdessen die Adresse heraus und
+   lässt den Browser in Ruhe – und ein Klick auf die Adresse selbst kopiert sie
+   vollständig. Beide Wege führen zu derselben Anmeldung, auf beide folgt also
+   Schritt 2.
 2. Die Seite zeigt einen Code. Den kopieren, in das Feld einfügen und auf
    **Anmeldung abschließen** klicken.
 
